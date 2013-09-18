@@ -6,9 +6,6 @@ import scalaoauth2.provider.{Request => OAuthRequest}
 
 trait OAuth2Provider extends Results {
 
-  val token = Token
-  val protectedResource = ProtectedResource
-
   implicit def play2oauthRequest[A](request: play.api.mvc.Request[A]) = {
     val form = request.body match {
       case body: play.api.mvc.AnyContent if body.asFormUrlEncoded.isDefined => body.asFormUrlEncoded.get
@@ -21,7 +18,7 @@ trait OAuth2Provider extends Results {
   }
 
   def issueAccessToken[A](dataHandler: DataHandler)(implicit request: play.api.mvc.Request[A]): PlainResult = {
-    token.handleRequest(request, dataHandler) match {
+    Token.handleRequest(request, dataHandler) match {
       case Left(e) if e.statusCode == 400 => responseOAuthError(BadRequest, e)
       case Left(e) if e.statusCode == 401 => responseOAuthError(Unauthorized, e)
       case Right(r) => Ok(Json.toJson(responseAccessToken(r)))
@@ -41,7 +38,7 @@ trait OAuth2Provider extends Results {
   }
 
   def authorize[A](dataHandler: DataHandler)(callback: AuthInfo => PlainResult)(implicit request: play.api.mvc.Request[A]): PlainResult = {
-    protectedResource.handleRequest(request, dataHandler) match {
+    ProtectedResource.handleRequest(request, dataHandler) match {
       case Left(e) if e.statusCode == 400 => responseOAuthError(BadRequest, e)
       case Left(e) if e.statusCode == 401 => responseOAuthError(Unauthorized, e)
       case Right(authInfo) => callback(authInfo)
