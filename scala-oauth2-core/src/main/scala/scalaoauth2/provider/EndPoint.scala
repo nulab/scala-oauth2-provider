@@ -23,7 +23,7 @@ trait ProtectedResource {
       val result = fetcher.fetch(request)
       val accessToken = dataHandler.findAccessToken(result.token).getOrElse(throw new InvalidToken("Invalid access token"))
       val now = System.currentTimeMillis()
-      if (accessToken.createdAt.getTime + accessToken.expiresIn <= now) {
+      if (accessToken.createdAt.getTime + accessToken.expiresIn * 1000 <= now) {
         throw new ExpiredToken()
       }
 
