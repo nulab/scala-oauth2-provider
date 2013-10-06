@@ -10,11 +10,11 @@ class AuthorizationCodeSpec extends FlatSpec {
     val request = Request(Map(), Map("code" -> Seq("code1"), "redirect_uri" -> Seq("http://example.com/")))
     val grantHandlerResult = authorizationCode.handleRequest(request, new MockDataHandler() {
       
-      override def findAuthInfoByCode(code: String): Option[AuthInfo] = Some(
-        AuthInfo(id = "1", userId = "10000", clientId = "clientId1", refreshToken = Some("refreshToken1"), scope = Some("all"), code = Some("code1"), redirectUri = Some("http://example.com/"))
+      override def findAuthInfoByCode(code: String): Option[AuthInfo[MockUser]] = Some(
+        AuthInfo(id = "1", user = MockUser(10000, "username"), clientId = "clientId1", refreshToken = Some("refreshToken1"), scope = Some("all"), code = Some("code1"), redirectUri = Some("http://example.com/"))
       )
 
-      override def createOrUpdateAccessToken(authInfo: AuthInfo): AccessToken = AccessToken("authId1", "token1", 3600, new java.util.Date())
+      override def createOrUpdateAccessToken(authInfo: AuthInfo[MockUser]): AccessToken = AccessToken("authId1", "token1", 3600, new java.util.Date())
     })
     grantHandlerResult.tokenType should be ("Bearer")
     grantHandlerResult.accessToken should be ("token1")
@@ -28,11 +28,11 @@ class AuthorizationCodeSpec extends FlatSpec {
     val request = Request(Map(), Map("code" -> Seq("code1"), "redirect_uri" -> Seq("http://example.com/")))
     val grantHandlerResult = authorizationCode.handleRequest(request, new MockDataHandler() {
       
-      override def findAuthInfoByCode(code: String): Option[AuthInfo] = Some(
-        AuthInfo(id = "1", userId = "10000", clientId = "clientId1", refreshToken = Some("refreshToken1"), scope = Some("all"), code = Some("code1"), redirectUri = None)
+      override def findAuthInfoByCode(code: String): Option[AuthInfo[MockUser]] = Some(
+        AuthInfo(id = "1", user = MockUser(10000, "username"), clientId = "clientId1", refreshToken = Some("refreshToken1"), scope = Some("all"), code = Some("code1"), redirectUri = None)
       )
 
-      override def createOrUpdateAccessToken(authInfo: AuthInfo): AccessToken = AccessToken("authId1", "token1", 3600, new java.util.Date())
+      override def createOrUpdateAccessToken(authInfo: AuthInfo[MockUser]): AccessToken = AccessToken("authId1", "token1", 3600, new java.util.Date())
     })
     grantHandlerResult.tokenType should be ("Bearer")
     grantHandlerResult.accessToken should be ("token1")

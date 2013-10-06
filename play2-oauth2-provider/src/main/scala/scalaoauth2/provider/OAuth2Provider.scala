@@ -27,7 +27,7 @@ import scalaoauth2.provider.{Request => OAuthRequest}
  * object BookController extends Controller with OAuthProvider {
  *   def list = Action { implicit request =>
  *     authorize(new MyDataHandler()) { authInfo =>
- *       val user = User.findById(authInfo.userId) // User is defined on your system
+ *       val user = authInfo.user // User is defined on your system
  *       // access resource for the user
  *     }
  *   }
@@ -56,7 +56,7 @@ trait OAuth2Provider extends Results {
    * @return Request is successful then return JSON to client in OAuth 2.0 format.
    *         Request is failed then return BadRequest or Unauthorized status to client with cause into the JSON.
    */
-  def issueAccessToken[A](dataHandler: DataHandler)(implicit request: play.api.mvc.Request[A]): PlainResult = {
+  def issueAccessToken[A, U](dataHandler: DataHandler[U])(implicit request: play.api.mvc.Request[A]): PlainResult = {
     Token.handleRequest(request, dataHandler) match {
       case Left(e) if e.statusCode == 400 => responseOAuthError(BadRequest, e)
       case Left(e) if e.statusCode == 401 => responseOAuthError(Unauthorized, e)
@@ -86,7 +86,7 @@ trait OAuth2Provider extends Results {
    * @return Authentication is successful then the response use your API result.
    *         Authentication is failed then return BadRequest or Unauthorized status to client with cause into the JSON.
    */
-  def authorize[A](dataHandler: DataHandler)(callback: AuthInfo => PlainResult)(implicit request: play.api.mvc.Request[A]): PlainResult = {
+  def authorize[A, U](dataHandler: DataHandler[U])(callback: AuthInfo[U] => PlainResult)(implicit request: play.api.mvc.Request[A]): PlainResult = {
     ProtectedResource.handleRequest(request, dataHandler) match {
       case Left(e) if e.statusCode == 400 => responseOAuthError(BadRequest, e)
       case Left(e) if e.statusCode == 401 => responseOAuthError(Unauthorized, e)

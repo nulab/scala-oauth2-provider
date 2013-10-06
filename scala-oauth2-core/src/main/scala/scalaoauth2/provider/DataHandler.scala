@@ -16,14 +16,14 @@ case class AccessToken(authId: String, token: String, expiresIn: Long, createdAt
  * Authorized information
  *
  * @param id Primary key.
- * @param userId Authorized user id which is registered on system.
+ * @param user Authorized user which is registered on system.
  * @param clientId Using client id which is registered on system.
  * @param refreshToken This value is used by Refresh Token Grant.
  * @param scope This value is used by permit to API.
  * @param code This value is used by Authorization Code Grant.
  * @param redirectUri This value is used by Authorization Code Grant.
  */
-case class AuthInfo(id: String, userId: String, clientId: String, refreshToken: Option[String], scope: Option[String], code: Option[String], redirectUri: Option[String])
+case class AuthInfo[U](id: String, user: U, clientId: String, refreshToken: Option[String], scope: Option[String], code: Option[String], redirectUri: Option[String])
 
 /**
  * Provide accessing to data storage for using OAuth 2.0.
@@ -41,23 +41,23 @@ case class AuthInfo(id: String, userId: String, clientId: String, refreshToken: 
  * <ul>
  *   <li>validateClient(clientId, clientSecret, grantType)</li>
  *   <li>findAuthInfoByRefreshToken(refreshToken)</li>
- *   <li>createOrUpdateAuthInfo</li>
+ *   <li>createOrUpdateAuthInfo(user, clientId, scope)</li>
  *   <li>createOrUpdateAccessToken(authInfo)</li>
  * </ul>
  * 
  * <h4>Resource Owner Password Credentials Grant</h4>
  * <ul>
  *   <li>validateClient(clientId, clientSecret, grantType)</li>
- *   <li>findUserId(username, password)</li>
- *   <li>createOrUpdateAuthInfo(clientId, userId, scope)</li>
+ *   <li>findUser(username, password)</li>
+ *   <li>createOrUpdateAuthInfo(user, clientId, scope)</li>
  *   <li>createOrUpdateAccessToken(authInfo)</li>
  * </ul>
  * 
  * <h4>Client Credentials Grant</h4>
  * <ul>
  *   <li>validateClient(clientId, clientSecret, grantType)</li>
- *   <li>findClientUserId(clientId, clientSecret)</li>
- *   <li>createOrUpdateAuthInfo(clientId, userId, scope)</li>
+ *   <li>findClientUser(clientId, clientSecret)</li>
+ *   <li>createOrUpdateAuthInfo(user, clientId, scope)</li>
  *   <li>createOrUpdateAccessToken(authInfo)</li>
  * </ul>
  *   
@@ -67,7 +67,7 @@ case class AuthInfo(id: String, userId: String, clientId: String, refreshToken: 
  *   <li>findAuthInfoById(authId)</li>
  * </ul>
  */
-trait DataHandler {
+trait DataHandler[U] {
 
   /**
    * Verify proper client with parameters for issue an access token.
@@ -87,7 +87,7 @@ trait DataHandler {
    * @param password Client send this value which is used on your system.
    * @return Including UserId to Option if could find the user, None if couldn't find.
    */
-  def findUserId(username: String, password: String): Option[String]
+  def findUser(username: String, password: String): Option[U]
 
   /**
    * Create or update authorized information by userId, clientId and scope.
@@ -95,12 +95,12 @@ trait DataHandler {
    * Returning None when create access token then response will be invalid grant.
    * This method also is called at the time of refresh token, it can safely return None.
    *
-   * @param userId DataHandler got this value by authentication.
+   * @param user DataHandler got this value by authentication.
    * @param clientId Client send this value which is registered by application.
    * @param scope Client request scope value. If client doesn't request then it will be None.
    * @return created or updated authorize information. Return None if you want to strictly verify the scope.
    */
-  def createOrUpdateAuthInfo(userId: String, clientId: String, scope: Option[String]): Option[AuthInfo]
+  def createOrUpdateAuthInfo(user: U, clientId: String, scope: Option[String]): Option[AuthInfo[U]]
 
   /**
    * Create or update access token by authorized information.
@@ -108,7 +108,7 @@ trait DataHandler {
    * @param authInfo This value is created by createOrUpdateAuthInfo method.
    * @return Access token return to client.
    */
-  def createOrUpdateAccessToken(authInfo: AuthInfo): AccessToken
+  def createOrUpdateAccessToken(authInfo: AuthInfo[U]): AccessToken
 
   /**
    * Find authorized information by authorization code.
@@ -118,7 +118,7 @@ trait DataHandler {
    * @param code Client send authorization code which is registered by system.
    * @return Return authorized information that matched the code.
    */
-  def findAuthInfoByCode(code: String): Option[AuthInfo]
+  def findAuthInfoByCode(code: String): Option[AuthInfo[U]]
 
   /**
    * Find authorized information by refresh token.
@@ -128,7 +128,7 @@ trait DataHandler {
    * @param refreshToken Client send refresh token which is created by system.
    * @return Return authorized information that matched the refresh token.
    */
-  def findAuthInfoByRefreshToken(refreshToken: String): Option[AuthInfo]
+  def findAuthInfoByRefreshToken(refreshToken: String): Option[AuthInfo[U]]
 
   /**
    * Find userId by clientId and clientSecret.
@@ -137,9 +137,9 @@ trait DataHandler {
    *
    * @param clientId Client send this value which is registered by application.
    * @param clientSecret Client send this value which is registered by application.
-   * @return Return userId that matched both values.
+   * @return Return user that matched both values.
    */
-  def findClientUserId(clientId: String, clientSecret: String): Option[String]
+  def findClientUser(clientId: String, clientSecret: String): Option[U]
 
   /**
    * Find AccessToken object by access token code.
@@ -156,6 +156,6 @@ trait DataHandler {
    * @param authId This value is passed from AccessToken.
    * @return Return authorized information if the parameter is available.
    */
-  def findAuthInfoById(authId: String): Option[AuthInfo]
+  def findAuthInfoById(authId: String): Option[AuthInfo[U]]
 
 }

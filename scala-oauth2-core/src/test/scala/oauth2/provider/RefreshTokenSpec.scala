@@ -10,10 +10,10 @@ class RefreshTokenSpec extends FlatSpec {
     val request = Request(Map(), Map("refresh_token" -> Seq("refreshToken1")))
     val grantHandlerResult = refreshToken.handleRequest(request, new MockDataHandler() {
 
-      override def findAuthInfoByRefreshToken(refreshToken: String): Option[AuthInfo] =
-        Some(AuthInfo(id = "1", userId = "10000", clientId = "clientId1", refreshToken = Some("refreshToken1"), scope = None, code = None, redirectUri = None))
+      override def findAuthInfoByRefreshToken(refreshToken: String): Option[AuthInfo[MockUser]] =
+        Some(AuthInfo(id = "1", user = MockUser(10000, "username"), clientId = "clientId1", refreshToken = Some("refreshToken1"), scope = None, code = None, redirectUri = None))
 
-      override def createOrUpdateAccessToken(authInfo: AuthInfo): AccessToken = AccessToken("authId1", "token1", 3600, new java.util.Date())
+      override def createOrUpdateAccessToken(authInfo: AuthInfo[MockUser]): AccessToken = AccessToken("authId1", "token1", 3600, new java.util.Date())
 
     })
     grantHandlerResult.tokenType should be ("Bearer")

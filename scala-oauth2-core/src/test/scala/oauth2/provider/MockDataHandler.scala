@@ -2,24 +2,26 @@ package scalaoauth2.provider
 
 import java.util.Date
 
-class MockDataHandler extends DataHandler {
+case class MockUser(id: Long, name: String)
+
+class MockDataHandler extends DataHandler[MockUser] {
 
   def validateClient(clientId: String, clientSecret: String, grantType: String): Boolean  = false
 
-  def findUserId(username: String, password: String): Option[String] = None
+  def findUser(username: String, password: String): Option[MockUser] = None
 
-  def createOrUpdateAuthInfo(userId: String, clientId: String, scope: Option[String]): Option[AuthInfo] = None
+  def createOrUpdateAuthInfo(user: MockUser, clientId: String, scope: Option[String]): Option[AuthInfo[MockUser]] = None
 
-  def createOrUpdateAccessToken(authInfo: AuthInfo): AccessToken = AccessToken("", "", 0L, new Date())
+  def createOrUpdateAccessToken(authInfo: AuthInfo[MockUser]): AccessToken = AccessToken("", "", 0L, new Date())
 
-  def findAuthInfoByCode(code: String): Option[AuthInfo] = None
+  def findAuthInfoByCode(code: String): Option[AuthInfo[MockUser]] = None
 
-  def findAuthInfoByRefreshToken(refreshToken: String): Option[AuthInfo] = None
+  def findAuthInfoByRefreshToken(refreshToken: String): Option[AuthInfo[MockUser]] = None
 
-  def findClientUserId(clientId: String, clientSecret: String): Option[String] = None
+  def findClientUser(clientId: String, clientSecret: String): Option[MockUser] = None
 
   def findAccessToken(token: String): Option[AccessToken] = None
 
-  def findAuthInfoById(authId: String): Option[AuthInfo] = None
+  def findAuthInfoById(authId: String): Option[AuthInfo[MockUser]] = None
 
 }

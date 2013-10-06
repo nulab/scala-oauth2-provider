@@ -10,13 +10,13 @@ class ClientCredentialsSpec extends FlatSpec {
     val request = Request(Map(), Map("scope" -> Seq("all")))
     val grantHandlerResult = clientCredentials.handleRequest(request, new MockDataHandler() {
 
-      override def findClientUserId(clientId: String, clientSecret: String): Option[String] = Some("10000")
+      override def findClientUser(clientId: String, clientSecret: String): Option[MockUser] = Some(MockUser(10000, "username"))
 
-      override def createOrUpdateAuthInfo(userId: String, clientId: String, scope: Option[String]): Option[AuthInfo] = Some(
-        AuthInfo(id = "1", userId = userId, clientId = clientId, refreshToken = None, scope = scope, code = Some("code1"), redirectUri = Some("http://example.com/"))
+      override def createOrUpdateAuthInfo(user: MockUser, clientId: String, scope: Option[String]): Option[AuthInfo[MockUser]] = Some(
+        AuthInfo(id = "1", user = user, clientId = clientId, refreshToken = None, scope = scope, code = Some("code1"), redirectUri = Some("http://example.com/"))
       )
 
-      override def createOrUpdateAccessToken(authInfo: AuthInfo): AccessToken = AccessToken("authId1", "token1", 3600, new java.util.Date())
+      override def createOrUpdateAccessToken(authInfo: AuthInfo[MockUser]): AccessToken = AccessToken("authId1", "token1", 3600, new java.util.Date())
     })
     grantHandlerResult.tokenType should be ("Bearer")
     grantHandlerResult.accessToken should be ("token1")

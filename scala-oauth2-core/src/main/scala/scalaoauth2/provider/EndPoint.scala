@@ -16,7 +16,7 @@ trait ProtectedResource {
 
   val fetchers = Seq(AuthHeader, RequestParameter)
 
-  def handleRequest(request: Request, dataHandler: DataHandler): Either[OAuthError, AuthInfo] = try {
+  def handleRequest[U](request: Request, dataHandler: DataHandler[U]): Either[OAuthError, AuthInfo[U]] = try {
     fetchers.find { fetcher =>
       fetcher.matches(request)
     }.map { fetcher =>
@@ -48,7 +48,7 @@ trait Token {
     "password" -> new Password(fetcher)
   )
 
-  def handleRequest(request: Request, dataHandler: DataHandler): Either[OAuthError, GrantHandlerResult] = try {
+  def handleRequest[U](request: Request, dataHandler: DataHandler[U]): Either[OAuthError, GrantHandlerResult] = try {
     val grantType = request.param("grant_type").getOrElse(throw new InvalidRequest("grant_type not found"))
     val handler = handlers.get(grantType).getOrElse(throw new UnsupportedGrantType("the grant_type isn't supported"))
     val clientCredential = fetcher.fetch(request).getOrElse(throw new InvalidRequest("client credential not found"))
