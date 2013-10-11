@@ -1,22 +1,24 @@
 # oauth2-server for Scala
 
-This library is able to be possible to provide OAuth2 server on your service by using Scala. ([Specification](http://tools.ietf.org/html/rfc6749))
+[The OAuth 2.0](http://tools.ietf.org/html/rfc6749) server-side implementation written in Scala.
 
-## Current supported Grant types
+This provides OAuth 2.0 server-side functionality and supporting function for [Playframework](http://www.playframework.com/). Playframework 2.1 and 2.2 are now supported.
+
+The idea of this library originally comes from [oauth2-server](https://github.com/yoichiro/oauth2-server) which is Java implementation of OAuth 2.0.
+
+## Supported OAuth features
+
+This library currently supports three grant types as follows
 
 - Authorization Code Grant
 - Resource Owner Password Credentials Grant
 - Client Credentials Grant
 
-## Current supported token types
-
-Bearer ([http://tools.ietf.org/html/rfc6750](http://tools.ietf.org/html/rfc6750))
+and an access token type called [Bearer](http://tools.ietf.org/html/rfc6750).
 
 ## Setup
 
-### SBT
-
-Playframework 2.1 and 2.2 is supporting.
+If you'd like to use this with Playframework, add "play2-oauth2-provider" to library dependencies of your project.
 
 ```scala
 libraryDependencies ++= Seq(
@@ -24,18 +26,18 @@ libraryDependencies ++= Seq(
 )
 ```
 
-If you want to use only Scala project or try making provider with another front-end library.
-
+Otherwise, add "scala-oauth2-core" instead. In this case, you need to implement your own OAuth provider working with web framework you use.
 ```scala
 libraryDependencies ++= Seq(
   "com.nulab-inc" %% "scala-oauth2-core" % "0.2.0"
 )
 ```
 
+## How to use
+
 ### Implement DataHandler
 
-You have to implement DataHandler trait which isn't depended specific data storage and
-DataHandler needs user class for authorzied but your system already has the class.
+Whether you use Playframework or not, you have to implement DataHandler trait and make it work with your own "User" class that may be already defined in your application.
 
 ```scala
 case class User(id: Long, name: String, hashedPassword: String)
@@ -63,12 +65,17 @@ class MyDataHandler extends DataHandler[User] {
 }
 ```
 
-See more Scaladoc at DataHandler class.
+For more details, refer to Scaladoc of DataHandler.
 
-## With Playframework
+### Work with Playframework
 
-### Defining Controller for register access token on your system
+You should follow three steps below to work with Playframework.
 
+* Define a controller to issue access token
+* Assign a route to the controller
+* Access to an authorized resource
+
+First, define your own controller with mixining OAuth2Provider trait provided by this library to issue access token.
 ```scala
 import scalaoauth2.provider._
 object OAuth2Controller extends Controller with OAuth2Provider {
@@ -78,18 +85,15 @@ object OAuth2Controller extends Controller with OAuth2Provider {
 }
 ```
 
-### routes
-
-To provide a route for user will be able to register access token.
-
+Then, assign a route to the controller that OAuth clients will access to.
 ```
 POST    /oauth2/access_token                    controllers.OAuth2Controller.accessToken
 ```
 
-### Access to resource
+Finally, you can access to an authorized resource like this:
 ```scala
 import scalaoauth2.provider._
-object MyController extends Controller with OAuthProvider {
+object MyController extends Controller with OAuth2Provider {
   def list = Action { implicit request =>
     authorize(new MyDataHandler()) { authInfo =>
       val user = authInfo.user // User is defined on your system
@@ -99,6 +103,5 @@ object MyController extends Controller with OAuthProvider {
 }
 ```
 
-If you want to handle the oauth flow more customizable, it would resolve using Token/ProtectedResource#handleRequest directly.
+If you'd like to change the OAuth workflow, modify handleRequest methods of Token and ProtectedResource traits defined in EndPoint.scala.
 
-This library has been based from [https://github.com/yoichiro/oauth2-server](https://github.com/yoichiro/oauth2-server) for Scala.
