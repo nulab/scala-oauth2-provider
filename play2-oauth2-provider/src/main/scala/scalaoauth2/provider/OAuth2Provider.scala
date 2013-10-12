@@ -44,7 +44,9 @@ trait OAuth2Provider extends Results {
       case body: play.api.mvc.MultipartFormData[_] => body.asFormUrlEncoded
       case _ => Map.empty[String, Seq[String]]
     }
-    OAuthRequest(request.headers.toSimpleMap, form)
+
+    val param = form ++ request.queryString.map { case (k, v) => k -> (v ++ form.getOrElse(k, Nil)) }
+    OAuthRequest(request.headers.toSimpleMap, param)
   }
 
   /**
