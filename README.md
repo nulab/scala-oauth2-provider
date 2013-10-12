@@ -20,7 +20,7 @@ Playframework 2.1 and 2.2 is supporting.
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.nulab-inc" %% "play2-oauth2-provider" % "0.2.0"
+  "com.nulab-inc" %% "play2-oauth2-provider" % "0.2.1"
 )
 ```
 
@@ -28,7 +28,7 @@ If you want to use only Scala project or try making provider with another front-
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.nulab-inc" %% "scala-oauth2-core" % "0.2.0"
+  "com.nulab-inc" %% "scala-oauth2-core" % "0.2.1"
 )
 ```
 
