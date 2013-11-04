@@ -36,6 +36,10 @@ import scalaoauth2.provider.{Request => OAuthRequest}
  */
 trait OAuth2Provider extends Results {
 
+  implicit def play2oauthRequest(request: RequestHeader) = {
+    OAuthRequest(request.headers.toSimpleMap, request.queryString)
+  }
+
   implicit def play2oauthRequest[A](request: play.api.mvc.Request[A]) = {
     val form = request.body match {
       case body: play.api.mvc.AnyContent if body.asFormUrlEncoded.isDefined => body.asFormUrlEncoded.get
