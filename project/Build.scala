@@ -16,6 +16,7 @@ object ScalaOAuth2Build extends Build {
     settings = Defaults.defaultSettings ++ Seq(
       organization := _organization,
       name := "scala-oauth2-core",
+      description := "OAuth 2.0 server-side implementation written in Scala",
       version := _version,
       scalaVersion := _scalaVersion,
       crossScalaVersions := _crossScalaVersions,
@@ -38,6 +39,7 @@ object ScalaOAuth2Build extends Build {
     settings = Defaults.defaultSettings ++ Seq(
       organization := _organization,
       name := "play2-oauth2-provider",
+      description := "Support scala-oauth2-core library on Playframework Scala",
       version := _version,
       scalaVersion := _scalaVersion,
       crossScalaVersions := _crossScalaVersions,
