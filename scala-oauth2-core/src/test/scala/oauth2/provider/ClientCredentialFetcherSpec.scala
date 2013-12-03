@@ -11,6 +11,13 @@ class ClientCredentialFetcherSpec extends FlatSpec {
     c.clientId should be ("client_id_value")
     c.clientSecret should be ("client_secret_value")
   }
+  
+  it should "fetch empty client_secret" in {
+    val request = Request(Map("Authorization" -> "Basic Y2xpZW50X2lkX3ZhbHVlOg=="), Map())
+    val Some(c) = ClientCredentialFetcher.fetch(request)
+    c.clientId should be ("client_id_value")
+    c.clientSecret should be ("")
+  }
 
   it should "not fetch no Authorization key in header" in {
     val request = Request(Map("authorizatio" -> "Basic Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU="), Map())
