@@ -15,14 +15,13 @@ trait ClientCredentialFetcher {
           case Array(clientId) => Option(ClientCredential(clientId, ""))
           case _ => None
         }
-        
       } else {
         None
       }
-
     }.getOrElse {
-      request.param("client_id").map(clientId =>
-        ClientCredential(clientId, request.param("client_secret").getOrElse("")))
+      request.param("client_id").map { clientId =>
+        ClientCredential(clientId, request.param("client_secret").getOrElse(""))
+      }
     }
   }
 }
