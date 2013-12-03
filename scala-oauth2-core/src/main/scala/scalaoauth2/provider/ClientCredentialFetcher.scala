@@ -14,10 +14,8 @@ trait ClientCredentialFetcher {
         case _ => None
       }
     }.getOrElse {
-      for {
-        clientId <- request.param("client_id")
-        clientSecret <- request.param("client_secret")
-      } yield ClientCredential(clientId, clientSecret)
+      request.param("client_id").map(clientId =>
+        ClientCredential(clientId, request.param("client_secret").getOrElse("")))
     }
   }
 }

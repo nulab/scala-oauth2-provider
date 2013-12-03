@@ -29,8 +29,13 @@ class ClientCredentialFetcherSpec extends FlatSpec {
     c.clientSecret should be ("client_secret_value")
   }
 
+  it should "omit client_secret" in {
+    val Some(c) = ClientCredentialFetcher.fetch(Request(Map(), Map("client_id" -> Seq("client_id_value"))))
+    c.clientId should be ("client_id_value")
+    c.clientSecret should be ("")
+  }
+  
   it should "not fetch missing parameter" in {
-    ClientCredentialFetcher.fetch(Request(Map(), Map("client_id" -> Seq("client_id_value")))) should be (None)
     ClientCredentialFetcher.fetch(Request(Map(), Map("client_secret" -> Seq("client_secret_value")))) should be (None)
   }
 }
