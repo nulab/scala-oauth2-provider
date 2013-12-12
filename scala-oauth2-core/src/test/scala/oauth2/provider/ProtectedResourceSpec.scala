@@ -8,10 +8,10 @@ class ProtectedResourceSpec extends FlatSpec {
 
   def successfulDataHandler() = new MockDataHandler() {
 
-    override def findAccessToken(token: String): Option[AccessToken] = Some(AccessToken("authId1", "token1", 3600, new Date()))
+    override def findAccessToken(token: String): Option[AccessToken] = Some(AccessToken("token1", Some("refreshToken1"), Some("all"), Some(3600), new Date()))
 
-    override def findAuthInfoById(authId: String): Option[AuthInfo[MockUser]] = Some(
-      AuthInfo(id = "1", user = MockUser(10000, "username"), clientId = "clientId1", refreshToken = Some("refreshToken1"), scope = Some("all"), redirectUri = None)
+    override def findAuthInfoByAccessToken(accessToken: AccessToken): Option[AuthInfo[MockUser]] = Some(
+      AuthInfo(user = MockUser(10000, "username"), clientId = "clientId1", scope = Some("all"), redirectUri = None)
     )
 
   }
@@ -44,10 +44,10 @@ class ProtectedResourceSpec extends FlatSpec {
 
     val dataHandler = new MockDataHandler() {
 
-      override def findAccessToken(token: String): Option[AccessToken] = Some(AccessToken("authId1", "token1", 3600, new Date(new Date().getTime() - 4000 * 1000)))
+      override def findAccessToken(token: String): Option[AccessToken] = Some(AccessToken("token1", Some("refreshToken1"), Some("all"), Some(3600), new Date(new Date().getTime() - 4000 * 1000)))
 
-      override def findAuthInfoById(authId: String): Option[AuthInfo[MockUser]] = Some(
-        AuthInfo(id = "1", user = MockUser(10000, "username"), clientId = "clientId1", refreshToken = Some("refreshToken1"), scope = Some("all"), redirectUri = None)
+      override def findAuthInfoByAccessToken(accessToken: AccessToken): Option[AuthInfo[MockUser]] = Some(
+        AuthInfo(user = MockUser(10000, "username"), clientId = "clientId1", scope = Some("all"), redirectUri = None)
       )
 
     }

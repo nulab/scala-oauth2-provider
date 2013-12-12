@@ -84,9 +84,10 @@ trait OAuth2Provider extends Results {
   protected def responseAccessToken(r: GrantHandlerResult) = {
     Map[String, JsValue](
       "token_type" -> JsString(r.tokenType),
-      "access_token" -> JsString(r.accessToken),
-      "expires_in" -> JsNumber(r.expiresIn)
-    ) ++ r.refreshToken.map {
+      "access_token" -> JsString(r.accessToken)
+    ) ++ r.expiresIn.map {
+      "expires_in" -> JsNumber(_)
+    } ++ r.refreshToken.map {
       "refresh_token" -> JsString(_)
     } ++ r.scope.map {
       "scope" -> JsString(_)

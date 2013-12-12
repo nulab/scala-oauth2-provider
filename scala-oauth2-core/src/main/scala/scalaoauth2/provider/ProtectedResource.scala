@@ -10,12 +10,11 @@ trait ProtectedResource {
     }.map { fetcher =>
       val result = fetcher.fetch(request)
       val accessToken = dataHandler.findAccessToken(result.token).getOrElse(throw new InvalidToken("Invalid access token"))
-      val now = System.currentTimeMillis()
-      if (accessToken.createdAt.getTime + accessToken.expiresIn * 1000 <= now) {
+      if (dataHandler.isAccessTokenExpired(accessToken)) {
         throw new ExpiredToken()
       }
 
-      dataHandler.findAuthInfoById(accessToken.authId).map { Right(_) }.getOrElse(Left(new InvalidToken("invalid access token")))
+      dataHandler.findAuthInfoByAccessToken(accessToken).map { Right(_) }.getOrElse(Left(new InvalidToken("invalid access token")))
     }.getOrElse(throw new InvalidRequest("Access token was not specified"))
   } catch {
     case e: OAuthError => Left(e)

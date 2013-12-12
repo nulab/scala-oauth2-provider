@@ -2,27 +2,26 @@ package scalaoauth2.provider
 
 import java.util.Date
 
+case class AccessTokenRequest[U](clientId: String, clientSecret: String, user: U)
+
 /**
  * Access token
  *
- * @param authId This value is consistent with AuthInfo has the id.
  * @param token Access token is used to authentication.
  * @param expiresIn Expiration date of access token. Unit is seconds.
  * @param createdAt Access token is created date.
  */
-case class AccessToken(authId: String, token: String, expiresIn: Long, createdAt: Date)
+case class AccessToken(token: String, refreshToken: Option[String], scope: Option[String], expiresIn: Option[Long], createdAt: Date)
 
 /**
  * Authorized information
  *
- * @param id Primary key.
  * @param user Authorized user which is registered on system.
  * @param clientId Using client id which is registered on system.
- * @param refreshToken This value is used by Refresh Token Grant.
  * @param scope This value is used by permit to API.
  * @param redirectUri This value is used by Authorization Code Grant.
  */
-case class AuthInfo[U](id: String, user: U, clientId: String, refreshToken: Option[String], scope: Option[String], redirectUri: Option[String])
+case class AuthInfo[U](user: U, clientId: String, scope: Option[String], redirectUri: Option[String])
 
 /**
  * Provide accessing to data storage for using OAuth 2.0.
@@ -89,25 +88,27 @@ trait DataHandler[U] {
   def findUser(username: String, password: String): Option[U]
 
   /**
-   * Create or update authorized information by userId, clientId and scope.
-   *
-   * Returning None when create access token then response will be invalid grant.
-   * This method also is called at the time of refresh token, it can safely return None.
-   *
-   * @param user DataHandler got this value by authentication.
-   * @param clientId Client send this value which is registered by application.
-   * @param scope Client request scope value. If client doesn't request then it will be None.
-   * @return created or updated authorize information. Return None if you want to strictly verify the scope.
-   */
-  def createOrUpdateAuthInfo(user: U, clientId: String, scope: Option[String]): Option[AuthInfo[U]]
-
-  /**
-   * Create or update access token by authorized information.
+   * Creates a new access token by authorized information.
    *
    * @param authInfo This value is created by createOrUpdateAuthInfo method.
    * @return Access token return to client.
    */
-  def createOrUpdateAccessToken(authInfo: AuthInfo[U]): AccessToken
+  def createAccessToken(authInfo: AuthInfo[U]): AccessToken
+
+  /**
+   * Returns stored access token by authorized information.
+   *
+   * @param authInfo This value is returned by createOrUpdateAuthInfo method.
+   * @return Access token return to client.
+   */
+  def getStoredAccessToken(authInfo: AuthInfo[U]): Option[AccessToken]
+
+  /**
+   * Creates a new access token by refreshToken.
+   * @param authInfo This value is returned by createOrUpdateAuthInfo method.
+   * @return
+   */
+  def refreshAccessToken(authInfo: AuthInfo[U], refreshToken: String):AccessToken
 
   /**
    * Find authorized information by authorization code.
@@ -138,7 +139,7 @@ trait DataHandler[U] {
    * @param clientSecret Client send this value which is registered by application.
    * @return Return user that matched both values.
    */
-  def findClientUser(clientId: String, clientSecret: String): Option[U]
+  def findClientUser(clientId: String, clientSecret: String, scope: Option[String]): Option[U]
 
   /**
    * Find AccessToken object by access token code.
@@ -149,12 +150,26 @@ trait DataHandler[U] {
   def findAccessToken(token: String): Option[AccessToken]
 
   /**
-   * Find authorized information by the primary key.
-   * The value is associated with AccessToken.
+   * Find authorized information by access token.
    *
-   * @param authId This value is passed from AccessToken.
+   * @param accessToken This value is AccessToken.
    * @return Return authorized information if the parameter is available.
    */
-  def findAuthInfoById(authId: String): Option[AuthInfo[U]]
+  def findAuthInfoByAccessToken(accessToken: AccessToken): Option[AuthInfo[U]]
+
+  /**
+   * Check expiration.
+   * 
+   * @param accessToken accessToken
+   * @return true if accessToken expired
+   */
+  def isAccessTokenExpired(accessToken: AccessToken): Boolean = {
+    accessToken.expiresIn.map {
+      expiresIn =>
+        val now = System.currentTimeMillis()
+        accessToken.createdAt.getTime + expiresIn * 1000 <= now
+
+    }.getOrElse(false)
+  }
 
 }

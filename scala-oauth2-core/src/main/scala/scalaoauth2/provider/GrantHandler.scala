@@ -1,19 +1,34 @@
 package scalaoauth2.provider
 
-case class GrantHandlerResult(tokenType: String, accessToken: String, expiresIn: Long, refreshToken: Option[String], scope: Option[String])
+
+case class GrantHandlerResult(tokenType: String, accessToken: String, expiresIn: Option[Long], refreshToken: Option[String], scope: Option[String])
 
 trait GrantHandler {
 
   def handleRequest[U](request: AuthorizationRequest, dataHandler: DataHandler[U]): GrantHandlerResult
 
+
+  /**
+   * Returns valid access token.
+   * 
+   * @param dataHandler
+   * @param authInfo
+   * @return 
+   */
   def issueAccessToken[U](dataHandler: DataHandler[U], authInfo: AuthInfo[U]): GrantHandlerResult = {
-    val accessToken = dataHandler.createOrUpdateAccessToken(authInfo)
+    val accessToken = dataHandler.getStoredAccessToken(authInfo) match {
+      case Some(token) if dataHandler.isAccessTokenExpired(token) =>
+        token.refreshToken.map( dataHandler.refreshAccessToken(authInfo, _)).getOrElse(dataHandler.createAccessToken(authInfo))
+      case Some(token) => token
+      case None => dataHandler.createAccessToken(authInfo)
+    }
+    
     GrantHandlerResult(
       "Bearer",
       accessToken.token,
       accessToken.expiresIn,
-      authInfo.refreshToken,
-      authInfo.scope
+      accessToken.refreshToken,
+      accessToken.scope
     )
   }
 }
@@ -27,9 +42,15 @@ class RefreshToken(clientCredentialFetcher: ClientCredentialFetcher) extends Gra
     if (authInfo.clientId != clientCredential.clientId) {
       throw new InvalidClient
     }
-
-    val newAuthInfo = dataHandler.createOrUpdateAuthInfo(authInfo.user, authInfo.clientId, authInfo.scope).getOrElse(authInfo)
-    issueAccessToken(dataHandler, newAuthInfo)
+    
+    val accessToken = dataHandler.refreshAccessToken(authInfo, refreshToken)
+    GrantHandlerResult(
+      "Bearer",
+      accessToken.token,
+      accessToken.expiresIn,
+      accessToken.refreshToken,
+      accessToken.scope
+    )
   }
 }
 
@@ -42,10 +63,7 @@ class Password(clientCredentialFetcher: ClientCredentialFetcher) extends GrantHa
     val user = dataHandler.findUser(username, password).getOrElse(throw new InvalidGrant())
     val scope = request.scope
     val clientId = clientCredential.clientId
-    val authInfo = dataHandler.createOrUpdateAuthInfo(user, clientId, scope).getOrElse(throw new InvalidGrant())
-    if (authInfo.clientId != clientId) {
-      throw new InvalidClient
-    }
+    val authInfo = AuthInfo(user, clientId, scope, None)
 
     issueAccessToken(dataHandler, authInfo)
   }
@@ -58,9 +76,9 @@ class ClientCredentials(clientCredentialFetcher: ClientCredentialFetcher) extend
     val clientSecret = clientCredential.clientSecret
     val clientId = clientCredential.clientId
     val scope = request.scope
-    val user = dataHandler.findClientUser(clientId, clientSecret).getOrElse(throw new InvalidGrant())
-    val authInfo = dataHandler.createOrUpdateAuthInfo(user, clientId, scope).getOrElse(throw new InvalidGrant())
-
+    val user = dataHandler.findClientUser(clientId, clientSecret, scope).getOrElse(throw new InvalidGrant())
+    val authInfo = AuthInfo(user, clientId, scope, None)
+    
     issueAccessToken(dataHandler, authInfo)
   }
 
