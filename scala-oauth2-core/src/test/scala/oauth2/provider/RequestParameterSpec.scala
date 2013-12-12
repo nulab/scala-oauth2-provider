@@ -5,9 +5,9 @@ import org.scalatest.FlatSpec
 
 class RequestParameterSpec extends FlatSpec {
 
-  def createRequest(oauthToken: Option[String], accessToken: Option[String], another: Map[String, Seq[String]] = Map()): Request = {
+  def createRequest(oauthToken: Option[String], accessToken: Option[String], another: Map[String, Seq[String]] = Map()): ProtectedResourceRequest = {
     val params = oauthToken.map { "oauth_token" -> Seq(_) } ++ accessToken.map { "access_token" -> Seq(_) }
-    Request(Map(), Map() ++ params ++ another)
+    ProtectedResourceRequest(Map(), Map() ++ params ++ another)
   }
 
   it should "match RequestParameter" in {

@@ -7,7 +7,7 @@ class ClientCredentialsSpec extends FlatSpec {
 
   it should "handle request" in {
     val clientCredentials = new ClientCredentials(new MockClientCredentialFetcher())
-    val request = Request(Map(), Map("scope" -> Seq("all")))
+    val request = AuthorizationRequest(Map(), Map("scope" -> Seq("all")))
     val grantHandlerResult = clientCredentials.handleRequest(request, new MockDataHandler() {
 
       override def findClientUser(clientId: String, clientSecret: String): Option[MockUser] = Some(MockUser(10000, "username"))
@@ -27,7 +27,7 @@ class ClientCredentialsSpec extends FlatSpec {
 
   class MockClientCredentialFetcher extends ClientCredentialFetcher {
 
-    override def fetch(request: Request): Option[ClientCredential] = Some(ClientCredential("clientId1", "clientSecret1"))
+    override def fetch(request: AuthorizationRequest): Option[ClientCredential] = Some(ClientCredential("clientId1", "clientSecret1"))
 
   }
 }

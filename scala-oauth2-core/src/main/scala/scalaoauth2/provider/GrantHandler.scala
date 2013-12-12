@@ -4,7 +4,7 @@ case class GrantHandlerResult(tokenType: String, accessToken: String, expiresIn:
 
 trait GrantHandler {
 
-  def handleRequest[U](request: Request, dataHandler: DataHandler[U]): GrantHandlerResult
+  def handleRequest[U](request: AuthorizationRequest, dataHandler: DataHandler[U]): GrantHandlerResult
 
   def issueAccessToken[U](dataHandler: DataHandler[U], authInfo: AuthInfo[U]): GrantHandlerResult = {
     val accessToken = dataHandler.createOrUpdateAccessToken(authInfo)
@@ -20,9 +20,9 @@ trait GrantHandler {
 
 class RefreshToken(clientCredentialFetcher: ClientCredentialFetcher) extends GrantHandler {
 
-  override def handleRequest[U](request: Request, dataHandler: DataHandler[U]): GrantHandlerResult = {
+  override def handleRequest[U](request: AuthorizationRequest, dataHandler: DataHandler[U]): GrantHandlerResult = {
     val clientCredential = clientCredentialFetcher.fetch(request).getOrElse(throw new InvalidRequest("BadRequest"))
-    val refreshToken = request.requireParam("refresh_token")
+    val refreshToken = request.requireRefreshToken
     val authInfo = dataHandler.findAuthInfoByRefreshToken(refreshToken).getOrElse(throw new InvalidGrant("NotFound"))
     if (authInfo.clientId != clientCredential.clientId) {
       throw new InvalidClient
@@ -35,12 +35,12 @@ class RefreshToken(clientCredentialFetcher: ClientCredentialFetcher) extends Gra
 
 class Password(clientCredentialFetcher: ClientCredentialFetcher) extends GrantHandler {
 
-  override def handleRequest[U](request: Request, dataHandler: DataHandler[U]): GrantHandlerResult = {
+  override def handleRequest[U](request: AuthorizationRequest, dataHandler: DataHandler[U]): GrantHandlerResult = {
     val clientCredential = clientCredentialFetcher.fetch(request).getOrElse(throw new InvalidRequest("BadRequest"))
-    val username = request.requireParam("username")
-    val password = request.requireParam("password")
+    val username = request.requireUsername
+    val password = request.requirePassword
     val user = dataHandler.findUser(username, password).getOrElse(throw new InvalidGrant())
-    val scope = request.param("scope")
+    val scope = request.scope
     val clientId = clientCredential.clientId
     val authInfo = dataHandler.createOrUpdateAuthInfo(user, clientId, scope).getOrElse(throw new InvalidGrant())
     if (authInfo.clientId != clientId) {
@@ -53,12 +53,12 @@ class Password(clientCredentialFetcher: ClientCredentialFetcher) extends GrantHa
 
 class ClientCredentials(clientCredentialFetcher: ClientCredentialFetcher) extends GrantHandler {
 
-  override def handleRequest[U](request: Request, dataHandler: DataHandler[U]): GrantHandlerResult = {
+  override def handleRequest[U](request: AuthorizationRequest, dataHandler: DataHandler[U]): GrantHandlerResult = {
     val clientCredential = clientCredentialFetcher.fetch(request).getOrElse(throw new InvalidRequest("BadRequest"))
     val clientSecret = clientCredential.clientSecret
     val clientId = clientCredential.clientId
+    val scope = request.scope
     val user = dataHandler.findClientUser(clientId, clientSecret).getOrElse(throw new InvalidGrant())
-    val scope = request.param("scope")
     val authInfo = dataHandler.createOrUpdateAuthInfo(user, clientId, scope).getOrElse(throw new InvalidGrant())
 
     issueAccessToken(dataHandler, authInfo)
@@ -68,11 +68,11 @@ class ClientCredentials(clientCredentialFetcher: ClientCredentialFetcher) extend
 
 class AuthorizationCode(clientCredentialFetcher: ClientCredentialFetcher) extends GrantHandler {
 
-  override def handleRequest[U](request: Request, dataHandler: DataHandler[U]): GrantHandlerResult = {
+  override def handleRequest[U](request: AuthorizationRequest, dataHandler: DataHandler[U]): GrantHandlerResult = {
     val clientCredential = clientCredentialFetcher.fetch(request).getOrElse(throw new InvalidRequest("BadRequest"))
     val clientId = clientCredential.clientId
-    val code = request.requireParam("code")
-    val redirectUri = request.param("redirect_uri")
+    val code = request.requireCode
+    val redirectUri = request.redirectUri
     val authInfo = dataHandler.findAuthInfoByCode(code).getOrElse(throw new InvalidGrant())
     if (authInfo.clientId != clientId) {
       throw new InvalidClient

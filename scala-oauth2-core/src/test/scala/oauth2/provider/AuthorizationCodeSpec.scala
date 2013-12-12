@@ -7,7 +7,7 @@ class AuthorizationCodeSpec extends FlatSpec {
 
   it should "handle request" in {
     val authorizationCode = new AuthorizationCode(new MockClientCredentialFetcher())
-    val request = Request(Map(), Map("code" -> Seq("code1"), "redirect_uri" -> Seq("http://example.com/")))
+    val request = AuthorizationRequest(Map(), Map("code" -> Seq("code1"), "redirect_uri" -> Seq("http://example.com/")))
     val grantHandlerResult = authorizationCode.handleRequest(request, new MockDataHandler() {
       
       override def findAuthInfoByCode(code: String): Option[AuthInfo[MockUser]] = Some(
@@ -25,7 +25,7 @@ class AuthorizationCodeSpec extends FlatSpec {
 
   it should "handle request if redirectUrl is none" in {
     val authorizationCode = new AuthorizationCode(new MockClientCredentialFetcher())
-    val request = Request(Map(), Map("code" -> Seq("code1"), "redirect_uri" -> Seq("http://example.com/")))
+    val request = AuthorizationRequest(Map(), Map("code" -> Seq("code1"), "redirect_uri" -> Seq("http://example.com/")))
     val grantHandlerResult = authorizationCode.handleRequest(request, new MockDataHandler() {
       
       override def findAuthInfoByCode(code: String): Option[AuthInfo[MockUser]] = Some(
@@ -43,7 +43,7 @@ class AuthorizationCodeSpec extends FlatSpec {
 
   class MockClientCredentialFetcher extends ClientCredentialFetcher {
 
-    override def fetch(request: Request): Option[ClientCredential] = Some(ClientCredential("clientId1", "clientSecret1"))
+    override def fetch(request: AuthorizationRequest): Option[ClientCredential] = Some(ClientCredential("clientId1", "clientSecret1"))
 
   }
 }

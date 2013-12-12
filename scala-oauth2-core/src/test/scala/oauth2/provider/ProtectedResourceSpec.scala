@@ -17,7 +17,7 @@ class ProtectedResourceSpec extends FlatSpec {
   }
 
   it should "be handled request with token into header" in {
-    val request = Request(
+    val request = ProtectedResourceRequest(
       Map("Authorization" -> "OAuth token1"),
       Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
     )
@@ -27,7 +27,7 @@ class ProtectedResourceSpec extends FlatSpec {
   }
 
   it should "be handled request with token into body" in {
-    val request = Request(
+    val request = ProtectedResourceRequest(
       Map(),
       Map("access_token" -> Seq("token1"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
     )
@@ -37,7 +37,7 @@ class ProtectedResourceSpec extends FlatSpec {
   }
 
   it should "be lost expired" in {
-    val request = Request(
+    val request = ProtectedResourceRequest(
       Map("Authorization" -> "OAuth token1"),
       Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
     )
@@ -61,7 +61,7 @@ class ProtectedResourceSpec extends FlatSpec {
   }
 
   it should "be invalid request without token" in {
-    val request = Request(
+    val request = ProtectedResourceRequest(
       Map(),
       Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
     )

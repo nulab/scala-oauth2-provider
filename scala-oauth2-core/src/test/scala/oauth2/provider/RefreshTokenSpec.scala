@@ -7,7 +7,7 @@ class RefreshTokenSpec extends FlatSpec {
 
   it should "handle request" in {
     val refreshToken = new RefreshToken(new MockClientCredentialFetcher())
-    val request = Request(Map(), Map("refresh_token" -> Seq("refreshToken1")))
+    val request = AuthorizationRequest(Map(), Map("refresh_token" -> Seq("refreshToken1")))
     val grantHandlerResult = refreshToken.handleRequest(request, new MockDataHandler() {
 
       override def findAuthInfoByRefreshToken(refreshToken: String): Option[AuthInfo[MockUser]] =
@@ -25,7 +25,7 @@ class RefreshTokenSpec extends FlatSpec {
 
   class MockClientCredentialFetcher extends ClientCredentialFetcher {
 
-    override def fetch(request: Request): Option[ClientCredential] = Some(ClientCredential("clientId1", "clientSecret1"))
+    override def fetch(request: AuthorizationRequest): Option[ClientCredential] = Some(ClientCredential("clientId1", "clientSecret1"))
 
   }
 }
