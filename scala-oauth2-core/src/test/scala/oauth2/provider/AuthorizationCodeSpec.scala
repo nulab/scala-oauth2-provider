@@ -11,7 +11,7 @@ class AuthorizationCodeSpec extends FlatSpec {
     val grantHandlerResult = authorizationCode.handleRequest(request, new MockDataHandler() {
       
       override def findAuthInfoByCode(code: String): Option[AuthInfo[MockUser]] = Some(
-        AuthInfo(id = "1", user = MockUser(10000, "username"), clientId = "clientId1", refreshToken = Some("refreshToken1"), scope = Some("all"), code = Some("code1"), redirectUri = Some("http://example.com/"))
+        AuthInfo(id = "1", user = MockUser(10000, "username"), clientId = "clientId1", refreshToken = Some("refreshToken1"), scope = Some("all"), redirectUri = Some("http://example.com/"))
       )
 
       override def createOrUpdateAccessToken(authInfo: AuthInfo[MockUser]): AccessToken = AccessToken("authId1", "token1", 3600, new java.util.Date())
@@ -29,7 +29,7 @@ class AuthorizationCodeSpec extends FlatSpec {
     val grantHandlerResult = authorizationCode.handleRequest(request, new MockDataHandler() {
       
       override def findAuthInfoByCode(code: String): Option[AuthInfo[MockUser]] = Some(
-        AuthInfo(id = "1", user = MockUser(10000, "username"), clientId = "clientId1", refreshToken = Some("refreshToken1"), scope = Some("all"), code = Some("code1"), redirectUri = None)
+        AuthInfo(id = "1", user = MockUser(10000, "username"), clientId = "clientId1", refreshToken = Some("refreshToken1"), scope = Some("all"), redirectUri = None)
       )
 
       override def createOrUpdateAccessToken(authInfo: AuthInfo[MockUser]): AccessToken = AccessToken("authId1", "token1", 3600, new java.util.Date())

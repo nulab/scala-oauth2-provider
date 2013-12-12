@@ -20,10 +20,9 @@ case class AccessToken(authId: String, token: String, expiresIn: Long, createdAt
  * @param clientId Using client id which is registered on system.
  * @param refreshToken This value is used by Refresh Token Grant.
  * @param scope This value is used by permit to API.
- * @param code This value is used by Authorization Code Grant.
  * @param redirectUri This value is used by Authorization Code Grant.
  */
-case class AuthInfo[U](id: String, user: U, clientId: String, refreshToken: Option[String], scope: Option[String], code: Option[String], redirectUri: Option[String])
+case class AuthInfo[U](id: String, user: U, clientId: String, refreshToken: Option[String], scope: Option[String], redirectUri: Option[String])
 
 /**
  * Provide accessing to data storage for using OAuth 2.0.
