@@ -2,7 +2,7 @@ package scalaoauth2.provider
 
 import play.api.mvc._
 import play.api.libs.json._
-import scalaoauth2.provider.{Request => OAuthRequest}
+//import scalaoauth2.provider.{AuthorizationRequest => OAuthRequest}
 
 /**
  * OAuth2Provider supports issue access token and authorize.
@@ -36,11 +36,21 @@ import scalaoauth2.provider.{Request => OAuthRequest}
  */
 trait OAuth2Provider extends Results {
 
-  implicit def play2oauthRequest(request: RequestHeader) = {
-    OAuthRequest(request.headers.toSimpleMap, request.queryString)
+  implicit def play2oauthRequest(request: RequestHeader): AuthorizationRequest = {
+    AuthorizationRequest(request.headers.toSimpleMap, request.queryString)
   }
 
-  implicit def play2oauthRequest[A](request: play.api.mvc.Request[A]) = {
+  implicit def play2oauthRequest[A](request: play.api.mvc.Request[A]): AuthorizationRequest = {
+    val param: Map[String, Seq[String]] = getParam(request)
+    AuthorizationRequest(request.headers.toSimpleMap, param)
+  }
+  
+  implicit def play2protectedResourceRequest[A](request: play.api.mvc.Request[A]): ProtectedResourceRequest = {
+    val param: Map[String, Seq[String]] = getParam(request)
+    ProtectedResourceRequest(request.headers.toSimpleMap, param)
+  }
+
+  final def getParam[A](request: Request[A]): Map[String, Seq[String]] = {
     val form = request.body match {
       case body: play.api.mvc.AnyContent if body.asFormUrlEncoded.isDefined => body.asFormUrlEncoded.get
       case body: play.api.mvc.AnyContent if body.asMultipartFormData.isDefined => body.asMultipartFormData.get.asFormUrlEncoded
@@ -49,8 +59,9 @@ trait OAuth2Provider extends Results {
       case _ => Map.empty[String, Seq[String]]
     }
 
-    val param = form ++ request.queryString.map { case (k, v) => k -> (v ++ form.getOrElse(k, Nil)) }
-    OAuthRequest(request.headers.toSimpleMap, param)
+    form ++ request.queryString.map {
+      case (k, v) => k -> (v ++ form.getOrElse(k, Nil))
+    }
   }
 
   /**
@@ -63,7 +74,7 @@ trait OAuth2Provider extends Results {
    *         Request is failed then return BadRequest or Unauthorized status to client with cause into the JSON.
    */
   def issueAccessToken[A, U](dataHandler: DataHandler[U])(implicit request: play.api.mvc.Request[A]): PlainResult = {
-    Token.handleRequest(request, dataHandler) match {
+    TokenEndpoint.handleRequest(request, dataHandler) match {
       case Left(e) if e.statusCode == 400 => responseOAuthError(BadRequest, e)
       case Left(e) if e.statusCode == 401 => responseOAuthError(Unauthorized, e)
       case Right(r) => Ok(Json.toJson(responseAccessToken(r)))
@@ -73,9 +84,10 @@ trait OAuth2Provider extends Results {
   protected def responseAccessToken(r: GrantHandlerResult) = {
     Map[String, JsValue](
       "token_type" -> JsString(r.tokenType),
-      "access_token" -> JsString(r.accessToken),
-      "expires_in" -> JsNumber(r.expiresIn)
-    ) ++ r.refreshToken.map {
+      "access_token" -> JsString(r.accessToken)
+    ) ++ r.expiresIn.map {
+      "expires_in" -> JsNumber(_)
+    } ++ r.refreshToken.map {
       "refresh_token" -> JsString(_)
     } ++ r.scope.map {
       "scope" -> JsString(_)

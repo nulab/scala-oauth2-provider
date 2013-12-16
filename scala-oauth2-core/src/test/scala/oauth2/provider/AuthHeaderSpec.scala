@@ -5,9 +5,9 @@ import org.scalatest.matchers.ShouldMatchers._
 
 class AuthHeaderSpec extends FlatSpec {
 
-  def createRequest(authorization: Option[String]): Request = authorization match {
-    case Some(s) => Request(Map("Authorization" -> s), Map())
-    case _ => Request(Map(), Map())
+  def createRequest(authorization: Option[String]): ProtectedResourceRequest = authorization match {
+    case Some(s) => ProtectedResourceRequest(Map("Authorization" -> s), Map())
+    case _ => ProtectedResourceRequest(Map(), Map())
   }
 
   it should "match AuthHeader from OAuth" in {
