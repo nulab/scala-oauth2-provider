@@ -1,6 +1,5 @@
 package scalaoauth2.provider
 
-
 class RequestBase(headers: Map[String, String], params: Map[String, Seq[String]]) {
 
   def header(name: String): Option[String] = headers.get(name)

@@ -18,7 +18,7 @@ trait GrantHandler {
   def issueAccessToken[U](dataHandler: DataHandler[U], authInfo: AuthInfo[U]): GrantHandlerResult = {
     val accessToken = dataHandler.getStoredAccessToken(authInfo) match {
       case Some(token) if dataHandler.isAccessTokenExpired(token) =>
-        token.refreshToken.map( dataHandler.refreshAccessToken(authInfo, _)).getOrElse(dataHandler.createAccessToken(authInfo))
+        token.refreshToken.map(dataHandler.refreshAccessToken(authInfo, _)).getOrElse(dataHandler.createAccessToken(authInfo))
       case Some(token) => token
       case None => dataHandler.createAccessToken(authInfo)
     }

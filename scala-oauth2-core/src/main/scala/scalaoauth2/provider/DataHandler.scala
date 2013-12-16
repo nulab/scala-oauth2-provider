@@ -8,6 +8,8 @@ case class AccessTokenRequest[U](clientId: String, clientSecret: String, user: U
  * Access token
  *
  * @param token Access token is used to authentication.
+ * @param refreshToken Refresh token is used to re-issue access token.
+ * @param scope Inform the client of the scope of the access token issued.
  * @param expiresIn Expiration date of access token. Unit is seconds.
  * @param createdAt Access token is created date.
  */
@@ -18,7 +20,7 @@ case class AccessToken(token: String, refreshToken: Option[String], scope: Optio
  *
  * @param user Authorized user which is registered on system.
  * @param clientId Using client id which is registered on system.
- * @param scope This value is used by permit to API.
+ * @param scope Inform the client of the scope of the access token issued.
  * @param redirectUri This value is used by Authorization Code Grant.
  */
 case class AuthInfo[U](user: U, clientId: String, scope: Option[String], redirectUri: Option[String])
@@ -32,37 +34,44 @@ case class AuthInfo[U](user: U, clientId: String, scope: Option[String], redirec
  * <ul>
  *   <li>validateClient(clientId, clientSecret, grantType)</li>
  *   <li>findAuthInfoByCode(code)</li>
- *   <li>createOrUpdateAccessToken(authInfo)</li>
+ *   <li>getStoredAccessToken(authInfo)</li>
+ *   <li>isAccessTokenExpired(token)</li>
+ *   <li>refreshAccessToken(authInfo, token)
+ *   <li>createAccessToken(authInfo)</li>
  * </ul>
  * 
  * <h4>Refresh Token Grant</h4>
  * <ul>
  *   <li>validateClient(clientId, clientSecret, grantType)</li>
  *   <li>findAuthInfoByRefreshToken(refreshToken)</li>
- *   <li>createOrUpdateAuthInfo(user, clientId, scope)</li>
- *   <li>createOrUpdateAccessToken(authInfo)</li>
+ *   <li>refreshAccessToken(authInfo, refreshToken)</li>
  * </ul>
  * 
  * <h4>Resource Owner Password Credentials Grant</h4>
  * <ul>
  *   <li>validateClient(clientId, clientSecret, grantType)</li>
  *   <li>findUser(username, password)</li>
- *   <li>createOrUpdateAuthInfo(user, clientId, scope)</li>
- *   <li>createOrUpdateAccessToken(authInfo)</li>
+ *   <li>getStoredAccessToken(authInfo)</li>
+ *   <li>isAccessTokenExpired(token)</li>
+ *   <li>refreshAccessToken(authInfo, token)
+ *   <li>createAccessToken(authInfo)</li>
  * </ul>
  * 
  * <h4>Client Credentials Grant</h4>
  * <ul>
  *   <li>validateClient(clientId, clientSecret, grantType)</li>
  *   <li>findClientUser(clientId, clientSecret)</li>
- *   <li>createOrUpdateAuthInfo(user, clientId, scope)</li>
- *   <li>createOrUpdateAccessToken(authInfo)</li>
+ *   <li>getStoredAccessToken(authInfo)</li>
+ *   <li>isAccessTokenExpired(token)</li>
+ *   <li>refreshAccessToken(authInfo, token)
+ *   <li>createAccessToken(authInfo)</li>
  * </ul>
  *   
  * <h3>[Access to Protected Resource phase]</h3>
  * <ul>
  *   <li>findAccessToken(token)</li>
- *   <li>findAuthInfoById(authId)</li>
+ *   <li>isAccessTokenExpired(token)</li>
+ *   <li>findAuthInfoByAccessToken(token)</li>
  * </ul>
  */
 trait DataHandler[U] {
@@ -90,25 +99,28 @@ trait DataHandler[U] {
   /**
    * Creates a new access token by authorized information.
    *
-   * @param authInfo This value is created by createOrUpdateAuthInfo method.
-   * @return Access token return to client.
+   * @param authInfo This value is already authorized by system.
+   * @return Access token returns to client.
    */
   def createAccessToken(authInfo: AuthInfo[U]): AccessToken
 
   /**
    * Returns stored access token by authorized information.
    *
-   * @param authInfo This value is returned by createOrUpdateAuthInfo method.
-   * @return Access token return to client.
+   * If want to create new access token then have to return None
+   *
+   * @param authInfo This value is already authorized by system.
+   * @return Access token returns to client.
    */
   def getStoredAccessToken(authInfo: AuthInfo[U]): Option[AccessToken]
 
   /**
    * Creates a new access token by refreshToken.
-   * @param authInfo This value is returned by createOrUpdateAuthInfo method.
-   * @return
+   *
+   * @param authInfo This value is already authorized by system.
+   * @return Access token returns to client.
    */
-  def refreshAccessToken(authInfo: AuthInfo[U], refreshToken: String):AccessToken
+  def refreshAccessToken(authInfo: AuthInfo[U], refreshToken: String): AccessToken
 
   /**
    * Find authorized information by authorization code.
@@ -164,11 +176,9 @@ trait DataHandler[U] {
    * @return true if accessToken expired
    */
   def isAccessTokenExpired(accessToken: AccessToken): Boolean = {
-    accessToken.expiresIn.map {
-      expiresIn =>
-        val now = System.currentTimeMillis()
-        accessToken.createdAt.getTime + expiresIn * 1000 <= now
-
+    accessToken.expiresIn.map { expiresIn =>
+      val now = System.currentTimeMillis()
+      accessToken.createdAt.getTime + expiresIn * 1000 <= now
     }.getOrElse(false)
   }
 

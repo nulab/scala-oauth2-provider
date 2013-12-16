@@ -44,23 +44,25 @@ case class User(id: Long, name: String, hashedPassword: String)
 
 class MyDataHandler extends DataHandler[User] {
 
-  def validateClient(clientId: String, clientSecret: String, grantType: String): Boolean  = ???
+  def validateClient(clientId: String, clientSecret: String, grantType: String): Boolean = ???
 
   def findUser(username: String, password: String): Option[User] = ???
 
-  def createOrUpdateAuthInfo(user: User, clientId: String, scope: Option[String]): Option[AuthInfo[User]] = ???
+  def createAccessToken(authInfo: AuthInfo[User]): AccessToken = ???
 
-  def createOrUpdateAccessToken(authInfo: AuthInfo[User]): AccessToken = ???
+  def getStoredAccessToken(authInfo: AuthInfo[User]): Option[AccessToken] = ???
+
+  def refreshAccessToken(authInfo: AuthInfo[User], refreshToken: String): AccessToken = ???
 
   def findAuthInfoByCode(code: String): Option[AuthInfo[User]] = ???
 
   def findAuthInfoByRefreshToken(refreshToken: String): Option[AuthInfo[User]] = ???
 
-  def findClientUser(clientId: String, clientSecret: String): Option[User] = ???
+  def findClientUser(clientId: String, clientSecret: String, scope: Option[String]): Option[User] = ???
 
   def findAccessToken(token: String): Option[AccessToken] = ???
 
-  def findAuthInfoById(authId: String): Option[AuthInfo[User]] = ???
+  def findAuthInfoByAccessToken(accessToken: AccessToken): Option[AuthInfo[User]] = ???
 
 }
 ```
@@ -103,5 +105,4 @@ object MyController extends Controller with OAuth2Provider {
 }
 ```
 
-If you'd like to change the OAuth workflow, modify handleRequest methods of Token and ProtectedResource traits defined in EndPoint.scala.
-
+If you'd like to change the OAuth workflow, modify handleRequest methods of TokenEndPoint and ProtectedResource traits.
