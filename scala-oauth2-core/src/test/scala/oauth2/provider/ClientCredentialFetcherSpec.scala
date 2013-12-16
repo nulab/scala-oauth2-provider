@@ -45,4 +45,9 @@ class ClientCredentialFetcherSpec extends FlatSpec {
   it should "not fetch missing parameter" in {
     ClientCredentialFetcher.fetch(AuthorizationRequest(Map(), Map("client_secret" -> Seq("client_secret_value")))) should be (None)
   }
+
+  it should "not fetch invalid parameter" in {
+    val request = AuthorizationRequest(Map("Authorization" -> ""), Map())
+    ClientCredentialFetcher.fetch(request) should be (None)
+  }
 }
