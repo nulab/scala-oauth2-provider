@@ -2,7 +2,6 @@ package scalaoauth2.provider
 
 import play.api.mvc._
 import play.api.libs.json._
-//import scalaoauth2.provider.{AuthorizationRequest => OAuthRequest}
 
 /**
  * OAuth2Provider supports issue access token and authorize.
