@@ -1,6 +1,6 @@
 package scalaoauth2.provider
 
-case class ProtectedResourceRequest(headers: Map[String, String], params: Map[String, Seq[String]]) extends RequestBase(headers, params) {
+case class ProtectedResourceRequest(headers: Map[String, Seq[String]], params: Map[String, Seq[String]]) extends RequestBase(headers, params) {
 
   def oauthToken: Option[String] = param("oauth_token")
 

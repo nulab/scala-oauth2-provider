@@ -18,7 +18,7 @@ class ProtectedResourceSpec extends FlatSpec {
 
   it should "be handled request with token into header" in {
     val request = ProtectedResourceRequest(
-      Map("Authorization" -> "OAuth token1"),
+      Map("Authorization" -> Seq("OAuth token1")),
       Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
     )
 
@@ -38,7 +38,7 @@ class ProtectedResourceSpec extends FlatSpec {
 
   it should "be lost expired" in {
     val request = ProtectedResourceRequest(
-      Map("Authorization" -> "OAuth token1"),
+      Map("Authorization" -> Seq("OAuth token1")),
       Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
     )
 

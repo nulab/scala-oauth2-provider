@@ -17,7 +17,7 @@ class TokenSpec extends FlatSpec {
 
   it should "be handled request" in {
     val request = AuthorizationRequest(
-      Map("Authorization" -> "Basic Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU="),
+      Map("Authorization" -> Seq("Basic Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU=")),
       Map("grant_type" -> Seq("password"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
     )
 
@@ -27,7 +27,7 @@ class TokenSpec extends FlatSpec {
 
   it should "be error if grant type doesn't exist" in {
     val request = AuthorizationRequest(
-      Map("Authorization" -> "Basic Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU="),
+      Map("Authorization" -> Seq("Basic Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU=")),
       Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
     )
 
@@ -42,7 +42,7 @@ class TokenSpec extends FlatSpec {
 
   it should "be error if grant type is wrong" in {
     val request = AuthorizationRequest(
-      Map("Authorization" -> "Basic Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU="),
+      Map("Authorization" -> Seq("Basic Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU=")),
       Map("grant_type" -> Seq("test"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
     )
 
@@ -72,7 +72,7 @@ class TokenSpec extends FlatSpec {
 
   it should "be invalid client if client information is wrong" in {
     val request = AuthorizationRequest(
-      Map("Authorization" -> "Basic Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU="),
+      Map("Authorization" -> Seq("Basic Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU=")),
       Map("grant_type" -> Seq("password"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
     )
 

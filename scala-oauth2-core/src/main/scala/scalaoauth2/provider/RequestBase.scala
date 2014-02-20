@@ -1,10 +1,17 @@
 package scalaoauth2.provider
 
-class RequestBase(headers: Map[String, String], params: Map[String, Seq[String]]) {
+import collection.immutable.TreeMap
+import math.Ordering
 
-  def header(name: String): Option[String] = headers.get(name)
+class RequestBase(headers: TreeMap[String, Seq[String]], params: Map[String, Seq[String]]) {
 
-  def requireHeader(name: String): String = headers.get(name).getOrElse(throw new InvalidRequest("required header: " + name))
+  def this(headers: Map[String, Seq[String]], params: Map[String, Seq[String]]) = {
+    this(new TreeMap[String, Seq[String]]()(Ordering.by(_.toLowerCase)) ++ headers, params)
+  }
+
+  def header(name: String): Option[String] = headers.get(name).flatMap { _.headOption }
+
+  def requireHeader(name: String): String = header(name).getOrElse(throw new InvalidRequest("required header: " + name))
 
   def param(name: String): Option[String] = params.get(name).flatMap(values => values.headOption)
 

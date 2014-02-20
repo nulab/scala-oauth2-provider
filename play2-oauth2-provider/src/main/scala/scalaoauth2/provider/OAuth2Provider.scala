@@ -36,17 +36,17 @@ import play.api.libs.json._
 trait OAuth2Provider extends Results {
 
   implicit def play2oauthRequest(request: RequestHeader): AuthorizationRequest = {
-    AuthorizationRequest(request.headers.toSimpleMap, request.queryString)
+    AuthorizationRequest(request.headers.toMap, request.queryString)
   }
 
   implicit def play2oauthRequest[A](request: play.api.mvc.Request[A]): AuthorizationRequest = {
     val param: Map[String, Seq[String]] = getParam(request)
-    AuthorizationRequest(request.headers.toSimpleMap, param)
+    AuthorizationRequest(request.headers.toMap, param)
   }
   
   implicit def play2protectedResourceRequest[A](request: play.api.mvc.Request[A]): ProtectedResourceRequest = {
     val param: Map[String, Seq[String]] = getParam(request)
-    ProtectedResourceRequest(request.headers.toSimpleMap, param)
+    ProtectedResourceRequest(request.headers.toMap, param)
   }
 
   final def getParam[A](request: Request[A]): Map[String, Seq[String]] = {
