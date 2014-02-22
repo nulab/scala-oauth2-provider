@@ -62,7 +62,7 @@ object ScalaOAuth2Build extends Build {
     else Some("releases" at nexus + "service/local/staging/deploy/maven2")
   }
 
-  val _scalacOptions = Seq("-deprecation", "-unchecked")
+  val _scalacOptions = Seq("-deprecation", "-unchecked", "-feature")
   val _pomExtra = <url>https://github.com/nulab/scala-oauth2-provider</url>
       <licenses>
         <license>
