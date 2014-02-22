@@ -1,6 +1,6 @@
 package scalaoauth2.provider
 
-import org.scalatest.matchers.ShouldMatchers._
+import org.scalatest.Matchers._
 import org.scalatest.FlatSpec
 
 class RequestParameterSpec extends FlatSpec {

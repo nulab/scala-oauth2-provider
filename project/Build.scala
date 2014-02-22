@@ -23,7 +23,7 @@ object ScalaOAuth2Build extends Build {
       scalacOptions ++= _scalacOptions,
       libraryDependencies ++= Seq(
         "commons-codec" % "commons-codec" % "1.8",
-        "org.scalatest" %% "scalatest" % "1.9.1" % "test"
+        "org.scalatest" %% "scalatest" % "2.0" % "test"
       ),
       publishTo <<= version { (v: String) => _publishTo(v) },
       publishMavenStyle := true,

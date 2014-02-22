@@ -1,7 +1,7 @@
 package scalaoauth2.provider
 
 import org.scalatest._
-import org.scalatest.matchers.ShouldMatchers._
+import org.scalatest.Matchers._
 
 class TokenSpec extends FlatSpec {
 

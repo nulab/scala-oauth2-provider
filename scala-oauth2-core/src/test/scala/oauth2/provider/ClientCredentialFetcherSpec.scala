@@ -1,7 +1,7 @@
 package scalaoauth2.provider
 
 import org.scalatest.FlatSpec
-import org.scalatest.matchers.ShouldMatchers._
+import org.scalatest.Matchers._
 
 class ClientCredentialFetcherSpec extends FlatSpec {
 
