@@ -73,7 +73,7 @@ trait OAuth2Provider extends Results {
    * @return Request is successful then return JSON to client in OAuth 2.0 format.
    *         Request is failed then return BadRequest or Unauthorized status to client with cause into the JSON.
    */
-  def issueAccessToken[A, U](dataHandler: DataHandler[U])(implicit request: play.api.mvc.Request[A]): PlainResult = {
+  def issueAccessToken[A, U](dataHandler: DataHandler[U])(implicit request: play.api.mvc.Request[A]): SimpleResult = {
     TokenEndpoint.handleRequest(request, dataHandler) match {
       case Left(e) if e.statusCode == 400 => responseOAuthError(BadRequest, e)
       case Left(e) if e.statusCode == 401 => responseOAuthError(Unauthorized, e)
@@ -104,7 +104,7 @@ trait OAuth2Provider extends Results {
    * @return Authentication is successful then the response use your API result.
    *         Authentication is failed then return BadRequest or Unauthorized status to client with cause into the JSON.
    */
-  def authorize[A, U](dataHandler: DataHandler[U])(callback: AuthInfo[U] => PlainResult)(implicit request: play.api.mvc.Request[A]): PlainResult = {
+  def authorize[A, U](dataHandler: DataHandler[U])(callback: AuthInfo[U] => SimpleResult)(implicit request: play.api.mvc.Request[A]): SimpleResult = {
     ProtectedResource.handleRequest(request, dataHandler) match {
       case Left(e) if e.statusCode == 400 => responseOAuthError(BadRequest, e)
       case Left(e) if e.statusCode == 401 => responseOAuthError(Unauthorized, e)
@@ -112,7 +112,7 @@ trait OAuth2Provider extends Results {
     }
   }
 
-  protected def responseOAuthError(result: PlainResult, e: OAuthError) = result.withHeaders(
+  protected def responseOAuthError(result: SimpleResult, e: OAuthError) = result.withHeaders(
     "WWW-Authenticate" -> ("Bearer " + toOAuthErrorString(e))
   )
 
