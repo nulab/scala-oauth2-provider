@@ -2,7 +2,7 @@
 
 [The OAuth 2.0](http://tools.ietf.org/html/rfc6749) server-side implementation written in Scala.
 
-This provides OAuth 2.0 server-side functionality and supporting function for [Playframework](http://www.playframework.com/). Playframework 2.1 and 2.2 are now supported.
+This provides OAuth 2.0 server-side functionality and supporting function for [Playframework](http://www.playframework.com/). Playframework 2.2 is now supported.
 
 The idea of this library originally comes from [oauth2-server](https://github.com/yoichiro/oauth2-server) which is Java implementation of OAuth 2.0.
 
@@ -22,14 +22,14 @@ If you'd like to use this with Playframework, add "play2-oauth2-provider" to lib
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.nulab-inc" %% "play2-oauth2-provider" % "0.4.0"
+  "com.nulab-inc" %% "play2-oauth2-provider" % "0.5.0"
 )
 ```
 
 Otherwise, add "scala-oauth2-core" instead. In this case, you need to implement your own OAuth provider working with web framework you use.
 ```scala
 libraryDependencies ++= Seq(
-  "com.nulab-inc" %% "scala-oauth2-core" % "0.4.0"
+  "com.nulab-inc" %% "scala-oauth2-core" % "0.5.0"
 )
 ```
 
