@@ -40,12 +40,16 @@ trait OAuth2Provider extends Results {
     AuthorizationRequest(request.headers.toMap, request.queryString)
   }
 
-  implicit def play2oauthRequest[A](request: play.api.mvc.Request[A]): AuthorizationRequest = {
+  implicit def play2oauthRequest[A](request: Request[A]): AuthorizationRequest = {
     val param: Map[String, Seq[String]] = getParam(request)
     AuthorizationRequest(request.headers.toMap, param)
   }
+
+  implicit def play2protectedResourceRequest(request: RequestHeader): ProtectedResourceRequest = {
+    ProtectedResourceRequest(request.headers.toMap, request.queryString)
+  }
   
-  implicit def play2protectedResourceRequest[A](request: play.api.mvc.Request[A]): ProtectedResourceRequest = {
+  implicit def play2protectedResourceRequest[A](request: Request[A]): ProtectedResourceRequest = {
     val param: Map[String, Seq[String]] = getParam(request)
     ProtectedResourceRequest(request.headers.toMap, param)
   }
