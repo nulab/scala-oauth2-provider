@@ -48,7 +48,7 @@ trait OAuth2Provider extends Results {
   implicit def play2protectedResourceRequest(request: RequestHeader): ProtectedResourceRequest = {
     ProtectedResourceRequest(request.headers.toMap, request.queryString)
   }
-  
+
   implicit def play2protectedResourceRequest[A](request: Request[A]): ProtectedResourceRequest = {
     val param: Map[String, Seq[String]] = getParam(request)
     ProtectedResourceRequest(request.headers.toMap, param)
@@ -79,13 +79,13 @@ trait OAuth2Provider extends Results {
    */
   def issueAccessToken[A, U](dataHandler: DataHandler[U])(implicit request: play.api.mvc.Request[A]): SimpleResult = {
     TokenEndpoint.handleRequest(request, dataHandler) match {
-      case Left(e) if e.statusCode == 400 => responseOAuthError(BadRequest, e)
-      case Left(e) if e.statusCode == 401 => responseOAuthError(Unauthorized, e)
+      case Left(e) if e.statusCode == 400 => BadRequest(responseOAuthErrorJson(e))
+      case Left(e) if e.statusCode == 401 => Unauthorized(responseOAuthErrorJson(e))
       case Right(r) => Ok(Json.toJson(responseAccessToken(r)))
     }
   }
 
-  protected def responseAccessToken(r: GrantHandlerResult) = {
+  protected[scalaoauth2] def responseAccessToken(r: GrantHandlerResult) = {
     Map[String, JsValue](
       "token_type" -> JsString(r.tokenType),
       "access_token" -> JsString(r.accessToken)
@@ -110,15 +110,18 @@ trait OAuth2Provider extends Results {
    */
   def authorize[A, U](dataHandler: DataHandler[U])(callback: AuthInfo[U] => SimpleResult)(implicit request: play.api.mvc.Request[A]): SimpleResult = {
     ProtectedResource.handleRequest(request, dataHandler) match {
-      case Left(e) if e.statusCode == 400 => responseOAuthError(BadRequest, e)
-      case Left(e) if e.statusCode == 401 => responseOAuthError(Unauthorized, e)
+      case Left(e) if e.statusCode == 400 => BadRequest.withHeaders(responseOAuthErrorHeader(e))
+      case Left(e) if e.statusCode == 401 => Unauthorized.withHeaders(responseOAuthErrorHeader(e))
       case Right(authInfo) => callback(authInfo)
     }
   }
 
-  protected def responseOAuthError(result: SimpleResult, e: OAuthError) = result.withHeaders(
-    "WWW-Authenticate" -> ("Bearer " + toOAuthErrorString(e))
+  protected[scalaoauth2] def responseOAuthErrorJson(e: OAuthError): JsValue = Json.obj(
+    "error" -> e.errorType,
+    "error_description" -> e.description
   )
+
+  protected[scalaoauth2] def responseOAuthErrorHeader(e: OAuthError): (String, String) = ("WWW-Authenticate" -> ("Bearer " + toOAuthErrorString(e)))
 
   protected def toOAuthErrorString(e: OAuthError): String = {
     val params = Seq("error=\"" + e.errorType + "\"") ++

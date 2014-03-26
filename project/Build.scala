@@ -4,11 +4,15 @@ import Keys._
 object ScalaOAuth2Build extends Build {
 
   lazy val _organization = "com.nulab-inc"
-  lazy val _version =  "0.5.0"
+  lazy val _version =  "0.5.1"
   lazy val _playVersion =  "2.2.0"
 
   val _scalaVersion = "2.10.3"
   val _crossScalaVersions = Seq("2.9.3", "2.10.3")
+
+  val commonDependenciesInTestScope = Seq(
+    "org.scalatest" %% "scalatest" % "2.0" % "test"
+  )
 
   lazy val scalaOAuth2Core = Project(
     id = "scala-oauth2-core",
@@ -22,9 +26,8 @@ object ScalaOAuth2Build extends Build {
       crossScalaVersions := _crossScalaVersions,
       scalacOptions ++= _scalacOptions,
       libraryDependencies ++= Seq(
-        "commons-codec" % "commons-codec" % "1.8",
-        "org.scalatest" %% "scalatest" % "2.0" % "test"
-      ),
+        "commons-codec" % "commons-codec" % "1.8"
+      ) ++ commonDependenciesInTestScope,
       publishTo <<= version { (v: String) => _publishTo(v) },
       publishMavenStyle := true,
       publishArtifact in Test := false,
@@ -47,7 +50,7 @@ object ScalaOAuth2Build extends Build {
       resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
       libraryDependencies ++= Seq(
         "com.typesafe.play" %% "play" % _playVersion % "provided"
-      ),
+      ) ++ commonDependenciesInTestScope,
       publishTo <<= version { (v: String) => _publishTo(v) },
       publishMavenStyle := true,
       publishArtifact in Test := false,
