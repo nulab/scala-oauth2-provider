@@ -22,14 +22,15 @@ If you'd like to use this with Playframework, add "play2-oauth2-provider" to lib
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.nulab-inc" %% "play2-oauth2-provider" % "0.5.1"
+  "com.nulab-inc" %% "play2-oauth2-provider" % "0.6.0"
 )
 ```
 
 Otherwise, add "scala-oauth2-core" instead. In this case, you need to implement your own OAuth provider working with web framework you use.
+
 ```scala
 libraryDependencies ++= Seq(
-  "com.nulab-inc" %% "scala-oauth2-core" % "0.5.1"
+  "com.nulab-inc" %% "scala-oauth2-core" % "0.6.0"
 )
 ```
 
@@ -37,7 +38,7 @@ libraryDependencies ++= Seq(
 
 ### Implement DataHandler
 
-Whether you use Playframework or not, you have to implement DataHandler trait and make it work with your own "User" class that may be already defined in your application.
+Whether you use Playframework or not, you have to implement ```DataHandler``` trait and make it work with your own ```User``` class that may be already defined in your application.
 
 ```scala
 case class User(id: Long, name: String, hashedPassword: String)
@@ -67,7 +68,7 @@ class MyDataHandler extends DataHandler[User] {
 }
 ```
 
-For more details, refer to Scaladoc of DataHandler.
+For more details, refer to Scaladoc of ```DataHandler```.
 
 ### Work with Playframework
 
@@ -77,7 +78,9 @@ You should follow three steps below to work with Playframework.
 * Assign a route to the controller
 * Access to an authorized resource
 
-First, define your own controller with mixining OAuth2Provider trait provided by this library to issue access token.
+First, define your own controller with mixining ```OAuth2Provider``` trait provided by this library to issue access token.
+Asynchronous result is used in your controller then you can use ```OAuth2AsyncProvider```, which supports returning ```Future[SimpleResult]```.
+
 ```scala
 import scalaoauth2.provider._
 object OAuth2Controller extends Controller with OAuth2Provider {
@@ -88,11 +91,13 @@ object OAuth2Controller extends Controller with OAuth2Provider {
 ```
 
 Then, assign a route to the controller that OAuth clients will access to.
+
 ```
 POST    /oauth2/access_token                    controllers.OAuth2Controller.accessToken
 ```
 
 Finally, you can access to an authorized resource like this:
+
 ```scala
 import scalaoauth2.provider._
 object MyController extends Controller with OAuth2Provider {
@@ -105,4 +110,4 @@ object MyController extends Controller with OAuth2Provider {
 }
 ```
 
-If you'd like to change the OAuth workflow, modify handleRequest methods of TokenEndPoint and ProtectedResource traits.
+If you'd like to change the OAuth workflow, modify handleRequest methods of TokenEndPoint and ```ProtectedResource``` traits.
