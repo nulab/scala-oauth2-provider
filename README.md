@@ -22,7 +22,7 @@ If you'd like to use this with Playframework, add "play2-oauth2-provider" to lib
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.nulab-inc" %% "play2-oauth2-provider" % "0.6.1"
+  "com.nulab-inc" %% "play2-oauth2-provider" % "0.7.0"
 )
 ```
 
@@ -30,7 +30,7 @@ Otherwise, add "scala-oauth2-core" instead. In this case, you need to implement 
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.nulab-inc" %% "scala-oauth2-core" % "0.6.1"
+  "com.nulab-inc" %% "scala-oauth2-core" % "0.7.0"
 )
 ```
 
@@ -111,3 +111,8 @@ object MyController extends Controller with OAuth2Provider {
 ```
 
 If you'd like to change the OAuth workflow, modify handleRequest methods of TokenEndPoint and ```ProtectedResource``` traits.
+
+## Application using this library
+
+- [Typetalk](https://typetalk.in/)
+- [Backlog](https://backlogtool.com/)
