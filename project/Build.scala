@@ -5,13 +5,16 @@ object ScalaOAuth2Build extends Build {
 
   lazy val _organization = "com.nulab-inc"
   lazy val _version =  "0.6.1"
-  lazy val _playVersion =  "2.2.0"
+  def _playVersion(version: String) = version match {
+    case "2.11.0" => "2.3.0-RC1"
+    case _ => "2.2.3"
+  }
 
   val _scalaVersion = "2.10.3"
-  val _crossScalaVersions = Seq("2.9.3", "2.10.3")
+  val _crossScalaVersions = Seq("2.10.3", "2.11.0")
 
   val commonDependenciesInTestScope = Seq(
-    "org.scalatest" %% "scalatest" % "2.0" % "test"
+    "org.scalatest" %% "scalatest" % "2.1.6" % "test"
   )
 
   lazy val scalaOAuth2Core = Project(
@@ -49,7 +52,7 @@ object ScalaOAuth2Build extends Build {
       scalacOptions ++= _scalacOptions,
       resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
       libraryDependencies ++= Seq(
-        "com.typesafe.play" %% "play" % _playVersion % "provided"
+        "com.typesafe.play" %% "play" % _playVersion(scalaVersion.value) % "provided"
       ) ++ commonDependenciesInTestScope,
       publishTo <<= version { (v: String) => _publishTo(v) },
       publishMavenStyle := true,
