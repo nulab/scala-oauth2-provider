@@ -4,7 +4,7 @@ import Keys._
 object ScalaOAuth2Build extends Build {
 
   lazy val _organization = "com.nulab-inc"
-  lazy val _version =  "0.6.1"
+  lazy val _version =  "0.7.0"
   def _playVersion(version: String) = version match {
     case "2.11.0" => "2.3.0-RC1"
     case _ => "2.2.3"
