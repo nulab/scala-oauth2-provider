@@ -6,7 +6,7 @@ object ScalaOAuth2Build extends Build {
   lazy val _organization = "com.nulab-inc"
   lazy val _version =  "0.7.1-SNAPSHOT"
   def _playVersion(version: String) = version match {
-    case "2.11.0" => "2.3.0-RC1"
+    case "2.11.0" => "2.3.0-RC2"
     case _ => "2.2.3"
   }
 
@@ -34,7 +34,7 @@ object ScalaOAuth2Build extends Build {
     id = "scala-oauth2-provider",
     base = file("."),
     settings = scalaOAuth2ProviderSettings ++ Seq(
-      name := "scala-oauth2-core",
+      name := "scala-oauth2-provider",
       description := "OAuth 2.0 server-side implementation written in Scala"
     )
   ).aggregate(scalaOAuth2Core, play2OAuth2Provider)
