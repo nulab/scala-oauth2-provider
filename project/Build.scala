@@ -4,7 +4,7 @@ import Keys._
 object ScalaOAuth2Build extends Build {
 
   lazy val _organization = "com.nulab-inc"
-  lazy val _version =  "0.7.0"
+  lazy val _version =  "0.7.1-SNAPSHOT"
   def _playVersion(version: String) = version match {
     case "2.11.0" => "2.3.0-RC1"
     case _ => "2.2.3"
@@ -17,48 +17,50 @@ object ScalaOAuth2Build extends Build {
     "org.scalatest" %% "scalatest" % "2.1.6" % "test"
   )
 
+  lazy val scalaOAuth2ProviderSettings = Defaults.defaultSettings ++ Seq(
+    organization := _organization,
+    version := _version,
+    scalaVersion := _scalaVersion,
+    crossScalaVersions := _crossScalaVersions,
+    scalacOptions ++= _scalacOptions,
+    publishTo <<= version { (v: String) => _publishTo(v) },
+    publishMavenStyle := true,
+    publishArtifact in Test := false,
+    pomIncludeRepository := { x => false },
+    pomExtra := _pomExtra
+  )
+
+  lazy val root = Project(
+    id = "scala-oauth2-provider",
+    base = file("."),
+    settings = scalaOAuth2ProviderSettings ++ Seq(
+      name := "scala-oauth2-core",
+      description := "OAuth 2.0 server-side implementation written in Scala"
+    )
+  ).aggregate(scalaOAuth2Core, play2OAuth2Provider)
+
   lazy val scalaOAuth2Core = Project(
     id = "scala-oauth2-core",
     base = file("scala-oauth2-core"),
-    settings = Defaults.defaultSettings ++ Seq(
-      organization := _organization,
+    settings = scalaOAuth2ProviderSettings ++ Seq(
       name := "scala-oauth2-core",
       description := "OAuth 2.0 server-side implementation written in Scala",
-      version := _version,
-      scalaVersion := _scalaVersion,
-      crossScalaVersions := _crossScalaVersions,
-      scalacOptions ++= _scalacOptions,
       libraryDependencies ++= Seq(
         "commons-codec" % "commons-codec" % "1.8"
-      ) ++ commonDependenciesInTestScope,
-      publishTo <<= version { (v: String) => _publishTo(v) },
-      publishMavenStyle := true,
-      publishArtifact in Test := false,
-      pomIncludeRepository := { x => false },
-      pomExtra := _pomExtra
+      ) ++ commonDependenciesInTestScope
     )
   )
 
   lazy val play2OAuth2Provider = Project(
     id = "play2-oauth2-provider",
     base = file("play2-oauth2-provider"),
-    settings = Defaults.defaultSettings ++ Seq(
-      organization := _organization,
+    settings = scalaOAuth2ProviderSettings ++ Seq(
       name := "play2-oauth2-provider",
       description := "Support scala-oauth2-core library on Playframework Scala",
-      version := _version,
-      scalaVersion := _scalaVersion,
-      crossScalaVersions := _crossScalaVersions,
-      scalacOptions ++= _scalacOptions,
       resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
       libraryDependencies ++= Seq(
         "com.typesafe.play" %% "play" % _playVersion(scalaVersion.value) % "provided"
-      ) ++ commonDependenciesInTestScope,
-      publishTo <<= version { (v: String) => _publishTo(v) },
-      publishMavenStyle := true,
-      publishArtifact in Test := false,
-      pomIncludeRepository := { x => false },
-      pomExtra := _pomExtra
+      ) ++ commonDependenciesInTestScope
     )
   ) dependsOn(scalaOAuth2Core)
 
