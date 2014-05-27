@@ -112,6 +112,10 @@ object MyController extends Controller with OAuth2Provider {
 
 If you'd like to change the OAuth workflow, modify handleRequest methods of TokenEndPoint and ```ProtectedResource``` traits.
 
+## Examples
+
+- [Playframework 2.2](https://github.com/oyediyildiz/scala-oauth2-provider-example)
+
 ## Application using this library
 
 - [Typetalk](https://typetalk.in/)
