@@ -71,4 +71,10 @@ class AuthHeaderSpec extends FlatSpec {
     result.token should be ("token1")
   }
 
+  it should "fetch illegal parameter without =" in {
+    val result = AuthHeader.fetch(createRequest(Some("""OAuth access_token_value,fizz=buzz,foo""")))
+    result.token should be ("access_token_value")
+    result.params("fizz") should be ("buzz")
+    result.params("foo") should be ("")
+  }
 }
