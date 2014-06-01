@@ -57,7 +57,7 @@ object ScalaOAuth2Build extends Build {
     settings = scalaOAuth2ProviderSettings ++ Seq(
       name := "play2-oauth2-provider",
       description := "Support scala-oauth2-core library on Playframework Scala",
-      resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
+      resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/maven-releases/",
       libraryDependencies ++= Seq(
         "com.typesafe.play" %% "play" % _playVersion(scalaVersion.value) % "provided"
       ) ++ commonDependenciesInTestScope
