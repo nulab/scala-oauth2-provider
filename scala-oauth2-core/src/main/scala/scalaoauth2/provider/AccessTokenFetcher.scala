@@ -49,6 +49,7 @@ object AuthHeader extends AccessTokenFetcher {
       val pairs = REGEXP_DIV_COMMA.split(trimmedHeader).map { exp =>
         val (key, value) = exp.split("=", 2) match {
           case Array(k, v) => (k, v.replaceFirst("^\"", ""))
+          case Array(k) => (k, "")
         }
 
         (key, URLDecoder.decode(value.replaceFirst("\"$", ""), "UTF-8"))
