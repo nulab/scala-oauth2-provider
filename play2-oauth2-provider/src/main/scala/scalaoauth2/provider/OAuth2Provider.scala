@@ -114,7 +114,7 @@ trait OAuth2Provider extends OAuth2BaseProvider {
     TokenEndpoint.handleRequest(request, dataHandler) match {
       case Left(e) if e.statusCode == 400 => BadRequest(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
       case Left(e) if e.statusCode == 401 => Unauthorized(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
-      case Right(r) => Ok(Json.toJson(responseAccessToken(r)))
+      case Right(r) => Ok(Json.toJson(responseAccessToken(r))).withHeaders("Cache-Control" -> "no-store", "Pragma" -> "no-cache")
     }
   }
 
@@ -185,7 +185,7 @@ trait OAuth2AsyncProvider extends OAuth2BaseProvider {
     TokenEndpoint.handleRequest(request, dataHandler) match {
       case Left(e) if e.statusCode == 400 => Future.successful(BadRequest(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e)))
       case Left(e) if e.statusCode == 401 => Future.successful(Unauthorized(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e)))
-      case Right(r) => Future.successful(Ok(Json.toJson(responseAccessToken(r))))
+      case Right(r) => Future.successful(Ok(Json.toJson(responseAccessToken(r))).withHeaders("Cache-Control" -> "no-store", "Pragma" -> "no-cache"))
     }
   }
 
