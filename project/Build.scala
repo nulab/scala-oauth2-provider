@@ -4,14 +4,11 @@ import Keys._
 object ScalaOAuth2Build extends Build {
 
   lazy val _organization = "com.nulab-inc"
-  lazy val _version =  "0.7.2"
-  def _playVersion(version: String) = version match {
-    case "2.11.1" => "2.3.0"
-    case _ => "2.2.3"
-  }
+  lazy val _version =  "0.7.3-SNAPSHOT"
+  lazy val _playVersion = "2.3.2"
 
-  val _scalaVersion = "2.10.3"
-  val _crossScalaVersions = Seq("2.10.3", "2.11.1")
+  val _scalaVersion = "2.10.4"
+  val _crossScalaVersions = Seq("2.10.4", "2.11.1")
 
   val commonDependenciesInTestScope = Seq(
     "org.scalatest" %% "scalatest" % "2.2.0" % "test"
@@ -59,7 +56,7 @@ object ScalaOAuth2Build extends Build {
       description := "Support scala-oauth2-core library on Playframework Scala",
       resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/maven-releases/",
       libraryDependencies ++= Seq(
-        "com.typesafe.play" %% "play" % _playVersion(scalaVersion.value) % "provided"
+        "com.typesafe.play" %% "play" % _playVersion % "provided"
       ) ++ commonDependenciesInTestScope
     )
   ) dependsOn(scalaOAuth2Core)
