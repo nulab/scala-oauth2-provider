@@ -79,7 +79,7 @@ You should follow three steps below to work with Playframework.
 * Access to an authorized resource
 
 First, define your own controller with mixining ```OAuth2Provider``` trait provided by this library to issue access token.
-Asynchronous result is used in your controller then you can use ```OAuth2AsyncProvider```, which supports returning ```Future[SimpleResult]```.
+Asynchronous result is used in your controller then you can use ```OAuth2AsyncProvider```, which supports returning ```Future[Result]```.
 
 ```scala
 import scalaoauth2.provider._
