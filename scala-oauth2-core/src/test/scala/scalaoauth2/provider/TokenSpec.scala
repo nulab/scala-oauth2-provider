@@ -2,16 +2,19 @@ package scalaoauth2.provider
 
 import org.scalatest._
 import org.scalatest.Matchers._
+import org.scalatest.concurrent.ScalaFutures
 
-class TokenSpec extends FlatSpec {
+import scala.concurrent.Future
+
+class TokenSpec extends FlatSpec with ScalaFutures {
 
   def successfulDataHandler() = new MockDataHandler() {
 
-    override def validateClient(clientId: String, clientSecret: String, grantType: String): Boolean = true
+    override def validateClient(clientId: String, clientSecret: String, grantType: String): Future[Boolean] = Future.successful(true)
 
-    override def findUser(username: String, password: String): Option[MockUser] = Some(MockUser(10000, "username"))
+    override def findUser(username: String, password: String): Future[Option[MockUser]] = Future.successful(Some(MockUser(10000, "username")))
 
-    override def createAccessToken(authInfo: AuthInfo[MockUser]): AccessToken = AccessToken("token1", None, Some("all"), Some(3600), new java.util.Date())
+    override def createAccessToken(authInfo: AuthInfo[MockUser]): Future[AccessToken] = Future.successful(AccessToken("token1", None, Some("all"), Some(3600), new java.util.Date()))
 
   }
 
@@ -22,7 +25,9 @@ class TokenSpec extends FlatSpec {
     )
 
     val dataHandler = successfulDataHandler()
-    TokenEndpoint.handleRequest(request, dataHandler) should be ('right)
+    val futureResult = TokenEndpoint.handleRequest(request, dataHandler)
+
+    whenReady(futureResult) { result => result should be ('right)}
   }
 
   it should "be error if grant type doesn't exist" in {
@@ -32,10 +37,14 @@ class TokenSpec extends FlatSpec {
     )
 
     val dataHandler = successfulDataHandler()
-    intercept[InvalidRequest] {
-      TokenEndpoint.handleRequest(request, dataHandler) match {
-        case Left(e) => throw e
-        case _ =>
+    val futureResult = TokenEndpoint.handleRequest(request, dataHandler)
+
+    whenReady(futureResult) { result =>
+      intercept[InvalidRequest] {
+        result match {
+          case Left(e) => throw e
+          case _ =>
+        }
       }
     }
   }
@@ -47,10 +56,14 @@ class TokenSpec extends FlatSpec {
     )
 
     val dataHandler = successfulDataHandler()
-    intercept[UnsupportedGrantType] {
-      TokenEndpoint.handleRequest(request, dataHandler) match {
-        case Left(e) => throw e
-        case _ =>
+    val futureResult = TokenEndpoint.handleRequest(request, dataHandler)
+
+    whenReady(futureResult) { result =>
+      intercept[UnsupportedGrantType] {
+        result match {
+          case Left(e) => throw e
+          case _ =>
+        }
       }
     }
   }
@@ -62,10 +75,14 @@ class TokenSpec extends FlatSpec {
     )
 
     val dataHandler = successfulDataHandler()
-    intercept[InvalidRequest] {
-      TokenEndpoint.handleRequest(request, dataHandler) match {
-        case Left(e) => throw e
-        case _ =>
+    val futureResult = TokenEndpoint.handleRequest(request, dataHandler)
+
+    whenReady(futureResult) {result =>
+      intercept[InvalidRequest] {
+        result match {
+          case Left(e) => throw e
+          case _ =>
+        }
       }
     }
   }
@@ -77,15 +94,18 @@ class TokenSpec extends FlatSpec {
     )
 
     val dataHandler = new MockDataHandler() {
-
-      override def validateClient(clientId: String, clientSecret: String, grantType: String): Boolean = false
+      override def validateClient(clientId: String, clientSecret: String, grantType: String): Future[Boolean] = Future.successful(false)
 
     }
 
-    intercept[InvalidClient] {
-      TokenEndpoint.handleRequest(request, dataHandler) match {
-        case Left(e) => throw e
-        case _ =>
+    val futureResult = TokenEndpoint.handleRequest(request, dataHandler)
+
+    whenReady(futureResult) { result =>
+      intercept[InvalidClient] {
+        result match {
+          case Left(e) => throw e
+          case _ =>
+        }
       }
     }
   }

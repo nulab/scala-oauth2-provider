@@ -2,7 +2,11 @@ package scalaoauth2.provider
 
 import play.api.mvc._
 import play.api.libs.json._
+import scala.concurrent.Await
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.implicitConversions
+import scala.concurrent.duration._
 
 /**
  * Basic OAuth2 provider trait.
@@ -110,12 +114,16 @@ trait OAuth2Provider extends OAuth2BaseProvider {
    * @return Request is successful then return JSON to client in OAuth 2.0 format.
    *         Request is failed then return BadRequest or Unauthorized status to client with cause into the JSON.
    */
-  def issueAccessToken[A, U](dataHandler: DataHandler[U])(implicit request: play.api.mvc.Request[A]): Result = {
-    TokenEndpoint.handleRequest(request, dataHandler) match {
-      case Left(e) if e.statusCode == 400 => BadRequest(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
-      case Left(e) if e.statusCode == 401 => Unauthorized(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
-      case Right(r) => Ok(Json.toJson(responseAccessToken(r))).withHeaders("Cache-Control" -> "no-store", "Pragma" -> "no-cache")
+  def issueAccessToken[A, U](dataHandler: DataHandler[U])(implicit request: play.api.mvc.Request[A], timeout: scala.concurrent.duration.Duration = 60.seconds): Result = {
+    val futureResult: Future[Result] = TokenEndpoint.handleRequest(request, dataHandler).map { requestResult =>
+      requestResult match {
+        case Left(e) if e.statusCode == 400 => BadRequest(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
+        case Left(e) if e.statusCode == 401 => Unauthorized(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
+        case Right(r) => Ok(Json.toJson(responseAccessToken(r))).withHeaders("Cache-Control" -> "no-store", "Pragma" -> "no-cache")
+      }
     }
+
+    Await.result(futureResult, timeout)
   }
 
   /**
@@ -128,12 +136,16 @@ trait OAuth2Provider extends OAuth2BaseProvider {
    * @return Authentication is successful then the response use your API result.
    *         Authentication is failed then return BadRequest or Unauthorized status to client with cause into the JSON.
    */
-  def authorize[A, U](dataHandler: DataHandler[U])(callback: AuthInfo[U] => Result)(implicit request: play.api.mvc.Request[A]): Result = {
-    ProtectedResource.handleRequest(request, dataHandler) match {
-      case Left(e) if e.statusCode == 400 => BadRequest.withHeaders(responseOAuthErrorHeader(e))
-      case Left(e) if e.statusCode == 401 => Unauthorized.withHeaders(responseOAuthErrorHeader(e))
-      case Right(authInfo) => callback(authInfo)
+  def authorize[A, U](dataHandler: DataHandler[U])(callback: AuthInfo[U] => Result)(implicit request: play.api.mvc.Request[A], timeout: scala.concurrent.duration.Duration = 60.seconds): Result = {
+    val futureResult: Future[Result] = ProtectedResource.handleRequest(request, dataHandler).map { requestResult =>
+      requestResult match {
+        case Left(e) if e.statusCode == 400 => BadRequest.withHeaders(responseOAuthErrorHeader(e))
+        case Left(e) if e.statusCode == 401 => Unauthorized.withHeaders(responseOAuthErrorHeader(e))
+        case Right(authInfo) => callback(authInfo)
+      }
     }
+
+    Await.result(futureResult, timeout)
   }
 
 }
@@ -182,10 +194,12 @@ trait OAuth2AsyncProvider extends OAuth2BaseProvider {
    *         Request is failed then return BadRequest or Unauthorized status to client with cause into the JSON.
    */
   def issueAccessToken[A, U](dataHandler: DataHandler[U])(implicit request: play.api.mvc.Request[A]): Future[Result] = {
-    TokenEndpoint.handleRequest(request, dataHandler) match {
-      case Left(e) if e.statusCode == 400 => Future.successful(BadRequest(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e)))
-      case Left(e) if e.statusCode == 401 => Future.successful(Unauthorized(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e)))
-      case Right(r) => Future.successful(Ok(Json.toJson(responseAccessToken(r))).withHeaders("Cache-Control" -> "no-store", "Pragma" -> "no-cache"))
+    TokenEndpoint.handleRequest(request, dataHandler).map { requestResult =>
+      requestResult match {
+        case Left(e) if e.statusCode == 400 => BadRequest(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
+        case Left(e) if e.statusCode == 401 => Unauthorized(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
+        case Right(r) => Ok(Json.toJson(responseAccessToken(r))).withHeaders("Cache-Control" -> "no-store", "Pragma" -> "no-cache")
+      }
     }
   }
 
@@ -200,10 +214,12 @@ trait OAuth2AsyncProvider extends OAuth2BaseProvider {
    *         Authentication is failed then return BadRequest or Unauthorized status to client with cause into the JSON.
    */
   def authorize[A, U](dataHandler: DataHandler[U])(callback: AuthInfo[U] => Future[Result])(implicit request: play.api.mvc.Request[A]): Future[Result] = {
-    ProtectedResource.handleRequest(request, dataHandler) match {
-      case Left(e) if e.statusCode == 400 => Future.successful(BadRequest.withHeaders(responseOAuthErrorHeader(e)))
-      case Left(e) if e.statusCode == 401 => Future.successful(Unauthorized.withHeaders(responseOAuthErrorHeader(e)))
-      case Right(authInfo) => callback(authInfo)
+    ProtectedResource.handleRequest(request, dataHandler).flatMap { requestResult =>
+      requestResult match {
+        case Left(e) if e.statusCode == 400 => Future.successful(BadRequest.withHeaders(responseOAuthErrorHeader(e)))
+        case Left(e) if e.statusCode == 401 => Future.successful(Unauthorized.withHeaders(responseOAuthErrorHeader(e)))
+        case Right(authInfo) => callback(authInfo)
+      }
     }
   }
 
