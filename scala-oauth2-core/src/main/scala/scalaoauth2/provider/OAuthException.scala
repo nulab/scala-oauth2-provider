@@ -50,6 +50,12 @@ class InvalidGrant(description: String = "") extends OAuthError(401, description
 
 }
 
+class InvalidUser(description: String = "") extends OAuthError(401, description) {
+
+  override val errorType = "unknown_user_password_combination"
+
+}
+
 class UnsupportedGrantType(description: String = "") extends OAuthError(description) {
 
   override val errorType = "unsupported_grant_type"
