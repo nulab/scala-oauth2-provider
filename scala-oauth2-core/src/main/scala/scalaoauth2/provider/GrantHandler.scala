@@ -60,7 +60,7 @@ class Password(clientCredentialFetcher: ClientCredentialFetcher) extends GrantHa
     val clientCredential = clientCredentialFetcher.fetch(request).getOrElse(throw new InvalidRequest("BadRequest"))
     val username = request.requireUsername
     val password = request.requirePassword
-    val user = dataHandler.findUser(username, password).getOrElse(throw new InvalidGrant())
+    val user = dataHandler.findUser(username, password).getOrElse(throw new InvalidGrant("username or password is incorrect."))
     val scope = request.scope
     val clientId = clientCredential.clientId
     val authInfo = AuthInfo(user, clientId, scope, None)
