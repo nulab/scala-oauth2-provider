@@ -1,4 +1,4 @@
-# oauth2-server for Scala
+# oauth2-server for Scala [![Build Status](https://travis-ci.org/nulab/scala-oauth2-provider.svg?branch=master)](https://travis-ci.org/nulab/scala-oauth2-provider)
 
 [The OAuth 2.0](http://tools.ietf.org/html/rfc6749) server-side implementation written in Scala.
 
@@ -32,7 +32,7 @@ libraryDependencies ++= Seq(
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.nulab-inc" %% "play2-oauth2-provider" % "0.7.2"
+  "com.nulab-inc" %% "play2-oauth2-provider" % "0.7.3"
 )
 ```
 
