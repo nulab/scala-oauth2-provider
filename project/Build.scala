@@ -4,11 +4,11 @@ import Keys._
 object ScalaOAuth2Build extends Build {
 
   lazy val _organization = "com.nulab-inc"
-  lazy val _version =  "0.8.0"
-  lazy val _playVersion = "2.3.2"
+  lazy val _version =  "0.7.3"
+  lazy val _playVersion = "2.2.4"
 
   val _scalaVersion = "2.10.4"
-  val _crossScalaVersions = Seq("2.10.4", "2.11.1")
+  val _crossScalaVersions = Seq("2.10.4")
 
   val commonDependenciesInTestScope = Seq(
     "org.scalatest" %% "scalatest" % "2.2.0" % "test"
