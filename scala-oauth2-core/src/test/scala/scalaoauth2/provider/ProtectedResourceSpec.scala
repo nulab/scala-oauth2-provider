@@ -4,15 +4,21 @@ import org.scalatest._
 import org.scalatest.Matchers._
 import java.util.Date
 
-class ProtectedResourceSpec extends FlatSpec {
+import org.scalatest.concurrent.ScalaFutures
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+
+
+class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
 
   def successfulDataHandler() = new MockDataHandler() {
 
-    override def findAccessToken(token: String): Option[AccessToken] = Some(AccessToken("token1", Some("refreshToken1"), Some("all"), Some(3600), new Date()))
+    override def findAccessToken(token: String): Future[Option[AccessToken]] = Future.successful(Some(AccessToken("token1", Some("refreshToken1"), Some("all"), Some(3600), new Date())))
 
-    override def findAuthInfoByAccessToken(accessToken: AccessToken): Option[AuthInfo[MockUser]] = Some(
+    override def findAuthInfoByAccessToken(accessToken: AccessToken): Future[Option[AuthInfo[MockUser]]] = Future.successful(Some(
       AuthInfo(user = MockUser(10000, "username"), clientId = "clientId1", scope = Some("all"), redirectUri = None)
-    )
+    ))
 
   }
 
@@ -23,7 +29,7 @@ class ProtectedResourceSpec extends FlatSpec {
     )
 
     val dataHandler = successfulDataHandler()
-    ProtectedResource.handleRequest(request, dataHandler) should be ('right)
+    ProtectedResource.handleRequest(request, dataHandler).map(_ should be ('right))
   }
 
   it should "be handled request with token into body" in {
@@ -33,7 +39,7 @@ class ProtectedResourceSpec extends FlatSpec {
     )
 
     val dataHandler = successfulDataHandler()
-    ProtectedResource.handleRequest(request, dataHandler) should be ('right)
+    ProtectedResource.handleRequest(request, dataHandler).map(_ should be ('right))
   }
 
   it should "be lost expired" in {
@@ -44,18 +50,22 @@ class ProtectedResourceSpec extends FlatSpec {
 
     val dataHandler = new MockDataHandler() {
 
-      override def findAccessToken(token: String): Option[AccessToken] = Some(AccessToken("token1", Some("refreshToken1"), Some("all"), Some(3600), new Date(new Date().getTime() - 4000 * 1000)))
+      override def findAccessToken(token: String): Future[Option[AccessToken]] = Future.successful(Some(AccessToken("token1", Some("refreshToken1"), Some("all"), Some(3600), new Date(new Date().getTime() - 4000 * 1000))))
 
-      override def findAuthInfoByAccessToken(accessToken: AccessToken): Option[AuthInfo[MockUser]] = Some(
+      override def findAuthInfoByAccessToken(accessToken: AccessToken): Future[Option[AuthInfo[MockUser]]] = Future.successful(Some(
         AuthInfo(user = MockUser(10000, "username"), clientId = "clientId1", scope = Some("all"), redirectUri = None)
-      )
+      ))
 
     }
 
-    intercept[ExpiredToken] {
-      ProtectedResource.handleRequest(request, dataHandler) match {
-        case Left(e) => throw e
-        case _ =>
+    val futureResult = ProtectedResource.handleRequest(request, dataHandler)
+
+    whenReady(futureResult) { result =>
+      intercept[ExpiredToken] {
+        result match {
+          case Left(e) => throw e
+          case _ =>
+        }
       }
     }
   }
@@ -67,10 +77,14 @@ class ProtectedResourceSpec extends FlatSpec {
     )
 
     val dataHandler = successfulDataHandler()
-    intercept[InvalidRequest] {
-      ProtectedResource.handleRequest(request, dataHandler) match {
-        case Left(e) => throw e
-        case _ =>
+    val futureResult = ProtectedResource.handleRequest(request, dataHandler)
+
+    whenReady(futureResult) { result =>
+      intercept[InvalidRequest] {
+        result match {
+          case Left(e) => throw e
+          case _ =>
+        }
       }
     }
   }
