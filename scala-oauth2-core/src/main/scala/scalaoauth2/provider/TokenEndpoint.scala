@@ -1,5 +1,8 @@
 package scalaoauth2.provider
 
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+
 class TokenEndpoint {
 
   val fetcher = ClientCredentialFetcher
@@ -11,17 +14,22 @@ class TokenEndpoint {
     "password" -> new Password(fetcher)
   )
 
-  def handleRequest[U](request: AuthorizationRequest, dataHandler: DataHandler[U]): Either[OAuthError, GrantHandlerResult] = try {
-    val grantType = request.grantType.getOrElse(throw new InvalidRequest("grant_type not found"))
+  def handleRequest[U](request: AuthorizationRequest, dataHandler: DataHandler[U]): Future[Either[OAuthError, GrantHandlerResult]] = try {
+    val grantType = request.grantType.getOrElse(throw new InvalidRequest("the grant_type is not found"))
     val handler = handlers.get(grantType).getOrElse(throw new UnsupportedGrantType("the grant_type isn't supported"))
-    val clientCredential = fetcher.fetch(request).getOrElse(throw new InvalidRequest("client credential not found"))
-    if (!dataHandler.validateClient(clientCredential.clientId, clientCredential.clientSecret, grantType)) {
-      throw new InvalidClient
-    }
+    val clientCredential = fetcher.fetch(request).getOrElse(throw new InvalidRequest("client credential is not found"))
 
-    Right(handler.handleRequest(request, dataHandler))
+    dataHandler.validateClient(clientCredential.clientId, clientCredential.clientSecret, grantType).flatMap { validClient =>
+      if (!validClient) {
+        Future.successful(Left(throw new InvalidClient()))
+      } else {
+        handler.handleRequest(request, dataHandler).map(Right(_))
+      }
+    }.recover {
+      case e: OAuthError => Left(e)
+    }
   } catch {
-    case e: OAuthError => Left(e)
+    case e: OAuthError => Future.successful(Left(e))
   }
 }
 
