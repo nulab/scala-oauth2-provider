@@ -15,19 +15,18 @@ class TokenEndpoint {
   )
 
   def handleRequest[U](request: AuthorizationRequest, dataHandler: DataHandler[U]): Future[Either[OAuthError, GrantHandlerResult]] = try {
-    val grantType = request.grantType.getOrElse(throw new InvalidRequest("grant_type not found"))
+    val grantType = request.grantType.getOrElse(throw new InvalidRequest("the grant_type is not found"))
     val handler = handlers.get(grantType).getOrElse(throw new UnsupportedGrantType("the grant_type isn't supported"))
-    val clientCredential = fetcher.fetch(request).getOrElse(throw new InvalidRequest("client credential not found"))
+    val clientCredential = fetcher.fetch(request).getOrElse(throw new InvalidRequest("client credential is not found"))
 
-    val validateClientFuture = dataHandler.validateClient(clientCredential.clientId, clientCredential.clientSecret, grantType)
-
-    validateClientFuture.flatMap { validClient =>
-      try {
-        if (!validClient) throw new InvalidClient
+    dataHandler.validateClient(clientCredential.clientId, clientCredential.clientSecret, grantType).flatMap { validClient =>
+      if (!validClient) {
+        Future.successful(Left(throw new InvalidClient()))
+      } else {
         handler.handleRequest(request, dataHandler).map(Right(_))
-      } catch {
-        case e: OAuthError => Future.successful(Left(e))
       }
+    }.recover {
+      case e: OAuthError => Left(e)
     }
   } catch {
     case e: OAuthError => Future.successful(Left(e))

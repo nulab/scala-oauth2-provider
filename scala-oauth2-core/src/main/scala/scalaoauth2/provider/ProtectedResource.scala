@@ -12,24 +12,15 @@ trait ProtectedResource {
       fetcher.matches(request)
     }.map { fetcher =>
       val result = fetcher.fetch(request)
-      val accessToken: Future[Option[AccessToken]] = dataHandler.findAccessToken(result.token)
-
-      accessToken.flatMap { optionalToken =>
-        try {
-          val token = optionalToken.getOrElse(throw new InvalidToken("Invalid access token"))
-          if (dataHandler.isAccessTokenExpired(token)) {
-            throw new ExpiredToken()
-          }
-          if (dataHandler.isAccessTokenExpired(token)) {
-            throw new ExpiredToken()
-          }
-
-          val authInfo: Future[Option[AuthInfo[U]]] = dataHandler.findAuthInfoByAccessToken(token)
-
-          authInfo.map(_.map(Right(_)).getOrElse(Left(new InvalidToken("invalid access token"))))
-        } catch {
-          case e: OAuthError => Future.successful(Left(e))
+      dataHandler.findAccessToken(result.token).flatMap { optionalToken =>
+        val token = optionalToken.getOrElse(throw new InvalidToken("Not found the access token"))
+        if (dataHandler.isAccessTokenExpired(token)) {
+          throw new ExpiredToken()
         }
+
+        dataHandler.findAuthInfoByAccessToken(token).map(_.map(Right(_)).getOrElse(Left(new InvalidToken("Invalid the access token"))))
+      }.recover {
+        case e: OAuthError => Left(e)
       }
     }.getOrElse(throw new InvalidRequest("Access token was not specified"))
   } catch {
