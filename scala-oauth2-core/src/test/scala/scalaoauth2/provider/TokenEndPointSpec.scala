@@ -117,7 +117,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
     }
   }
 
-  it should "be" in {
+  it should "be Failure when DataHandler throws Exception" in {
     val request = AuthorizationRequest(
       Map("Authorization" -> Seq("Basic Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU=")),
       Map("grant_type" -> Seq("password"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
