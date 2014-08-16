@@ -13,16 +13,16 @@ trait ProtectedResource {
     }.map { fetcher =>
       val result = fetcher.fetch(request)
       dataHandler.findAccessToken(result.token).flatMap { optionalToken =>
-        val token = optionalToken.getOrElse(throw new InvalidToken("Not found the access token"))
+        val token = optionalToken.getOrElse(throw new InvalidToken("The access token is not found"))
         if (dataHandler.isAccessTokenExpired(token)) {
           throw new ExpiredToken()
         }
 
-        dataHandler.findAuthInfoByAccessToken(token).map(_.map(Right(_)).getOrElse(Left(new InvalidToken("Invalid the access token"))))
+        dataHandler.findAuthInfoByAccessToken(token).map(_.map(Right(_)).getOrElse(Left(new InvalidToken("The access token is invalid"))))
       }.recover {
         case e: OAuthError => Left(e)
       }
-    }.getOrElse(throw new InvalidRequest("Access token was not specified"))
+    }.getOrElse(throw new InvalidRequest("Access token is not found"))
   } catch {
     case e: OAuthError => Future.successful(Left(e))
   }

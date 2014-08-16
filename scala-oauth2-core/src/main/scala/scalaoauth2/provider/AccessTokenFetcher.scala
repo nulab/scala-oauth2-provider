@@ -39,7 +39,7 @@ object AuthHeader extends AccessTokenFetcher {
   override def fetch(request: ProtectedResourceRequest): FetchResult = {
     val header = request.requireHeader("Authorization")
     val matcher = REGEXP_AUTHORIZATION.findFirstMatchIn(header).getOrElse {
-      throw new InvalidRequest("parse() method was called when match() result was false.")
+      throw new InvalidRequest("Authorization is invalid")
     }
 
     val token = matcher.group(2)

@@ -85,7 +85,7 @@ class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
           case _ =>
         }
       }
-      e.description should be ("Access token was not specified")
+      e.description should be ("Access token is not found")
     }
   }
 
@@ -112,7 +112,7 @@ class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
           case _ =>
         }
       }
-      e.description should be ("Not found the access token")
+      e.description should be ("The access token is not found")
     }
   }
 
@@ -139,7 +139,7 @@ class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
           case _ =>
         }
       }
-      e.description should be ("Invalid the access token")
+      e.description should be ("The access token is invalid")
     }
   }
 }

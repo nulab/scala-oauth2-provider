@@ -49,7 +49,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
           case _ =>
         }
       }
-      e.description should be ("the grant_type is not found")
+      e.description should be ("grant_type is not found")
     }
   }
 
@@ -69,7 +69,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
           case _ =>
         }
       }
-      e.description should be ("the grant_type isn't supported")
+      e.description should be ("The grant_type is not supported")
     }
   }
 
@@ -89,7 +89,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
           case _ =>
         }
       }
-      e.description should be ("client credential is not found")
+      e.description should be ("Client credential is not found")
     }
   }
 

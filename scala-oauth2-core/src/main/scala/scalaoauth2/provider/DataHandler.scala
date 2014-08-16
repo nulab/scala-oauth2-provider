@@ -144,7 +144,7 @@ trait DataHandler[U] {
   def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[U]]]
 
   /**
-   * Find userId by clientId and clientSecret.
+   * Find user by clientId and clientSecret.
    *
    * If you don't support Client Credentials Grant then doesn't need implementing.
    *

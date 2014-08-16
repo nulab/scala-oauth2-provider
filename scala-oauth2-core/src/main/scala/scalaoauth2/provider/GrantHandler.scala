@@ -9,7 +9,6 @@ trait GrantHandler {
 
   def handleRequest[U](request: AuthorizationRequest, dataHandler: DataHandler[U]): Future[GrantHandlerResult]
 
-
   /**
    * Returns valid access token.
    *
@@ -41,11 +40,11 @@ trait GrantHandler {
 class RefreshToken(clientCredentialFetcher: ClientCredentialFetcher) extends GrantHandler {
 
   override def handleRequest[U](request: AuthorizationRequest, dataHandler: DataHandler[U]): Future[GrantHandlerResult] = {
-    val clientCredential = clientCredentialFetcher.fetch(request).getOrElse(throw new InvalidRequest("BadRequest"))
+    val clientCredential = clientCredentialFetcher.fetch(request).getOrElse(throw new InvalidRequest("Authorization header is invalid"))
     val refreshToken = request.requireRefreshToken
 
     dataHandler.findAuthInfoByRefreshToken(refreshToken).flatMap { authInfoOption =>
-      val authInfo = authInfoOption.getOrElse(throw new InvalidGrant("NotFound"))
+      val authInfo = authInfoOption.getOrElse(throw new InvalidGrant("Authorized information is not found by the refresh token"))
       if (authInfo.clientId != clientCredential.clientId) {
         throw new InvalidClient
       }
@@ -66,7 +65,7 @@ class RefreshToken(clientCredentialFetcher: ClientCredentialFetcher) extends Gra
 class Password(clientCredentialFetcher: ClientCredentialFetcher) extends GrantHandler {
 
   override def handleRequest[U](request: AuthorizationRequest, dataHandler: DataHandler[U]): Future[GrantHandlerResult] = {
-    val clientCredential = clientCredentialFetcher.fetch(request).getOrElse(throw new InvalidRequest("BadRequest"))
+    val clientCredential = clientCredentialFetcher.fetch(request).getOrElse(throw new InvalidRequest("Authorization header is invalid"))
     val username = request.requireUsername
     val password = request.requirePassword
 
@@ -84,13 +83,13 @@ class Password(clientCredentialFetcher: ClientCredentialFetcher) extends GrantHa
 class ClientCredentials(clientCredentialFetcher: ClientCredentialFetcher) extends GrantHandler {
 
   override def handleRequest[U](request: AuthorizationRequest, dataHandler: DataHandler[U]): Future[GrantHandlerResult] = {
-    val clientCredential = clientCredentialFetcher.fetch(request).getOrElse(throw new InvalidRequest("BadRequest"))
+    val clientCredential = clientCredentialFetcher.fetch(request).getOrElse(throw new InvalidRequest("Authorization header is invalid"))
     val clientSecret = clientCredential.clientSecret
     val clientId = clientCredential.clientId
     val scope = request.scope
 
     dataHandler.findClientUser(clientId, clientSecret, scope).flatMap { userOption =>
-      val user = userOption.getOrElse(throw new InvalidGrant())
+      val user = userOption.getOrElse(throw new InvalidGrant("client_id or client_secret or scope is incorrect"))
       val authInfo = AuthInfo(user, clientId, scope, None)
 
       issueAccessToken(dataHandler, authInfo)
@@ -102,13 +101,13 @@ class ClientCredentials(clientCredentialFetcher: ClientCredentialFetcher) extend
 class AuthorizationCode(clientCredentialFetcher: ClientCredentialFetcher) extends GrantHandler {
 
   override def handleRequest[U](request: AuthorizationRequest, dataHandler: DataHandler[U]): Future[GrantHandlerResult] = {
-    val clientCredential = clientCredentialFetcher.fetch(request).getOrElse(throw new InvalidRequest("BadRequest"))
+    val clientCredential = clientCredentialFetcher.fetch(request).getOrElse(throw new InvalidRequest("Authorization header is invalid"))
     val clientId = clientCredential.clientId
     val code = request.requireCode
     val redirectUri = request.redirectUri
 
     dataHandler.findAuthInfoByCode(code).flatMap { authInfoOption =>
-      val authInfo = authInfoOption.getOrElse(throw new InvalidGrant())
+      val authInfo = authInfoOption.getOrElse(throw new InvalidGrant("Authorized information is not found by the code"))
       if (authInfo.clientId != clientId) {
         throw new InvalidClient
       }
