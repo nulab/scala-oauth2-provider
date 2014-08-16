@@ -139,4 +139,24 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
       case Failure(e) => e.getMessage should be ("Failure")
     }
   }
+
+  it should "be possible to customize supporting grant types" in {
+
+    object TestTokenEndpoint extends TokenEndpoint {
+      override val handlers = Map(
+        "password" -> new Password(fetcher)
+      )
+    }
+
+    val f = TestTokenEndpoint.handleRequest(AuthorizationRequest(Map(), Map("grant_type" -> Seq("client_credentials"))), successfulDataHandler())
+    whenReady(f) { result =>
+      val e = intercept[UnsupportedGrantType] {
+        result match {
+          case Left(e) => throw e
+          case _ =>
+        }
+      }
+      e.description should be ("The grant_type is not supported")
+    }
+  }
 }

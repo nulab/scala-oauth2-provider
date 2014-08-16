@@ -3,7 +3,7 @@ package scalaoauth2.provider
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class TokenEndpoint {
+trait TokenEndpoint {
 
   val fetcher = ClientCredentialFetcher
 

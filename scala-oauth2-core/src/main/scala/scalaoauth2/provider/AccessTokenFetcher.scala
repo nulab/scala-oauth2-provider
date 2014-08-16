@@ -14,7 +14,7 @@ trait AccessTokenFetcher {
 
 object RequestParameter extends AccessTokenFetcher {
 
-  override def matches(request :ProtectedResourceRequest): Boolean = {
+  override def matches(request: ProtectedResourceRequest): Boolean = {
     request.oauthToken.isDefined || request.accessToken.isDefined
   }
 

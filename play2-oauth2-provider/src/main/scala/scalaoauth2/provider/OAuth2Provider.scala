@@ -13,6 +13,10 @@ import scala.concurrent.duration._
  */
 trait OAuth2BaseProvider extends Results {
 
+  val protectedResource = ProtectedResource
+
+  val tokenEndpoint = TokenEndpoint
+
   implicit def play2oauthRequest(request: RequestHeader): AuthorizationRequest = {
     AuthorizationRequest(request.headers.toMap, request.queryString)
   }
@@ -115,7 +119,7 @@ trait OAuth2Provider extends OAuth2BaseProvider {
    *         Request is failed then return BadRequest or Unauthorized status to client with cause into the JSON.
    */
   def issueAccessToken[A, U](dataHandler: DataHandler[U], timeout: Duration = 60.seconds)(implicit request: Request[A]): Result = {
-    val f = TokenEndpoint.handleRequest(request, dataHandler).map { requestResult =>
+    val f = tokenEndpoint.handleRequest(request, dataHandler).map { requestResult =>
       requestResult match {
         case Left(e) if e.statusCode == 400 => BadRequest(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
         case Left(e) if e.statusCode == 401 => Unauthorized(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
@@ -137,7 +141,7 @@ trait OAuth2Provider extends OAuth2BaseProvider {
    *         Authentication is failed then return BadRequest or Unauthorized status to client with cause into the JSON.
    */
   def authorize[A, U](dataHandler: DataHandler[U], timeout: Duration = 60.seconds)(callback: AuthInfo[U] => Result)(implicit request: Request[A]): Result = {
-    val f = ProtectedResource.handleRequest(request, dataHandler).map { requestResult =>
+    val f = protectedResource.handleRequest(request, dataHandler).map { requestResult =>
       requestResult match {
         case Left(e) if e.statusCode == 400 => BadRequest.withHeaders(responseOAuthErrorHeader(e))
         case Left(e) if e.statusCode == 401 => Unauthorized.withHeaders(responseOAuthErrorHeader(e))
@@ -192,7 +196,7 @@ trait OAuth2AsyncProvider extends OAuth2BaseProvider {
    *         Request is failed then return BadRequest or Unauthorized status to client with cause into the JSON.
    */
   def issueAccessToken[A, U](dataHandler: DataHandler[U])(implicit request: Request[A]): Future[Result] = {
-    TokenEndpoint.handleRequest(request, dataHandler).map { requestResult =>
+    tokenEndpoint.handleRequest(request, dataHandler).map { requestResult =>
       requestResult match {
         case Left(e) if e.statusCode == 400 => BadRequest(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
         case Left(e) if e.statusCode == 401 => Unauthorized(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
@@ -212,7 +216,7 @@ trait OAuth2AsyncProvider extends OAuth2BaseProvider {
    *         Authentication is failed then return BadRequest or Unauthorized status to client with cause into the JSON.
    */
   def authorize[A, U](dataHandler: DataHandler[U])(callback: AuthInfo[U] => Future[Result])(implicit request: Request[A]): Future[Result] = {
-    ProtectedResource.handleRequest(request, dataHandler).flatMap { requestResult =>
+    protectedResource.handleRequest(request, dataHandler).flatMap { requestResult =>
       requestResult match {
         case Left(e) if e.statusCode == 400 => Future.successful(BadRequest.withHeaders(responseOAuthErrorHeader(e)))
         case Left(e) if e.statusCode == 401 => Future.successful(Unauthorized.withHeaders(responseOAuthErrorHeader(e)))
