@@ -6,20 +6,24 @@ case class ClientCredential(clientId: String, clientSecret: String)
 
 trait ClientCredentialFetcher {
 
+  val REGEXP_AUTHORIZATION = """^\s*Basic\s+(.+?)\s*$""".r
+
   def fetch(request: AuthorizationRequest): Option[ClientCredential] = {
-    request.header("Authorization") match {
-      case Some(authorization) if authorization.length > 5 => {
-        val decoded = new String(Base64.decodeBase64(authorization.substring(6).getBytes), "UTF-8")
+    request.header("Authorization").flatMap {
+      REGEXP_AUTHORIZATION.findFirstMatchIn
+    } match {
+      case Some(matcher) =>
+        val authorization = matcher.group(1)
+        val decoded = new String(Base64.decodeBase64(authorization.getBytes), "UTF-8")
         if (decoded.indexOf(':') > 0) {
           decoded.split(":", 2) match {
-            case Array(clientId, clientSecret) => Option(ClientCredential(clientId, clientSecret))
-            case Array(clientId) => Option(ClientCredential(clientId, ""))
+            case Array(clientId, clientSecret) => Some(ClientCredential(clientId, clientSecret))
+            case Array(clientId) => Some(ClientCredential(clientId, ""))
             case _ => None
           }
         } else {
           None
         }
-      }
       case _ => request.clientId.map { clientId =>
         ClientCredential(clientId, request.clientSecret.getOrElse(""))
       }

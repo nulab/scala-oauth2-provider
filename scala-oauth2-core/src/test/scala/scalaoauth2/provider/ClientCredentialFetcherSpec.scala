@@ -18,7 +18,7 @@ class ClientCredentialFetcherSpec extends FlatSpec {
     c.clientId should be ("client_id_value")
     c.clientSecret should be ("client_secret_value")
   }
-  
+
   it should "fetch empty client_secret" in {
     val request = AuthorizationRequest(Map("Authorization" -> Seq("Basic Y2xpZW50X2lkX3ZhbHVlOg==")), Map())
     val Some(c) = ClientCredentialFetcher.fetch(request)
@@ -31,7 +31,7 @@ class ClientCredentialFetcherSpec extends FlatSpec {
     ClientCredentialFetcher.fetch(request) should be (None)
   }
 
-  it should "not fetch invalidate Base64" in {
+  it should "not fetch invalid Base64" in {
     val request = AuthorizationRequest(Map("Authorization" -> Seq("Basic basic")), Map())
     ClientCredentialFetcher.fetch(request) should be (None)
   }
@@ -48,7 +48,7 @@ class ClientCredentialFetcherSpec extends FlatSpec {
     c.clientId should be ("client_id_value")
     c.clientSecret should be ("")
   }
-  
+
   it should "not fetch missing parameter" in {
     ClientCredentialFetcher.fetch(AuthorizationRequest(Map(), Map("client_secret" -> Seq("client_secret_value")))) should be (None)
   }
@@ -56,5 +56,15 @@ class ClientCredentialFetcherSpec extends FlatSpec {
   it should "not fetch invalid parameter" in {
     val request = AuthorizationRequest(Map("Authorization" -> Seq("")), Map())
     ClientCredentialFetcher.fetch(request) should be (None)
+  }
+
+  it should "fetch parameter with invalid header" in {
+    val request = AuthorizationRequest(
+      Map("Authorization" -> Seq("fakeheader aaaa")),
+      Map("client_id" -> Seq("client_id_value"), "client_secret" -> Seq("client_secret_value"))
+    )
+    val Some(c) = ClientCredentialFetcher.fetch(request)
+    c.clientId should be ("client_id_value")
+    c.clientSecret should be ("client_secret_value")
   }
 }
