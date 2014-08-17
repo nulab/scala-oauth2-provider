@@ -80,6 +80,8 @@ class MyDataHandler extends DataHandler[User] {
 }
 ```
 
+If your data access is blocking for the data storage, then you just wrap your implementation in the ```DataHandler``` trait with ```Future.successful(...)```.
+
 For more details, refer to Scaladoc of ```DataHandler```.
 
 ### Work with Playframework
