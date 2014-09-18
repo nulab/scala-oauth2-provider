@@ -15,9 +15,9 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
 
     override def validateClient(clientId: String, clientSecret: String, grantType: String): Future[Boolean] = Future.successful(true)
 
-    override def findUser(username: String, password: String): Future[Option[MockUser]] = Future.successful(Some(MockUser(10000, "username")))
+    override def findUser(username: String, password: String): Future[Option[User]] = Future.successful(Some(MockUser(10000, "username")))
 
-    override def createAccessToken(authInfo: AuthInfo[MockUser]): Future[AccessToken] = Future.successful(AccessToken("token1", None, Some("all"), Some(3600), new Date()))
+    override def createAccessToken(authInfo: AuthInfo[User]): Future[AccessToken] = Future.successful(AccessToken("token1", None, Some("all"), Some(3600), new Date()))
 
   }
 
@@ -127,9 +127,9 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
 
       override def validateClient(clientId: String, clientSecret: String, grantType: String): Future[Boolean] = Future.successful(true)
 
-      override def findUser(username: String, password: String): Future[Option[MockUser]] = Future.successful(Some(MockUser(10000, "username")))
+      override def findUser(username: String, password: String): Future[Option[User]] = Future.successful(Some(MockUser(10000, "username")))
 
-      override def createAccessToken(authInfo: AuthInfo[MockUser]): Future[AccessToken] = throw new Exception("Failure")
+      override def createAccessToken(authInfo: AuthInfo[User]): Future[AccessToken] = throw new Exception("Failure")
 
     }
 

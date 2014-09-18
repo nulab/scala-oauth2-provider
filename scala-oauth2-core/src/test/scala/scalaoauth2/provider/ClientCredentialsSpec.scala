@@ -15,9 +15,9 @@ class ClientCredentialsSpec extends FlatSpec with ScalaFutures {
     val request = AuthorizationRequest(Map(), Map("scope" -> Seq("all")))
     val f = clientCredentials.handleRequest(request, new MockDataHandler() {
 
-      override def findClientUser(clientId: String, clientSecret: String, scope: Option[String]): Future[Option[MockUser]] = Future.successful(Some(MockUser(10000, "username")))
+      override def findClientUser(clientId: String, clientSecret: String, scope: Option[String]): Future[Option[User]] = Future.successful(Some(MockUser(10000, "username")))
 
-      override def createAccessToken(authInfo: AuthInfo[MockUser]): Future[AccessToken] = Future.successful(AccessToken("token1", None, Some("all"), Some(3600), new java.util.Date()))
+      override def createAccessToken(authInfo: AuthInfo[User]): Future[AccessToken] = Future.successful(AccessToken("token1", None, Some("all"), Some(3600), new java.util.Date()))
     })
 
     whenReady(f) { result =>
