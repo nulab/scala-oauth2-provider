@@ -4,8 +4,6 @@ import org.scalatest._
 import org.scalatest.Matchers._
 import org.scalatest.concurrent.ScalaFutures
 
-import scala.concurrent.Await
-import scala.concurrent.duration._
 import scala.concurrent.Future
 
 class PasswordSpec extends FlatSpec with ScalaFutures {
@@ -15,9 +13,9 @@ class PasswordSpec extends FlatSpec with ScalaFutures {
     val request = AuthorizationRequest(Map(), Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all")))
     val f = password.handleRequest(request, new MockDataHandler() {
 
-      override def findUser(username: String, password: String): Future[Option[MockUser]] = Future.successful(Some(MockUser(10000, "username")))
+      override def findUser(username: String, password: String): Future[Option[User]] = Future.successful(Some(MockUser(10000, "username")))
 
-      override def createAccessToken(authInfo: AuthInfo[MockUser]): Future[AccessToken] = Future.successful(AccessToken("token1", Some("refreshToken1"), Some("all"), Some(3600), new java.util.Date()))
+      override def createAccessToken(authInfo: AuthInfo[User]): Future[AccessToken] = Future.successful(AccessToken("token1", Some("refreshToken1"), Some("all"), Some(3600), new java.util.Date()))
 
     })
 
