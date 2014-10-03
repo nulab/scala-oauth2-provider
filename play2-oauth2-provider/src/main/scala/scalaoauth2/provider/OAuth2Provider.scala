@@ -114,10 +114,11 @@ trait OAuth2Provider extends OAuth2BaseProvider {
    *
    * @param dataHandler Implemented DataHander for register access token to your system.
    * @param request Playframework is provided HTTP request interface.
+   * @tparam A play.api.mvc.Request has type.
    * @return Request is successful then return JSON to client in OAuth 2.0 format.
    *         Request is failed then return BadRequest or Unauthorized status to client with cause into the JSON.
    */
-  def issueAccessToken[U](dataHandler: DataHandler[U], timeout: Duration = 60.seconds)(implicit request: RequestHeader): Result = {
+  def issueAccessToken[A, U](dataHandler: DataHandler[U], timeout: Duration = 60.seconds)(implicit request: Request[A]): Result = {
     val f = tokenEndpoint.handleRequest(request, dataHandler).map {
       case Left(e) if e.statusCode == 400 => BadRequest(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
       case Left(e) if e.statusCode == 401 => Unauthorized(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
@@ -185,10 +186,11 @@ trait OAuth2AsyncProvider extends OAuth2BaseProvider {
    *
    * @param dataHandler Implemented DataHander for register access token to your system.
    * @param request Playframework is provided HTTP request interface.
+   * @tparam A play.api.mvc.Request has type.
    * @return Request is successful then return JSON to client in OAuth 2.0 format.
    *         Request is failed then return BadRequest or Unauthorized status to client with cause into the JSON.
    */
-  def issueAccessToken[U](dataHandler: DataHandler[U])(implicit request: RequestHeader): Future[Result] = {
+  def issueAccessToken[A, U](dataHandler: DataHandler[U])(implicit request: Request[A]): Future[Result] = {
     tokenEndpoint.handleRequest(request, dataHandler).map {
       case Left(e) if e.statusCode == 400 => BadRequest(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
       case Left(e) if e.statusCode == 401 => Unauthorized(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
