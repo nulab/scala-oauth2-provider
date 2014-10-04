@@ -93,6 +93,27 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
     }
   }
 
+  it should "not be invalid request without client credential when not required" in {
+    val request = AuthorizationRequest(
+      Map(),
+      Map("grant_type" -> Seq("password"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
+    )
+
+    val dataHandler = successfulDataHandler()
+    val passwordNoCred = new Password(ClientCredentialFetcher) {
+      override def clientCredentialRequired = false
+    }
+    class MyTokenEndpoint extends TokenEndpoint {
+      override val handlers = Map(
+        "password" -> passwordNoCred
+      )
+    }
+
+    val f = (new MyTokenEndpoint().handleRequest(request, dataHandler))
+
+    whenReady(f) { result => result should be ('right)}
+  }
+
   it should "be invalid client if client information is wrong" in {
     val request = AuthorizationRequest(
       Map("Authorization" -> Seq("Basic Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU=")),

@@ -8,8 +8,15 @@ import scala.concurrent.Future
 
 class PasswordSpec extends FlatSpec with ScalaFutures {
 
-  it should "handle request" in {
-    val password = new Password(new MockClientCredentialFetcher())
+  val passwordClientCredReq = new Password(new MockClientCredentialFetcher())
+  val passwordNoClientCredReq = new Password(new MockClientCredentialFetcher()) {
+    override def clientCredentialRequired = false
+  }
+
+  "Password when client credential required" should "handle request" in handlesRequest(passwordClientCredReq)
+  "Password when client credential not required" should "handle request" in handlesRequest(passwordNoClientCredReq)
+
+  def handlesRequest(password: Password) = {
     val request = AuthorizationRequest(Map(), Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all")))
     val f = password.handleRequest(request, new MockDataHandler() {
 
@@ -20,11 +27,11 @@ class PasswordSpec extends FlatSpec with ScalaFutures {
     })
 
     whenReady(f) { result =>
-      result.tokenType should be ("Bearer")
-      result.accessToken should be ("token1")
-      result.expiresIn should be (Some(3600))
-      result.refreshToken should be (Some("refreshToken1"))
-      result.scope should be (Some("all"))
+      result.tokenType should be("Bearer")
+      result.accessToken should be("token1")
+      result.expiresIn should be(Some(3600))
+      result.refreshToken should be(Some("refreshToken1"))
+      result.scope should be(Some("all"))
     }
   }
 

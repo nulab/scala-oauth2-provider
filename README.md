@@ -126,6 +126,25 @@ object MyController extends Controller with OAuth2Provider {
 
 If you'd like to change the OAuth workflow, modify handleRequest methods of TokenEndPoint and ```ProtectedResource``` traits.
 
+### Customizing Grant Handlers
+
+If you want to change which grant types are supported or to use a customized handler for a grant type, you can
+override the ```handlers``` map in a customized ```TokenEndpoint``` trait.  Here's an example of a customized
+```TokenEndpoint``` that 1) only supports the ```password``` grant type, and 2) customizes the ``password``` grant
+type handler to not require client credentials:
+
+```scala
+class MyTokenEndpoint extends TokenEndpoint {
+  val passwordNoCred = new Password(ClientCredentialFetcher) {
+    override def clientCredentialRequired = false
+  }
+
+  override val handlers = Map(
+    "password" -> passwordNoCred
+  )
+}
+```
+
 ## Examples
 
 - [Playframework 2.2](https://github.com/oyediyildiz/scala-oauth2-provider-example)

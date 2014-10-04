@@ -24,7 +24,7 @@ case class AccessToken(token: String, refreshToken: Option[String], scope: Optio
  * @param scope Inform the client of the scope of the access token issued.
  * @param redirectUri This value is used by Authorization Code Grant.
  */
-case class AuthInfo[+U](user: U, clientId: String, scope: Option[String], redirectUri: Option[String])
+case class AuthInfo[+U](user: U, clientId: Option[String], scope: Option[String], redirectUri: Option[String])
 
 /**
  * Provide accessing to data storage for using OAuth 2.0.
