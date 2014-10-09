@@ -129,7 +129,7 @@ If you'd like to change the OAuth workflow, modify handleRequest methods of Toke
 ### Customizing Grant Handlers
 
 If you want to change which grant types are supported or to use a customized handler for a grant type, you can
-override the ```handlers``` map in a customized ```TokenEndpoint``` trait.  Here's an example of a customized
+override the ```handlers``` map in a customized ```TokenEndpoint``` trait since version 0.10.0.  Here's an example of a customized
 ```TokenEndpoint``` that 1) only supports the ```password``` grant type, and 2) customizes the ``password``` grant
 type handler to not require client credentials:
 
