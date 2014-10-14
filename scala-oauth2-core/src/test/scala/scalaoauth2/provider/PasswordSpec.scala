@@ -8,17 +8,17 @@ import scala.concurrent.Future
 
 class PasswordSpec extends FlatSpec with ScalaFutures {
 
-  val passwordClientCredReq = new Password(new MockClientCredentialFetcher())
-  val passwordNoClientCredReq = new Password(new MockClientCredentialFetcher()) {
+  val passwordClientCredReq = new Password()
+  val passwordNoClientCredReq = new Password() {
     override def clientCredentialRequired = false
   }
 
-  "Password when client credential required" should "handle request" in handlesRequest(passwordClientCredReq)
-  "Password when client credential not required" should "handle request" in handlesRequest(passwordNoClientCredReq)
+  "Password when client credential required" should "handle request" in handlesRequest(passwordClientCredReq, Some(ClientCredential("clientId1", "clientSecret1")))
+  "Password when client credential not required" should "handle request" in handlesRequest(passwordNoClientCredReq, None)
 
-  def handlesRequest(password: Password) = {
+  def handlesRequest(password: Password, clientCredential: Option[ClientCredential]) = {
     val request = AuthorizationRequest(Map(), Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all")))
-    val f = password.handleRequest(request, new MockDataHandler() {
+    val f = password.handleRequest(request, clientCredential, new MockDataHandler() {
 
       override def findUser(username: String, password: String): Future[Option[User]] = Future.successful(Some(MockUser(10000, "username")))
 
@@ -33,11 +33,5 @@ class PasswordSpec extends FlatSpec with ScalaFutures {
       result.refreshToken should be(Some("refreshToken1"))
       result.scope should be(Some("all"))
     }
-  }
-
-  class MockClientCredentialFetcher extends ClientCredentialFetcher {
-
-    override def fetch(request: AuthorizationRequest): Option[ClientCredential] = Some(ClientCredential("clientId1", "clientSecret1"))
-
   }
 }

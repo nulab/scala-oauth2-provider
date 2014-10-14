@@ -7,10 +7,10 @@ trait TokenEndpoint {
   val fetcher = ClientCredentialFetcher
 
   val handlers = Map(
-    "authorization_code" -> new AuthorizationCode(fetcher),
-    "refresh_token" -> new RefreshToken(fetcher),
-    "client_credentials" -> new ClientCredentials(fetcher),
-    "password" -> new Password(fetcher)
+    "authorization_code" -> new AuthorizationCode(),
+    "refresh_token" -> new RefreshToken(),
+    "client_credentials" -> new ClientCredentials(),
+    "password" -> new Password()
   )
 
   def handleRequest[U](request: AuthorizationRequest, dataHandler: DataHandler[U]): Future[Either[OAuthError, GrantHandlerResult]] = try {
@@ -22,7 +22,7 @@ trait TokenEndpoint {
         if (!validClient) {
           Future.successful(Left(throw new InvalidClient()))
         } else {
-          handler.handleRequest(request, dataHandler).map(Right(_))
+          handler.handleRequest(request, Some(clientCredential), dataHandler).map(Right(_))
         }
       }.recover {
         case e: OAuthError => Left(e)
@@ -31,7 +31,7 @@ trait TokenEndpoint {
       if (handler.clientCredentialRequired) {
         throw new InvalidRequest("Client credential is not found")
       } else {
-        handler.handleRequest(request, dataHandler).map(Right(_)).recover {
+        handler.handleRequest(request, None, dataHandler).map(Right(_)).recover {
           case e: OAuthError => Left(e)
         }
       }

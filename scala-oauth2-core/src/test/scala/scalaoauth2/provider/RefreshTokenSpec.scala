@@ -4,16 +4,14 @@ import org.scalatest.FlatSpec
 import org.scalatest.Matchers._
 import org.scalatest.concurrent.ScalaFutures
 
-import scala.concurrent.Await
-import scala.concurrent.duration._
 import scala.concurrent.Future
 
 class RefreshTokenSpec extends FlatSpec with ScalaFutures {
 
   it should "handle request" in {
-    val refreshToken = new RefreshToken(new MockClientCredentialFetcher())
+    val refreshToken = new RefreshToken()
     val request = AuthorizationRequest(Map(), Map("refresh_token" -> Seq("refreshToken1")))
-    val f = refreshToken.handleRequest(request, new MockDataHandler() {
+    val f = refreshToken.handleRequest(request, Some(ClientCredential("clientId1", "clientSecret1")), new MockDataHandler() {
 
       override def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[User]]] =
         Future.successful(Some(AuthInfo(user = MockUser(10000, "username"), clientId = Some("clientId1"), scope = None, redirectUri = None)))
@@ -29,11 +27,5 @@ class RefreshTokenSpec extends FlatSpec with ScalaFutures {
       result.refreshToken should be (Some("refreshToken1"))
       result.scope should be (None)
     }
-  }
-
-  class MockClientCredentialFetcher extends ClientCredentialFetcher {
-
-    override def fetch(request: AuthorizationRequest): Option[ClientCredential] = Some(ClientCredential("clientId1", "clientSecret1"))
-
   }
 }

@@ -1,19 +1,17 @@
 package scalaoauth2.provider
 
-import org.scalatest._
 import org.scalatest.Matchers._
+import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
 
-import scala.concurrent.Await
-import scala.concurrent.duration._
 import scala.concurrent.Future
 
 class ClientCredentialsSpec extends FlatSpec with ScalaFutures {
 
   it should "handle request" in {
-    val clientCredentials = new ClientCredentials(new MockClientCredentialFetcher())
+    val clientCredentials = new ClientCredentials()
     val request = AuthorizationRequest(Map(), Map("scope" -> Seq("all")))
-    val f = clientCredentials.handleRequest(request, new MockDataHandler() {
+    val f = clientCredentials.handleRequest(request, Some(ClientCredential("clientId1", "clientSecret1")), new MockDataHandler() {
 
       override def findClientUser(clientId: String, clientSecret: String, scope: Option[String]): Future[Option[User]] = Future.successful(Some(MockUser(10000, "username")))
 
@@ -27,11 +25,5 @@ class ClientCredentialsSpec extends FlatSpec with ScalaFutures {
       result.refreshToken should be (None)
       result.scope should be (Some("all"))
     }
-  }
-
-  class MockClientCredentialFetcher extends ClientCredentialFetcher {
-
-    override def fetch(request: AuthorizationRequest): Option[ClientCredential] = Some(ClientCredential("clientId1", "clientSecret1"))
-
   }
 }

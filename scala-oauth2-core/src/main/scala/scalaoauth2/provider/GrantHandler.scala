@@ -13,7 +13,7 @@ trait GrantHandler {
    */
   def clientCredentialRequired = true
 
-  def handleRequest[U](request: AuthorizationRequest, dataHandler: DataHandler[U]): Future[GrantHandlerResult]
+  def handleRequest[U](request: AuthorizationRequest, optionalClientCredential: Option[ClientCredential], dataHandler: DataHandler[U]): Future[GrantHandlerResult]
 
   /**
    * Returns valid access token.
@@ -43,10 +43,10 @@ trait GrantHandler {
   }
 }
 
-class RefreshToken(clientCredentialFetcher: ClientCredentialFetcher) extends GrantHandler {
+class RefreshToken extends GrantHandler {
 
-  override def handleRequest[U](request: AuthorizationRequest, dataHandler: DataHandler[U]): Future[GrantHandlerResult] = {
-    val clientCredential = clientCredentialFetcher.fetch(request).getOrElse(throw new InvalidRequest("Authorization header is invalid"))
+  override def handleRequest[U](request: AuthorizationRequest, optionalClientCredential: Option[ClientCredential], dataHandler: DataHandler[U]): Future[GrantHandlerResult] = {
+    val clientCredential = optionalClientCredential.getOrElse(throw new InvalidRequest("Client credential is required"))
     val refreshToken = request.requireRefreshToken
 
     dataHandler.findAuthInfoByRefreshToken(refreshToken).flatMap { authInfoOption =>
@@ -68,19 +68,20 @@ class RefreshToken(clientCredentialFetcher: ClientCredentialFetcher) extends Gra
   }
 }
 
-class Password(clientCredentialFetcher: ClientCredentialFetcher) extends GrantHandler {
+class Password extends GrantHandler {
 
-  override def handleRequest[U](request: AuthorizationRequest, dataHandler: DataHandler[U]): Future[GrantHandlerResult] = {
-    val clientCredential = clientCredentialFetcher.fetch(request)
-    if (clientCredentialRequired && clientCredential.isEmpty)
-      throw new InvalidRequest("Authorization header is invalid")
+  override def handleRequest[U](request: AuthorizationRequest, optionalClientCredential: Option[ClientCredential], dataHandler: DataHandler[U]): Future[GrantHandlerResult] = {
+    if (clientCredentialRequired && optionalClientCredential.isEmpty) {
+      throw new InvalidRequest("Client credential is required")
+    }
+
     val username = request.requireUsername
     val password = request.requirePassword
 
     dataHandler.findUser(username, password).flatMap { userOption =>
       val user = userOption.getOrElse(throw new InvalidGrant("username or password is incorrect"))
       val scope = request.scope
-      val clientId = clientCredential.map { _.clientId }
+      val clientId = optionalClientCredential.map { _.clientId }
       val authInfo = AuthInfo(user, clientId, scope, None)
 
       issueAccessToken(dataHandler, authInfo)
@@ -88,17 +89,15 @@ class Password(clientCredentialFetcher: ClientCredentialFetcher) extends GrantHa
   }
 }
 
-class ClientCredentials(clientCredentialFetcher: ClientCredentialFetcher) extends GrantHandler {
+class ClientCredentials extends GrantHandler {
 
-  override def handleRequest[U](request: AuthorizationRequest, dataHandler: DataHandler[U]): Future[GrantHandlerResult] = {
-    val clientCredential = clientCredentialFetcher.fetch(request).getOrElse(throw new InvalidRequest("Authorization header is invalid"))
-    val clientSecret = clientCredential.clientSecret
-    val clientId = clientCredential.clientId
+  override def handleRequest[U](request: AuthorizationRequest, optionalClientCredential: Option[ClientCredential], dataHandler: DataHandler[U]): Future[GrantHandlerResult] = {
+    val clientCredential = optionalClientCredential.getOrElse(throw new InvalidRequest("Client credential is required"))
     val scope = request.scope
 
-    dataHandler.findClientUser(clientId, clientSecret, scope).flatMap { userOption =>
-      val user = userOption.getOrElse(throw new InvalidGrant("client_id or client_secret or scope is incorrect"))
-      val authInfo = AuthInfo(user, Some(clientId), scope, None)
+    dataHandler.findClientUser(clientCredential.clientId, clientCredential.clientSecret, scope).flatMap { optionalUser =>
+      val user = optionalUser.getOrElse(throw new InvalidGrant("client_id or client_secret or scope is incorrect"))
+      val authInfo = AuthInfo(user, Some(clientCredential.clientId), scope, None)
 
       issueAccessToken(dataHandler, authInfo)
     }
@@ -106,16 +105,16 @@ class ClientCredentials(clientCredentialFetcher: ClientCredentialFetcher) extend
 
 }
 
-class AuthorizationCode(clientCredentialFetcher: ClientCredentialFetcher) extends GrantHandler {
+class AuthorizationCode extends GrantHandler {
 
-  override def handleRequest[U](request: AuthorizationRequest, dataHandler: DataHandler[U]): Future[GrantHandlerResult] = {
-    val clientCredential = clientCredentialFetcher.fetch(request).getOrElse(throw new InvalidRequest("Authorization header is invalid"))
+  override def handleRequest[U](request: AuthorizationRequest, optionalClientCredential: Option[ClientCredential], dataHandler: DataHandler[U]): Future[GrantHandlerResult] = {
+    val clientCredential = optionalClientCredential.getOrElse(throw new InvalidRequest("Client credential is required"))
     val clientId = clientCredential.clientId
     val code = request.requireCode
     val redirectUri = request.redirectUri
 
-    dataHandler.findAuthInfoByCode(code).flatMap { authInfoOption =>
-      val authInfo = authInfoOption.getOrElse(throw new InvalidGrant("Authorized information is not found by the code"))
+    dataHandler.findAuthInfoByCode(code).flatMap { optionalAuthInfo =>
+      val authInfo = optionalAuthInfo.getOrElse(throw new InvalidGrant("Authorized information is not found by the code"))
       if (authInfo.clientId != Some(clientId)) {
         throw new InvalidClient
       }
