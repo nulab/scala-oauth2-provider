@@ -57,7 +57,7 @@ case class User(id: Long, name: String, hashedPassword: String)
 
 class MyDataHandler extends DataHandler[User] {
 
-  def validateClient(clientId: String, clientSecret: String, grantType: String): Future[Boolean] = ???
+  def validateClient(clientCredential: ClientCredential, grantType: String): Future[Boolean] = ???
 
   def findUser(username: String, password: String): Future[Option[User]] = ???
 
@@ -71,7 +71,7 @@ class MyDataHandler extends DataHandler[User] {
 
   def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[User]]] = ???
 
-  def findClientUser(clientId: String, clientSecret: String, scope: Option[String]): Future[Option[User]] = ???
+  def findClientUser(clientCredential: ClientCredential, scope: Option[String]): Future[Option[User]] = ???
 
   def findAccessToken(token: String): Future[Option[AccessToken]] = ???
 
