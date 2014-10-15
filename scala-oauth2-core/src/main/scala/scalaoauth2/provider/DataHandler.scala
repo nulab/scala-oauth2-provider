@@ -3,8 +3,6 @@ package scalaoauth2.provider
 import java.util.Date
 import scala.concurrent.Future
 
-case class AccessTokenRequest[U](clientId: String, clientSecret: String, user: U)
-
 /**
  * Access token
  *
@@ -33,7 +31,7 @@ case class AuthInfo[+U](user: U, clientId: Option[String], scope: Option[String]
  * 
  * <h4>Authorization Code Grant</h4>
  * <ul>
- *   <li>validateClient(clientId, clientSecret, grantType)</li>
+ *   <li>validateClient(clientCredential, grantType)</li>
  *   <li>findAuthInfoByCode(code)</li>
  *   <li>getStoredAccessToken(authInfo)</li>
  *   <li>isAccessTokenExpired(token)</li>
@@ -43,14 +41,14 @@ case class AuthInfo[+U](user: U, clientId: Option[String], scope: Option[String]
  * 
  * <h4>Refresh Token Grant</h4>
  * <ul>
- *   <li>validateClient(clientId, clientSecret, grantType)</li>
+ *   <li>validateClient(clientCredential, grantType)</li>
  *   <li>findAuthInfoByRefreshToken(refreshToken)</li>
  *   <li>refreshAccessToken(authInfo, refreshToken)</li>
  * </ul>
  * 
  * <h4>Resource Owner Password Credentials Grant</h4>
  * <ul>
- *   <li>validateClient(clientId, clientSecret, grantType)</li>
+ *   <li>validateClient(clientCredential, grantType)</li>
  *   <li>findUser(username, password)</li>
  *   <li>getStoredAccessToken(authInfo)</li>
  *   <li>isAccessTokenExpired(token)</li>
@@ -60,8 +58,8 @@ case class AuthInfo[+U](user: U, clientId: Option[String], scope: Option[String]
  * 
  * <h4>Client Credentials Grant</h4>
  * <ul>
- *   <li>validateClient(clientId, clientSecret, grantType)</li>
- *   <li>findClientUser(clientId, clientSecret)</li>
+ *   <li>validateClient(clientCredential, grantType)</li>
+ *   <li>findClientUser(clientCredential)</li>
  *   <li>getStoredAccessToken(authInfo)</li>
  *   <li>isAccessTokenExpired(token)</li>
  *   <li>refreshAccessToken(authInfo, token)
@@ -80,19 +78,18 @@ trait DataHandler[U] {
   /**
    * Verify proper client with parameters for issue an access token.
    *
-   * @param clientId Client send this value which is registered by application.
-   * @param clientSecret Client send this value which is registered by application.
-   * @param grantType Client send this value which is registered by application.
+   * @param clientCredential Client sends clientId and clientSecret which are registered by application.
+   * @param grantType Client sends this value which is registered by application.
    * @return true if request is a regular client, false if request is a illegal client.
    */
-  def validateClient(clientId: String, clientSecret: String, grantType: String): Future[Boolean]
+  def validateClient(clientCredential: ClientCredential, grantType: String): Future[Boolean]
 
   /**
    * Find userId with username and password these are used on your system.
    * If you don't support Resource Owner Password Credentials Grant then doesn't need implementing.
    *
-   * @param username Client send this value which is used on your system.
-   * @param password Client send this value which is used on your system.
+   * @param username Client sends this value which is used on your system.
+   * @param password Client sends this value which is used on your system.
    * @return Including UserId to Option if could find the user, None if couldn't find.
    */
   def findUser(username: String, password: String): Future[Option[U]]
@@ -128,7 +125,7 @@ trait DataHandler[U] {
    *
    * If you don't support Authorization Code Grant then doesn't need implementing.
    *
-   * @param code Client send authorization code which is registered by system.
+   * @param code Client sends authorization code which is registered by system.
    * @return Return authorized information that matched the code.
    */
   def findAuthInfoByCode(code: String): Future[Option[AuthInfo[U]]]
@@ -138,7 +135,7 @@ trait DataHandler[U] {
    *
    * If you don't support Refresh Token Grant then doesn't need implementing.
    *
-   * @param refreshToken Client send refresh token which is created by system.
+   * @param refreshToken Client sends refresh token which is created by system.
    * @return Return authorized information that matched the refresh token.
    */
   def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[U]]]
@@ -148,16 +145,15 @@ trait DataHandler[U] {
    *
    * If you don't support Client Credentials Grant then doesn't need implementing.
    *
-   * @param clientId Client send this value which is registered by application.
-   * @param clientSecret Client send this value which is registered by application.
+   * @param clientCredential Client sends clientId and clientSecret which are registered by application.
    * @return Return user that matched both values.
    */
-  def findClientUser(clientId: String, clientSecret: String, scope: Option[String]): Future[Option[U]]
+  def findClientUser(clientCredential: ClientCredential, scope: Option[String]): Future[Option[U]]
 
   /**
    * Find AccessToken object by access token code.
    *
-   * @param token Client send access token which is created by system.
+   * @param token Client sends access token which is created by system.
    * @return Return access token that matched the token.
    */
   def findAccessToken(token: String): Future[Option[AccessToken]]

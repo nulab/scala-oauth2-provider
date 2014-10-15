@@ -8,7 +8,7 @@ case class MockUser(id: Long, name: String) extends User
 
 class MockDataHandler extends DataHandler[User] {
 
-  def validateClient(clientId: String, clientSecret: String, grantType: String): Future[Boolean] = Future.successful(false)
+  def validateClient(clientCredential: ClientCredential, grantType: String): Future[Boolean] = Future.successful(false)
 
   def findUser(username: String, password: String): Future[Option[User]] = Future.successful(None)
 
@@ -18,7 +18,7 @@ class MockDataHandler extends DataHandler[User] {
 
   def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[User]]] = Future.successful(None)
 
-  def findClientUser(clientId: String, clientSecret: String, scope: Option[String]): Future[Option[User]] = Future.successful(None)
+  def findClientUser(clientCredential: ClientCredential, scope: Option[String]): Future[Option[User]] = Future.successful(None)
 
   def findAccessToken(token: String): Future[Option[AccessToken]] = Future.successful(None)
 

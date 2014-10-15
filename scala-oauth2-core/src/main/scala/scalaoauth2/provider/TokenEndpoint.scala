@@ -18,7 +18,7 @@ trait TokenEndpoint {
     val handler = handlers.get(grantType).getOrElse(throw new UnsupportedGrantType("The grant_type is not supported"))
 
     fetcher.fetch(request).map { clientCredential =>
-      dataHandler.validateClient(clientCredential.clientId, clientCredential.clientSecret, grantType).flatMap { validClient =>
+      dataHandler.validateClient(clientCredential, grantType).flatMap { validClient =>
         if (!validClient) {
           Future.successful(Left(throw new InvalidClient()))
         } else {

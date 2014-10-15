@@ -11,7 +11,7 @@ class AuthorizationCodeSpec extends FlatSpec with ScalaFutures {
   it should "handle request" in {
     val authorizationCode = new AuthorizationCode()
     val request = AuthorizationRequest(Map(), Map("code" -> Seq("code1"), "redirect_uri" -> Seq("http://example.com/")))
-    val f = authorizationCode.handleRequest(request, Some(ClientCredential("clientId1", "clientSecret1")), new MockDataHandler() {
+    val f = authorizationCode.handleRequest(request, Some(ClientCredential("clientId1", Some("clientSecret1"))), new MockDataHandler() {
 
       override def findAuthInfoByCode(code: String): Future[Option[AuthInfo[User]]] = Future.successful(Some(
         AuthInfo(user = MockUser(10000, "username"), clientId = Some("clientId1"), scope = Some("all"), redirectUri = Some("http://example.com/"))
@@ -32,7 +32,7 @@ class AuthorizationCodeSpec extends FlatSpec with ScalaFutures {
   it should "handle request if redirectUrl is none" in {
     val authorizationCode = new AuthorizationCode()
     val request = AuthorizationRequest(Map(), Map("code" -> Seq("code1"), "redirect_uri" -> Seq("http://example.com/")))
-    val f = authorizationCode.handleRequest(request, Some(ClientCredential("clientId1", "clientSecret1")), new MockDataHandler() {
+    val f = authorizationCode.handleRequest(request, Some(ClientCredential("clientId1", Some("clientSecret1"))), new MockDataHandler() {
 
       override def findAuthInfoByCode(code: String): Future[Option[AuthInfo[MockUser]]] = Future.successful(Some(
         AuthInfo(user = MockUser(10000, "username"), clientId = Some("clientId1"), scope = Some("all"), redirectUri = None)

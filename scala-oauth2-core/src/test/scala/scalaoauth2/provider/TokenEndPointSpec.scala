@@ -13,7 +13,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
 
   def successfulDataHandler() = new MockDataHandler() {
 
-    override def validateClient(clientId: String, clientSecret: String, grantType: String): Future[Boolean] = Future.successful(true)
+    override def validateClient(clientCredential: ClientCredential, grantType: String): Future[Boolean] = Future.successful(true)
 
     override def findUser(username: String, password: String): Future[Option[User]] = Future.successful(Some(MockUser(10000, "username")))
 
@@ -122,7 +122,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
 
     val dataHandler = new MockDataHandler() {
 
-      override def validateClient(clientId: String, clientSecret: String, grantType: String): Future[Boolean] = Future.successful(false)
+      override def validateClient(clientCredential: ClientCredential, grantType: String): Future[Boolean] = Future.successful(false)
 
     }
 
@@ -146,7 +146,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
 
     def dataHandler = new MockDataHandler() {
 
-      override def validateClient(clientId: String, clientSecret: String, grantType: String): Future[Boolean] = Future.successful(true)
+      override def validateClient(clientCredential: ClientCredential, grantType: String): Future[Boolean] = Future.successful(true)
 
       override def findUser(username: String, password: String): Future[Option[User]] = Future.successful(Some(MockUser(10000, "username")))
 

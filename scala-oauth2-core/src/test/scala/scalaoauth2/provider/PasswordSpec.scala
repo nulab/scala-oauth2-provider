@@ -13,7 +13,7 @@ class PasswordSpec extends FlatSpec with ScalaFutures {
     override def clientCredentialRequired = false
   }
 
-  "Password when client credential required" should "handle request" in handlesRequest(passwordClientCredReq, Some(ClientCredential("clientId1", "clientSecret1")))
+  "Password when client credential required" should "handle request" in handlesRequest(passwordClientCredReq, Some(ClientCredential("clientId1", Some("clientSecret1"))))
   "Password when client credential not required" should "handle request" in handlesRequest(passwordNoClientCredReq, None)
 
   def handlesRequest(password: Password, clientCredential: Option[ClientCredential]) = {

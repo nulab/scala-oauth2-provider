@@ -2,7 +2,7 @@ package scalaoauth2.provider
 
 import org.apache.commons.codec.binary.Base64
 
-case class ClientCredential(clientId: String, clientSecret: String)
+case class ClientCredential(clientId: String, clientSecret: Option[String])
 
 trait ClientCredentialFetcher {
 
@@ -17,15 +17,14 @@ trait ClientCredentialFetcher {
         val decoded = new String(Base64.decodeBase64(authorization.getBytes), "UTF-8")
         if (decoded.indexOf(':') > 0) {
           decoded.split(":", 2) match {
-            case Array(clientId, clientSecret) => Some(ClientCredential(clientId, clientSecret))
-            case Array(clientId) => Some(ClientCredential(clientId, ""))
-            case _ => None
+            case Array(clientId, clientSecret) => Some(ClientCredential(clientId, if (clientSecret == "") None else Some(clientSecret)))
+            case Array(clientId) => Some(ClientCredential(clientId, None))
           }
         } else {
           None
         }
       case _ => request.clientId.map { clientId =>
-        ClientCredential(clientId, request.clientSecret.getOrElse(""))
+        ClientCredential(clientId, request.clientSecret)
       }
     }
   }

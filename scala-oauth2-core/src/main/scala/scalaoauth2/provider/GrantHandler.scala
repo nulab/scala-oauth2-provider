@@ -95,7 +95,7 @@ class ClientCredentials extends GrantHandler {
     val clientCredential = optionalClientCredential.getOrElse(throw new InvalidRequest("Client credential is required"))
     val scope = request.scope
 
-    dataHandler.findClientUser(clientCredential.clientId, clientCredential.clientSecret, scope).flatMap { optionalUser =>
+    dataHandler.findClientUser(clientCredential, scope).flatMap { optionalUser =>
       val user = optionalUser.getOrElse(throw new InvalidGrant("client_id or client_secret or scope is incorrect"))
       val authInfo = AuthInfo(user, Some(clientCredential.clientId), scope, None)
 

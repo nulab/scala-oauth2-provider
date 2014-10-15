@@ -11,7 +11,7 @@ class RefreshTokenSpec extends FlatSpec with ScalaFutures {
   it should "handle request" in {
     val refreshToken = new RefreshToken()
     val request = AuthorizationRequest(Map(), Map("refresh_token" -> Seq("refreshToken1")))
-    val f = refreshToken.handleRequest(request, Some(ClientCredential("clientId1", "clientSecret1")), new MockDataHandler() {
+    val f = refreshToken.handleRequest(request, Some(ClientCredential("clientId1", Some("clientSecret1"))), new MockDataHandler() {
 
       override def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[User]]] =
         Future.successful(Some(AuthInfo(user = MockUser(10000, "username"), clientId = Some("clientId1"), scope = None, redirectUri = None)))

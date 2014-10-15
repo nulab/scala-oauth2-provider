@@ -9,24 +9,29 @@ class ClientCredentialFetcherSpec extends FlatSpec {
     val request = AuthorizationRequest(Map("Authorization" -> Seq("Basic Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU=")), Map())
     val Some(c) = ClientCredentialFetcher.fetch(request)
     c.clientId should be ("client_id_value")
-    c.clientSecret should be ("client_secret_value")
+    c.clientSecret should be (Some("client_secret_value"))
   }
 
   it should "fetch Basic64 by case insensitive" in {
     val request = AuthorizationRequest(Map("authorization" -> Seq("Basic Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU=")), Map())
     val Some(c) = ClientCredentialFetcher.fetch(request)
     c.clientId should be ("client_id_value")
-    c.clientSecret should be ("client_secret_value")
+    c.clientSecret should be (Some("client_secret_value"))
   }
 
-  it should "fetch empty client_secret" in {
+  it should "fetch authorization header without colon" in {
+    val request = AuthorizationRequest(Map("Authorization" -> Seq("Basic Y2xpZW50X2lkX3ZhbHVl")), Map())
+    ClientCredentialFetcher.fetch(request) should be (None)
+  }
+
+  it should "fetch empty client_secret with colon" in {
     val request = AuthorizationRequest(Map("Authorization" -> Seq("Basic Y2xpZW50X2lkX3ZhbHVlOg==")), Map())
     val Some(c) = ClientCredentialFetcher.fetch(request)
     c.clientId should be ("client_id_value")
-    c.clientSecret should be ("")
+    c.clientSecret should be (None)
   }
 
-  it should "not fetch no Authorization key in header" in {
+  it should "not fetch not Authorization key in header" in {
     val request = AuthorizationRequest(Map("authorizatio" -> Seq("Basic Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU=")), Map())
     ClientCredentialFetcher.fetch(request) should be (None)
   }
@@ -40,13 +45,13 @@ class ClientCredentialFetcherSpec extends FlatSpec {
     val request = AuthorizationRequest(Map(), Map("client_id" -> Seq("client_id_value"), "client_secret" -> Seq("client_secret_value")))
     val Some(c) = ClientCredentialFetcher.fetch(request)
     c.clientId should be ("client_id_value")
-    c.clientSecret should be ("client_secret_value")
+    c.clientSecret should be (Some("client_secret_value"))
   }
 
   it should "omit client_secret" in {
     val Some(c) = ClientCredentialFetcher.fetch(AuthorizationRequest(Map(), Map("client_id" -> Seq("client_id_value"))))
     c.clientId should be ("client_id_value")
-    c.clientSecret should be ("")
+    c.clientSecret should be (None)
   }
 
   it should "not fetch missing parameter" in {
@@ -65,6 +70,6 @@ class ClientCredentialFetcherSpec extends FlatSpec {
     )
     val Some(c) = ClientCredentialFetcher.fetch(request)
     c.clientId should be ("client_id_value")
-    c.clientSecret should be ("client_secret_value")
+    c.clientSecret should be (Some("client_secret_value"))
   }
 }
