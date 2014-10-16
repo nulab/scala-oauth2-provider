@@ -13,7 +13,7 @@ trait GrantHandler {
    */
   def clientCredentialRequired = true
 
-  def handleRequest[U](request: AuthorizationRequest, optionalClientCredential: Option[ClientCredential], dataHandler: DataHandler[U]): Future[GrantHandlerResult]
+  def handleRequest[U](request: AuthorizationRequest, maybeClientCredential: Option[ClientCredential], dataHandler: DataHandler[U]): Future[GrantHandlerResult]
 
   /**
    * Returns valid access token.
@@ -45,8 +45,8 @@ trait GrantHandler {
 
 class RefreshToken extends GrantHandler {
 
-  override def handleRequest[U](request: AuthorizationRequest, optionalClientCredential: Option[ClientCredential], dataHandler: DataHandler[U]): Future[GrantHandlerResult] = {
-    val clientCredential = optionalClientCredential.getOrElse(throw new InvalidRequest("Client credential is required"))
+  override def handleRequest[U](request: AuthorizationRequest, maybeClientCredential: Option[ClientCredential], dataHandler: DataHandler[U]): Future[GrantHandlerResult] = {
+    val clientCredential = maybeClientCredential.getOrElse(throw new InvalidRequest("Client credential is required"))
     val refreshToken = request.requireRefreshToken
 
     dataHandler.findAuthInfoByRefreshToken(refreshToken).flatMap { authInfoOption =>
@@ -70,8 +70,8 @@ class RefreshToken extends GrantHandler {
 
 class Password extends GrantHandler {
 
-  override def handleRequest[U](request: AuthorizationRequest, optionalClientCredential: Option[ClientCredential], dataHandler: DataHandler[U]): Future[GrantHandlerResult] = {
-    if (clientCredentialRequired && optionalClientCredential.isEmpty) {
+  override def handleRequest[U](request: AuthorizationRequest, maybeClientCredential: Option[ClientCredential], dataHandler: DataHandler[U]): Future[GrantHandlerResult] = {
+    if (clientCredentialRequired && maybeClientCredential.isEmpty) {
       throw new InvalidRequest("Client credential is required")
     }
 
@@ -81,7 +81,7 @@ class Password extends GrantHandler {
     dataHandler.findUser(username, password).flatMap { userOption =>
       val user = userOption.getOrElse(throw new InvalidGrant("username or password is incorrect"))
       val scope = request.scope
-      val clientId = optionalClientCredential.map { _.clientId }
+      val clientId = maybeClientCredential.map { _.clientId }
       val authInfo = AuthInfo(user, clientId, scope, None)
 
       issueAccessToken(dataHandler, authInfo)
@@ -91,8 +91,8 @@ class Password extends GrantHandler {
 
 class ClientCredentials extends GrantHandler {
 
-  override def handleRequest[U](request: AuthorizationRequest, optionalClientCredential: Option[ClientCredential], dataHandler: DataHandler[U]): Future[GrantHandlerResult] = {
-    val clientCredential = optionalClientCredential.getOrElse(throw new InvalidRequest("Client credential is required"))
+  override def handleRequest[U](request: AuthorizationRequest, maybeClientCredential: Option[ClientCredential], dataHandler: DataHandler[U]): Future[GrantHandlerResult] = {
+    val clientCredential = maybeClientCredential.getOrElse(throw new InvalidRequest("Client credential is required"))
     val scope = request.scope
 
     dataHandler.findClientUser(clientCredential, scope).flatMap { optionalUser =>
@@ -107,8 +107,8 @@ class ClientCredentials extends GrantHandler {
 
 class AuthorizationCode extends GrantHandler {
 
-  override def handleRequest[U](request: AuthorizationRequest, optionalClientCredential: Option[ClientCredential], dataHandler: DataHandler[U]): Future[GrantHandlerResult] = {
-    val clientCredential = optionalClientCredential.getOrElse(throw new InvalidRequest("Client credential is required"))
+  override def handleRequest[U](request: AuthorizationRequest, maybeClientCredential: Option[ClientCredential], dataHandler: DataHandler[U]): Future[GrantHandlerResult] = {
+    val clientCredential = maybeClientCredential.getOrElse(throw new InvalidRequest("Client credential is required"))
     val clientId = clientCredential.clientId
     val code = request.requireCode
     val redirectUri = request.redirectUri
