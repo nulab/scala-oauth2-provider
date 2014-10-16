@@ -84,6 +84,26 @@ If your data access is blocking for the data storage, then you just wrap your im
 
 For more details, refer to Scaladoc of ```DataHandler```.
 
+### AuthInfo
+
+```DataHandler``` returns ```AuthInfo``` as authorized information.
+```AuthInfo``` is made up of the following fields.
+
+```
+case class AuthInfo[User](user: User, clientId: Option[String], scope: Option[String], redirectUri: Option[String])
+```
+
+- user
+  - ```user``` is authorized by DataHandler
+- clientId
+  - ```clientId``` which is sent from a client has been verified by ```DataHandler```
+  - If your application requires client_id for client authentication, you can get ```clientId``` as below
+    - ```val clientId = authInfo.clientId.getOrElse(throw new InvalidClient())```
+- scope
+  - inform the client of the scope of the access token issued
+- redirectUri
+  - This value must be enabled on authorization code grant
+
 ### Work with Playframework
 
 You should follow three steps below to work with Playframework.
