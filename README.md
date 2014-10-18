@@ -57,7 +57,7 @@ case class User(id: Long, name: String, hashedPassword: String)
 
 class MyDataHandler extends DataHandler[User] {
 
-  def validateClient(clientId: String, clientSecret: String, grantType: String): Future[Boolean] = ???
+  def validateClient(clientCredential: ClientCredential, grantType: String): Future[Boolean] = ???
 
   def findUser(username: String, password: String): Future[Option[User]] = ???
 
@@ -71,7 +71,7 @@ class MyDataHandler extends DataHandler[User] {
 
   def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[User]]] = ???
 
-  def findClientUser(clientId: String, clientSecret: String, scope: Option[String]): Future[Option[User]] = ???
+  def findClientUser(clientCredential: ClientCredential, scope: Option[String]): Future[Option[User]] = ???
 
   def findAccessToken(token: String): Future[Option[AccessToken]] = ???
 
@@ -83,6 +83,26 @@ class MyDataHandler extends DataHandler[User] {
 If your data access is blocking for the data storage, then you just wrap your implementation in the ```DataHandler``` trait with ```Future.successful(...)```.
 
 For more details, refer to Scaladoc of ```DataHandler```.
+
+### AuthInfo
+
+```DataHandler``` returns ```AuthInfo``` as authorized information.
+```AuthInfo``` is made up of the following fields.
+
+```
+case class AuthInfo[User](user: User, clientId: Option[String], scope: Option[String], redirectUri: Option[String])
+```
+
+- user
+  - ```user``` is authorized by DataHandler
+- clientId
+  - ```clientId``` which is sent from a client has been verified by ```DataHandler```
+  - If your application requires client_id for client authentication, you can get ```clientId``` as below
+    - ```val clientId = authInfo.clientId.getOrElse(throw new InvalidClient())```
+- scope
+  - inform the client of the scope of the access token issued
+- redirectUri
+  - This value must be enabled on authorization code grant
 
 ### Work with Playframework
 
