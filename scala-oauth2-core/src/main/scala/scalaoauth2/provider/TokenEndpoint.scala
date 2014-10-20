@@ -7,10 +7,10 @@ trait TokenEndpoint {
   val fetcher = ClientCredentialFetcher
 
   val handlers = Map(
-    "authorization_code" -> new AuthorizationCode(),
-    "refresh_token" -> new RefreshToken(),
-    "client_credentials" -> new ClientCredentials(),
-    "password" -> new Password()
+    OAuthGrantType.AUTHORIZATION_CODE  -> new AuthorizationCode(),
+    OAuthGrantType.REFRESH_TOKEN       -> new RefreshToken(),
+    OAuthGrantType.CLIENT_CREDENTIALS  -> new ClientCredentials(),
+    OAuthGrantType.PASSWORD            -> new Password()
   )
 
   def handleRequest[U](request: AuthorizationRequest, dataHandler: DataHandler[U]): Future[Either[OAuthError, GrantHandlerResult]] = try {

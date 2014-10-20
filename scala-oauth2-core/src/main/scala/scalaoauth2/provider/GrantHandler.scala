@@ -17,16 +17,14 @@ trait GrantHandler {
 
   /**
    * Returns valid access token.
-   *
-   * @param dataHandler
-   * @param authInfo
-   * @return
    */
   def issueAccessToken[U](dataHandler: DataHandler[U], authInfo: AuthInfo[U]): Future[GrantHandlerResult] = {
     dataHandler.getStoredAccessToken(authInfo).flatMap { optionalAccessToken =>
       (optionalAccessToken match {
-        case Some(token) if dataHandler.isAccessTokenExpired(token) => {
-          token.refreshToken.map(dataHandler.refreshAccessToken(authInfo, _)).getOrElse(dataHandler.createAccessToken(authInfo))
+        case Some(token) if token.isExpired => token.refreshToken.map {
+          dataHandler.refreshAccessToken(authInfo, _)
+        }.getOrElse {
+          dataHandler.createAccessToken(authInfo)
         }
         case Some(token) => Future.successful(token)
         case None => dataHandler.createAccessToken(authInfo)
@@ -41,6 +39,7 @@ trait GrantHandler {
       }
     }
   }
+
 }
 
 class RefreshToken extends GrantHandler {

@@ -12,7 +12,17 @@ import scala.concurrent.Future
  * @param expiresIn Expiration date of access token. Unit is seconds.
  * @param createdAt Access token is created date.
  */
-case class AccessToken(token: String, refreshToken: Option[String], scope: Option[String], expiresIn: Option[Long], createdAt: Date)
+case class AccessToken(token: String, refreshToken: Option[String], scope: Option[String], expiresIn: Option[Long], createdAt: Date) {
+
+  /**
+   * Check expiration.
+   */
+  def isExpired: Boolean = expiresIn.exists { expiresIn =>
+    val now = System.currentTimeMillis()
+    createdAt.getTime + expiresIn * 1000 <= now
+  }
+
+}
 
 /**
  * Authorized information
@@ -65,13 +75,7 @@ case class AuthInfo[+U](user: U, clientId: Option[String], scope: Option[String]
  *   <li>refreshAccessToken(authInfo, token)
  *   <li>createAccessToken(authInfo)</li>
  * </ul>
- *   
- * <h3>[Access to Protected Resource phase]</h3>
- * <ul>
- *   <li>findAccessToken(token)</li>
- *   <li>isAccessTokenExpired(token)</li>
- *   <li>findAuthInfoByAccessToken(token)</li>
- * </ul>
+ *
  */
 trait DataHandler[U] {
 
@@ -149,34 +153,5 @@ trait DataHandler[U] {
    * @return Return user that matched both values.
    */
   def findClientUser(clientCredential: ClientCredential, scope: Option[String]): Future[Option[U]]
-
-  /**
-   * Find AccessToken object by access token code.
-   *
-   * @param token Client sends access token which is created by system.
-   * @return Return access token that matched the token.
-   */
-  def findAccessToken(token: String): Future[Option[AccessToken]]
-
-  /**
-   * Find authorized information by access token.
-   *
-   * @param accessToken This value is AccessToken.
-   * @return Return authorized information if the parameter is available.
-   */
-  def findAuthInfoByAccessToken(accessToken: AccessToken): Future[Option[AuthInfo[U]]]
-
-  /**
-   * Check expiration.
-   * 
-   * @param accessToken accessToken
-   * @return true if accessToken expired
-   */
-  def isAccessTokenExpired(accessToken: AccessToken): Boolean = {
-    accessToken.expiresIn.exists { expiresIn =>
-      val now = System.currentTimeMillis()
-      accessToken.createdAt.getTime + expiresIn * 1000 <= now
-    }
-  }
 
 }

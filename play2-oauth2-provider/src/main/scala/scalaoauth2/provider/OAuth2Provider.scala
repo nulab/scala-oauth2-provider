@@ -138,7 +138,7 @@ trait OAuth2Provider extends OAuth2BaseProvider {
    * @return Authentication is successful then the response use your API result.
    *         Authentication is failed then return BadRequest or Unauthorized status to client with cause into the JSON.
    */
-  def authorize[A, U](dataHandler: DataHandler[U], timeout: Duration = 60.seconds)(callback: AuthInfo[U] => Result)(implicit request: Request[A]): Result = {
+  def authorize[A, U](dataHandler: ResourceHandler[U], timeout: Duration = 60.seconds)(callback: AuthInfo[U] => Result)(implicit request: Request[A]): Result = {
     val f = protectedResource.handleRequest(request, dataHandler).map {
       case Left(e) if e.statusCode == 400 => BadRequest.withHeaders(responseOAuthErrorHeader(e))
       case Left(e) if e.statusCode == 401 => Unauthorized.withHeaders(responseOAuthErrorHeader(e))
@@ -209,7 +209,7 @@ trait OAuth2AsyncProvider extends OAuth2BaseProvider {
    * @return Authentication is successful then the response use your API result.
    *         Authentication is failed then return BadRequest or Unauthorized status to client with cause into the JSON.
    */
-  def authorize[A, U](dataHandler: DataHandler[U])(callback: AuthInfo[U] => Future[Result])(implicit request: Request[A]): Future[Result] = {
+  def authorize[A, U](dataHandler: ResourceHandler[U])(callback: AuthInfo[U] => Future[Result])(implicit request: Request[A]): Future[Result] = {
     protectedResource.handleRequest(request, dataHandler).flatMap {
       case Left(e) if e.statusCode == 400 => Future.successful(BadRequest.withHeaders(responseOAuthErrorHeader(e)))
       case Left(e) if e.statusCode == 401 => Future.successful(Unauthorized.withHeaders(responseOAuthErrorHeader(e)))
