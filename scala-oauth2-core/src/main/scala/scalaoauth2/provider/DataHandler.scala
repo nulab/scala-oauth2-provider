@@ -173,10 +173,10 @@ trait DataHandler[U] {
    * @return true if accessToken expired
    */
   def isAccessTokenExpired(accessToken: AccessToken): Boolean = {
-    accessToken.expiresIn.map { expiresIn =>
+    accessToken.expiresIn.exists { expiresIn =>
       val now = System.currentTimeMillis()
       accessToken.createdAt.getTime + expiresIn * 1000 <= now
-    }.getOrElse(false)
+    }
   }
 
 }

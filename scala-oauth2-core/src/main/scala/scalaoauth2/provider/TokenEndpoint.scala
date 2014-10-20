@@ -15,7 +15,7 @@ trait TokenEndpoint {
 
   def handleRequest[U](request: AuthorizationRequest, dataHandler: DataHandler[U]): Future[Either[OAuthError, GrantHandlerResult]] = try {
     val grantType = request.grantType.getOrElse(throw new InvalidRequest("grant_type is not found"))
-    val handler = handlers.get(grantType).getOrElse(throw new UnsupportedGrantType("The grant_type is not supported"))
+    val handler = handlers.getOrElse(grantType, throw new UnsupportedGrantType("The grant_type is not supported"))
 
     fetcher.fetch(request).map { clientCredential =>
       dataHandler.validateClient(clientCredential, grantType).flatMap { validClient =>
