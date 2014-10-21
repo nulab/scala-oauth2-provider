@@ -7,18 +7,18 @@ trait ProtectedResource {
 
   val fetchers = Seq(AuthHeader, RequestParameter)
 
-  def handleRequest[U](request: ProtectedResourceRequest, dataHandler: DataHandler[U]): Future[Either[OAuthError, AuthInfo[U]]] = try {
+  def handleRequest[U](request: ProtectedResourceRequest, handler: ProtectedResourceHandler[U]): Future[Either[OAuthError, AuthInfo[U]]] = try {
     fetchers.find { fetcher =>
       fetcher.matches(request)
     }.map { fetcher =>
       val result = fetcher.fetch(request)
-      dataHandler.findAccessToken(result.token).flatMap { maybeToken =>
+      handler.findAccessToken(result.token).flatMap { maybeToken =>
         val token = maybeToken.getOrElse(throw new InvalidToken("The access token is not found"))
-        if (dataHandler.isAccessTokenExpired(token)) {
+        if (token.isExpired) {
           throw new ExpiredToken()
         }
 
-        dataHandler.findAuthInfoByAccessToken(token).map(_.map(Right(_)).getOrElse(Left(new InvalidToken("The access token is invalid"))))
+        handler.findAuthInfoByAccessToken(token).map(_.map(Right(_)).getOrElse(Left(new InvalidToken("The access token is invalid"))))
       }.recover {
         case e: OAuthError => Left(e)
       }

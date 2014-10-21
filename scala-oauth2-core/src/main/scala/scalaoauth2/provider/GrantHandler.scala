@@ -13,23 +13,21 @@ trait GrantHandler {
    */
   def clientCredentialRequired = true
 
-  def handleRequest[U](request: AuthorizationRequest, maybeClientCredential: Option[ClientCredential], dataHandler: DataHandler[U]): Future[GrantHandlerResult]
+  def handleRequest[U](request: AuthorizationRequest, maybeClientCredential: Option[ClientCredential], authorizationHandler: AuthorizationHandler[U]): Future[GrantHandlerResult]
 
   /**
    * Returns valid access token.
-   *
-   * @param dataHandler
-   * @param authInfo
-   * @return
    */
-  def issueAccessToken[U](dataHandler: DataHandler[U], authInfo: AuthInfo[U]): Future[GrantHandlerResult] = {
-    dataHandler.getStoredAccessToken(authInfo).flatMap { optionalAccessToken =>
+  def issueAccessToken[U](handler: AuthorizationHandler[U], authInfo: AuthInfo[U]): Future[GrantHandlerResult] = {
+    handler.getStoredAccessToken(authInfo).flatMap { optionalAccessToken =>
       (optionalAccessToken match {
-        case Some(token) if dataHandler.isAccessTokenExpired(token) => {
-          token.refreshToken.map(dataHandler.refreshAccessToken(authInfo, _)).getOrElse(dataHandler.createAccessToken(authInfo))
+        case Some(token) if token.isExpired => token.refreshToken.map {
+          handler.refreshAccessToken(authInfo, _)
+        }.getOrElse {
+          handler.createAccessToken(authInfo)
         }
         case Some(token) => Future.successful(token)
-        case None => dataHandler.createAccessToken(authInfo)
+        case None => handler.createAccessToken(authInfo)
       }).map { accessToken =>
         GrantHandlerResult(
           "Bearer",
@@ -41,21 +39,22 @@ trait GrantHandler {
       }
     }
   }
+
 }
 
 class RefreshToken extends GrantHandler {
 
-  override def handleRequest[U](request: AuthorizationRequest, maybeClientCredential: Option[ClientCredential], dataHandler: DataHandler[U]): Future[GrantHandlerResult] = {
+  override def handleRequest[U](request: AuthorizationRequest, maybeClientCredential: Option[ClientCredential], handler: AuthorizationHandler[U]): Future[GrantHandlerResult] = {
     val clientCredential = maybeClientCredential.getOrElse(throw new InvalidRequest("Client credential is required"))
     val refreshToken = request.requireRefreshToken
 
-    dataHandler.findAuthInfoByRefreshToken(refreshToken).flatMap { authInfoOption =>
+    handler.findAuthInfoByRefreshToken(refreshToken).flatMap { authInfoOption =>
       val authInfo = authInfoOption.getOrElse(throw new InvalidGrant("Authorized information is not found by the refresh token"))
       if (authInfo.clientId != Some(clientCredential.clientId)) {
         throw new InvalidClient
       }
 
-      dataHandler.refreshAccessToken(authInfo, refreshToken).map { accessToken =>
+      handler.refreshAccessToken(authInfo, refreshToken).map { accessToken =>
         GrantHandlerResult(
           "Bearer",
           accessToken.token,
@@ -70,7 +69,7 @@ class RefreshToken extends GrantHandler {
 
 class Password extends GrantHandler {
 
-  override def handleRequest[U](request: AuthorizationRequest, maybeClientCredential: Option[ClientCredential], dataHandler: DataHandler[U]): Future[GrantHandlerResult] = {
+  override def handleRequest[U](request: AuthorizationRequest, maybeClientCredential: Option[ClientCredential], handler: AuthorizationHandler[U]): Future[GrantHandlerResult] = {
     if (clientCredentialRequired && maybeClientCredential.isEmpty) {
       throw new InvalidRequest("Client credential is required")
     }
@@ -78,28 +77,28 @@ class Password extends GrantHandler {
     val username = request.requireUsername
     val password = request.requirePassword
 
-    dataHandler.findUser(username, password).flatMap { userOption =>
+    handler.findUser(username, password).flatMap { userOption =>
       val user = userOption.getOrElse(throw new InvalidGrant("username or password is incorrect"))
       val scope = request.scope
       val clientId = maybeClientCredential.map { _.clientId }
       val authInfo = AuthInfo(user, clientId, scope, None)
 
-      issueAccessToken(dataHandler, authInfo)
+      issueAccessToken(handler, authInfo)
     }
   }
 }
 
 class ClientCredentials extends GrantHandler {
 
-  override def handleRequest[U](request: AuthorizationRequest, maybeClientCredential: Option[ClientCredential], dataHandler: DataHandler[U]): Future[GrantHandlerResult] = {
+  override def handleRequest[U](request: AuthorizationRequest, maybeClientCredential: Option[ClientCredential], handler: AuthorizationHandler[U]): Future[GrantHandlerResult] = {
     val clientCredential = maybeClientCredential.getOrElse(throw new InvalidRequest("Client credential is required"))
     val scope = request.scope
 
-    dataHandler.findClientUser(clientCredential, scope).flatMap { optionalUser =>
+    handler.findClientUser(clientCredential, scope).flatMap { optionalUser =>
       val user = optionalUser.getOrElse(throw new InvalidGrant("client_id or client_secret or scope is incorrect"))
       val authInfo = AuthInfo(user, Some(clientCredential.clientId), scope, None)
 
-      issueAccessToken(dataHandler, authInfo)
+      issueAccessToken(handler, authInfo)
     }
   }
 
@@ -107,13 +106,13 @@ class ClientCredentials extends GrantHandler {
 
 class AuthorizationCode extends GrantHandler {
 
-  override def handleRequest[U](request: AuthorizationRequest, maybeClientCredential: Option[ClientCredential], dataHandler: DataHandler[U]): Future[GrantHandlerResult] = {
+  override def handleRequest[U](request: AuthorizationRequest, maybeClientCredential: Option[ClientCredential], handler: AuthorizationHandler[U]): Future[GrantHandlerResult] = {
     val clientCredential = maybeClientCredential.getOrElse(throw new InvalidRequest("Client credential is required"))
     val clientId = clientCredential.clientId
     val code = request.requireCode
     val redirectUri = request.redirectUri
 
-    dataHandler.findAuthInfoByCode(code).flatMap { optionalAuthInfo =>
+    handler.findAuthInfoByCode(code).flatMap { optionalAuthInfo =>
       val authInfo = optionalAuthInfo.getOrElse(throw new InvalidGrant("Authorized information is not found by the code"))
       if (authInfo.clientId != Some(clientId)) {
         throw new InvalidClient
@@ -123,7 +122,7 @@ class AuthorizationCode extends GrantHandler {
         throw new RedirectUriMismatch
       }
 
-      issueAccessToken(dataHandler, authInfo)
+      issueAccessToken(handler, authInfo)
     }
   }
 

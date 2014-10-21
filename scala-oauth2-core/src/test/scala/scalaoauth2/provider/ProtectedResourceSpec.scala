@@ -11,7 +11,7 @@ import scala.concurrent.Future
 
 class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
 
-  def successfulDataHandler() = new MockDataHandler() {
+  def successfulProtectedResourceHandler() = new ProtectedResourceHandler[User] {
 
     override def findAccessToken(token: String): Future[Option[AccessToken]] = Future.successful(Some(AccessToken("token1", Some("refreshToken1"), Some("all"), Some(3600), new Date())))
 
@@ -27,7 +27,7 @@ class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
       Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
     )
 
-    val dataHandler = successfulDataHandler()
+    val dataHandler = successfulProtectedResourceHandler()
     ProtectedResource.handleRequest(request, dataHandler).map(_ should be ('right))
   }
 
@@ -37,7 +37,7 @@ class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
       Map("access_token" -> Seq("token1"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
     )
 
-    val dataHandler = successfulDataHandler()
+    val dataHandler = successfulProtectedResourceHandler()
     ProtectedResource.handleRequest(request, dataHandler).map(_ should be ('right))
   }
 
@@ -47,7 +47,7 @@ class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
       Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
     )
 
-    val dataHandler = new MockDataHandler() {
+    val dataHandler = new ProtectedResourceHandler[User] {
 
       override def findAccessToken(token: String): Future[Option[AccessToken]] = Future.successful(Some(AccessToken("token1", Some("refreshToken1"), Some("all"), Some(3600), new Date(new Date().getTime() - 4000 * 1000))))
 
@@ -75,7 +75,7 @@ class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
       Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
     )
 
-    val dataHandler = successfulDataHandler()
+    val dataHandler = successfulProtectedResourceHandler()
     val f = ProtectedResource.handleRequest(request, dataHandler)
 
     whenReady(f) { result =>
@@ -95,7 +95,7 @@ class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
       Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
     )
 
-    val dataHandler = new MockDataHandler() {
+    val dataHandler = new ProtectedResourceHandler[User] {
 
       override def findAccessToken(token: String): Future[Option[AccessToken]] = Future.successful(None)
 
@@ -122,7 +122,7 @@ class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
       Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
     )
 
-    val dataHandler = new MockDataHandler() {
+    val dataHandler = new ProtectedResourceHandler[User] {
 
       override def findAccessToken(token: String): Future[Option[AccessToken]] = Future.successful(Some(AccessToken("token1", Some("refreshToken1"), Some("all"), Some(3600), new Date())))
 

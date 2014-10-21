@@ -1,7 +1,11 @@
 package scalaoauth2.provider
 
 import java.util.Date
-import scala.concurrent.Future
+
+/**
+ * Provide accessing to data storage for using OAuth 2.0.
+ */
+trait DataHandler[U] extends AuthorizationHandler[U] with ProtectedResourceHandler[U]
 
 /**
  * Access token
@@ -12,7 +16,14 @@ import scala.concurrent.Future
  * @param expiresIn Expiration date of access token. Unit is seconds.
  * @param createdAt Access token is created date.
  */
-case class AccessToken(token: String, refreshToken: Option[String], scope: Option[String], expiresIn: Option[Long], createdAt: Date)
+case class AccessToken(token: String, refreshToken: Option[String], scope: Option[String], expiresIn: Option[Long], createdAt: Date) {
+
+  def isExpired: Boolean = expiresIn.exists { expiresIn =>
+    val now = System.currentTimeMillis()
+    createdAt.getTime + expiresIn * 1000 <= now
+  }
+
+}
 
 /**
  * Authorized information
@@ -23,160 +34,3 @@ case class AccessToken(token: String, refreshToken: Option[String], scope: Optio
  * @param redirectUri This value is used by Authorization Code Grant.
  */
 case class AuthInfo[+U](user: U, clientId: Option[String], scope: Option[String], redirectUri: Option[String])
-
-/**
- * Provide accessing to data storage for using OAuth 2.0.
- *
- * <h3>[Authorization phases]</h3>
- * 
- * <h4>Authorization Code Grant</h4>
- * <ul>
- *   <li>validateClient(clientCredential, grantType)</li>
- *   <li>findAuthInfoByCode(code)</li>
- *   <li>getStoredAccessToken(authInfo)</li>
- *   <li>isAccessTokenExpired(token)</li>
- *   <li>refreshAccessToken(authInfo, token)
- *   <li>createAccessToken(authInfo)</li>
- * </ul>
- * 
- * <h4>Refresh Token Grant</h4>
- * <ul>
- *   <li>validateClient(clientCredential, grantType)</li>
- *   <li>findAuthInfoByRefreshToken(refreshToken)</li>
- *   <li>refreshAccessToken(authInfo, refreshToken)</li>
- * </ul>
- * 
- * <h4>Resource Owner Password Credentials Grant</h4>
- * <ul>
- *   <li>validateClient(clientCredential, grantType)</li>
- *   <li>findUser(username, password)</li>
- *   <li>getStoredAccessToken(authInfo)</li>
- *   <li>isAccessTokenExpired(token)</li>
- *   <li>refreshAccessToken(authInfo, token)
- *   <li>createAccessToken(authInfo)</li>
- * </ul>
- * 
- * <h4>Client Credentials Grant</h4>
- * <ul>
- *   <li>validateClient(clientCredential, grantType)</li>
- *   <li>findClientUser(clientCredential)</li>
- *   <li>getStoredAccessToken(authInfo)</li>
- *   <li>isAccessTokenExpired(token)</li>
- *   <li>refreshAccessToken(authInfo, token)
- *   <li>createAccessToken(authInfo)</li>
- * </ul>
- *   
- * <h3>[Access to Protected Resource phase]</h3>
- * <ul>
- *   <li>findAccessToken(token)</li>
- *   <li>isAccessTokenExpired(token)</li>
- *   <li>findAuthInfoByAccessToken(token)</li>
- * </ul>
- */
-trait DataHandler[U] {
-
-  /**
-   * Verify proper client with parameters for issue an access token.
-   *
-   * @param clientCredential Client sends clientId and clientSecret which are registered by application.
-   * @param grantType Client sends this value which is registered by application.
-   * @return true if request is a regular client, false if request is a illegal client.
-   */
-  def validateClient(clientCredential: ClientCredential, grantType: String): Future[Boolean]
-
-  /**
-   * Find userId with username and password these are used on your system.
-   * If you don't support Resource Owner Password Credentials Grant then doesn't need implementing.
-   *
-   * @param username Client sends this value which is used on your system.
-   * @param password Client sends this value which is used on your system.
-   * @return Including UserId to Option if could find the user, None if couldn't find.
-   */
-  def findUser(username: String, password: String): Future[Option[U]]
-
-  /**
-   * Creates a new access token by authorized information.
-   *
-   * @param authInfo This value is already authorized by system.
-   * @return Access token returns to client.
-   */
-  def createAccessToken(authInfo: AuthInfo[U]): Future[AccessToken]
-
-  /**
-   * Returns stored access token by authorized information.
-   *
-   * If want to create new access token then have to return None
-   *
-   * @param authInfo This value is already authorized by system.
-   * @return Access token returns to client.
-   */
-  def getStoredAccessToken(authInfo: AuthInfo[U]): Future[Option[AccessToken]]
-
-  /**
-   * Creates a new access token by refreshToken.
-   *
-   * @param authInfo This value is already authorized by system.
-   * @return Access token returns to client.
-   */
-  def refreshAccessToken(authInfo: AuthInfo[U], refreshToken: String): Future[AccessToken]
-
-  /**
-   * Find authorized information by authorization code.
-   *
-   * If you don't support Authorization Code Grant then doesn't need implementing.
-   *
-   * @param code Client sends authorization code which is registered by system.
-   * @return Return authorized information that matched the code.
-   */
-  def findAuthInfoByCode(code: String): Future[Option[AuthInfo[U]]]
-
-  /**
-   * Find authorized information by refresh token.
-   *
-   * If you don't support Refresh Token Grant then doesn't need implementing.
-   *
-   * @param refreshToken Client sends refresh token which is created by system.
-   * @return Return authorized information that matched the refresh token.
-   */
-  def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[U]]]
-
-  /**
-   * Find user by clientId and clientSecret.
-   *
-   * If you don't support Client Credentials Grant then doesn't need implementing.
-   *
-   * @param clientCredential Client sends clientId and clientSecret which are registered by application.
-   * @return Return user that matched both values.
-   */
-  def findClientUser(clientCredential: ClientCredential, scope: Option[String]): Future[Option[U]]
-
-  /**
-   * Find AccessToken object by access token code.
-   *
-   * @param token Client sends access token which is created by system.
-   * @return Return access token that matched the token.
-   */
-  def findAccessToken(token: String): Future[Option[AccessToken]]
-
-  /**
-   * Find authorized information by access token.
-   *
-   * @param accessToken This value is AccessToken.
-   * @return Return authorized information if the parameter is available.
-   */
-  def findAuthInfoByAccessToken(accessToken: AccessToken): Future[Option[AuthInfo[U]]]
-
-  /**
-   * Check expiration.
-   * 
-   * @param accessToken accessToken
-   * @return true if accessToken expired
-   */
-  def isAccessTokenExpired(accessToken: AccessToken): Boolean = {
-    accessToken.expiresIn.map { expiresIn =>
-      val now = System.currentTimeMillis()
-      accessToken.createdAt.getTime + expiresIn * 1000 <= now
-    }.getOrElse(false)
-  }
-
-}

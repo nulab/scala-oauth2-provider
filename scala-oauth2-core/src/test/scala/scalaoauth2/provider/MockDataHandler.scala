@@ -4,8 +4,6 @@ import java.util.Date
 
 import scala.concurrent.Future
 
-case class MockUser(id: Long, name: String) extends User
-
 class MockDataHandler extends DataHandler[User] {
 
   def validateClient(clientCredential: ClientCredential, grantType: String): Future[Boolean] = Future.successful(false)
@@ -34,3 +32,5 @@ trait User {
   def id: Long
   def name: String
 }
+
+case class MockUser(id: Long, name: String) extends User
