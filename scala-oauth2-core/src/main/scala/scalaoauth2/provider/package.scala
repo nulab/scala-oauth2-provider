@@ -1,8 +1,5 @@
 package scalaoauth2
 
-/**
- * @author dbalduini
- */
 package object provider {
 
   object OAuthGrantType {
@@ -11,6 +8,5 @@ package object provider {
     val CLIENT_CREDENTIALS = "client_credentials"
     val PASSWORD = "password"
   }
-
 
 }

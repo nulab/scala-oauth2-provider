@@ -4,7 +4,7 @@ import scala.concurrent.Future
 
 /**
  *
- * Provide accessing to data storage for using OAuth 2.0.
+ * Provide access to <b>Protected Resource</b> phase support for using OAuth 2.0.
  *
  * <h3>[Access to Protected Resource phase]</h3>
  * <ul>
@@ -12,7 +12,7 @@ import scala.concurrent.Future
  *   <li>findAuthInfoByAccessToken(token)</li>
  * </ul>
  */
-trait ResourceHandler[+U] {
+trait ProtectedResourceHandler[+U] {
 
   /**
    * Find authorized information by access token.
