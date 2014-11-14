@@ -89,8 +89,13 @@ For more details, refer to Scaladoc of ```DataHandler```.
 ```DataHandler``` returns ```AuthInfo``` as authorized information.
 ```AuthInfo``` is made up of the following fields.
 
-```
-case class AuthInfo[User](user: User, clientId: Option[String], scope: Option[String], redirectUri: Option[String])
+```scala
+case class AuthInfo[User](
+  user: User,
+  clientId: Option[String],
+  scope: Option[String],
+  redirectUri: Option[String]
+)
 ```
 
 - user
@@ -113,13 +118,23 @@ You should follow three steps below to work with Playframework.
 * Access to an authorized resource
 
 First, define your own controller with mixining ```OAuth2Provider``` trait provided by this library to issue access token.
-Asynchronous result is used in your controller then you can use ```OAuth2AsyncProvider```, which supports returning ```Future[Result]```.
+
+```scala
+import scalaoauth2.provider._
+object OAuth2Controller extends Controller with OAuth2Provider {
+  def accessToken = Action.async { implicit request =>
+    issueAccessToken(new MyDataHandler())
+  }
+}
+```
+
+NOTE: If your controller supports returning synchronous result, use ```await``` method which is package object of scalaoauth2.provider.
 
 ```scala
 import scalaoauth2.provider._
 object OAuth2Controller extends Controller with OAuth2Provider {
   def accessToken = Action { implicit request =>
-    issueAccessToken(new MyDataHandler())
+    await(issueAccessToken(new MyDataHandler()))
   }
 }
 ```
@@ -135,7 +150,7 @@ Finally, you can access to an authorized resource like this:
 ```scala
 import scalaoauth2.provider._
 object MyController extends Controller with OAuth2Provider {
-  def list = Action { implicit request =>
+  def list = Action.async { implicit request =>
     authorize(new MyDataHandler()) { authInfo =>
       val user = authInfo.user // User is defined on your system
       // access resource for the user
@@ -160,7 +175,7 @@ class MyTokenEndpoint extends TokenEndpoint {
   }
 
   override val handlers = Map(
-    "password" -> passwordNoCred
+    OAuthGrantType.PASSWORD -> passwordNoCred
   )
 }
 ```
