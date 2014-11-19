@@ -15,7 +15,7 @@ class AuthHeaderSpec extends FlatSpec {
     AuthHeader.matches(createRequest(Some(" OAuth token1 "))) should be (true)
   }
 
-  it should "match AuthHader by case insensitive" in {
+  it should "match AuthHeader by case insensitive" in {
     AuthHeader.matches(ProtectedResourceRequest(Map("authorization" -> Seq("OAuth token1")), Map())) should be (true)
   }
 
