@@ -3,8 +3,7 @@ package scalaoauth2.provider
 import play.api.libs.json._
 import play.api.mvc._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.language.implicitConversions
 
 /**
@@ -113,11 +112,13 @@ trait OAuth2Provider extends OAuth2BaseProvider {
    *
    * @param handler Implemented AuthorizationHandler for register access token to your system.
    * @param request Playframework is provided HTTP request interface.
+   * @param ctx This context is used by TokenEndPoint.
    * @tparam A play.api.mvc.Request has type.
+   * @tparam U set the type in AuthorizationHandler.
    * @return Request is successful then return JSON to client in OAuth 2.0 format.
    *         Request is failed then return BadRequest or Unauthorized status to client with cause into the JSON.
    */
-  def issueAccessToken[A, U](handler: AuthorizationHandler[U])(implicit request: Request[A]): Future[Result] = {
+  def issueAccessToken[A, U](handler: AuthorizationHandler[U])(implicit request: Request[A], ctx: ExecutionContext): Future[Result] = {
     tokenEndpoint.handleRequest(request, handler).map {
       case Left(e) if e.statusCode == 400 => BadRequest(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
       case Left(e) if e.statusCode == 401 => Unauthorized(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
@@ -131,11 +132,13 @@ trait OAuth2Provider extends OAuth2BaseProvider {
    * @param handler Implemented ProtectedResourceHandler for authenticate to your system.
    * @param callback Callback is called when authentication is successful.
    * @param request Playframework is provided HTTP request interface.
+   * @param ctx This contxt is used by ProtectedResource.
    * @tparam A play.api.mvc.Request has type.
+   * @tparam U set the type in AuthorizationHandler.
    * @return Authentication is successful then the response use your API result.
    *         Authentication is failed then return BadRequest or Unauthorized status to client with cause into the JSON.
    */
-  def authorize[A, U](handler: ProtectedResourceHandler[U])(callback: AuthInfo[U] => Future[Result])(implicit request: Request[A]): Future[Result] = {
+  def authorize[A, U](handler: ProtectedResourceHandler[U])(callback: AuthInfo[U] => Future[Result])(implicit request: Request[A], ctx: ExecutionContext): Future[Result] = {
     protectedResource.handleRequest(request, handler).flatMap {
       case Left(e) if e.statusCode == 400 => Future.successful(BadRequest.withHeaders(responseOAuthErrorHeader(e)))
       case Left(e) if e.statusCode == 401 => Future.successful(Unauthorized.withHeaders(responseOAuthErrorHeader(e)))
