@@ -1,13 +1,15 @@
 package scalaoauth2.provider
 
+import org.scalamock.scalatest.MockFactory
 import org.scalatest._
 import org.scalatest.Matchers._
-import scala.concurrent.Future
 import play.api.libs.json._
 
-class OAuth2ProviderSpec extends FlatSpec {
+class OAuth2ProviderSpec extends FlatSpec with MockFactory {
+  case class DummyProfile(username: String)
 
-  object TestOAuthProvider extends OAuth2Provider {
+  object TestOAuthProvider extends OAuth2Provider[DummyProfile] {
+    val dataHandler = mock[DataHandler[DummyProfile]]
     override def responseAccessToken(r: GrantHandlerResult) = super.responseAccessToken(r) ++ Map("custom_key" -> JsString("custom_value"))
   }
 
