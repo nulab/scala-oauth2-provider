@@ -5,13 +5,13 @@ object ScalaOAuth2Build extends Build {
 
   lazy val _organization = "com.nulab-inc"
   lazy val _version =  "0.12.0"
-  lazy val _playVersion = "2.3.4"
+  lazy val _playVersion = "2.3.7"
 
   val _scalaVersion = "2.10.4"
-  val _crossScalaVersions = Seq("2.10.4", "2.11.2")
+  val _crossScalaVersions = Seq("2.10.4", "2.11.5")
 
   val commonDependenciesInTestScope = Seq(
-    "org.scalatest" %% "scalatest" % "2.2.0" % "test"
+    "org.scalatest" %% "scalatest" % "2.2.1" % "test"
   )
 
   lazy val scalaOAuth2ProviderSettings = Defaults.defaultSettings ++ Seq(
