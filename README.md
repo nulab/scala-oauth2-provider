@@ -182,7 +182,14 @@ class MyTokenEndpoint extends TokenEndpoint {
 
 ## Examples
 
-- [Playframework 2.2](https://github.com/oyediyildiz/scala-oauth2-provider-example)
+### Playframework 2.3
+
+- https://github.com/davidseth/scala-oauth2-provider-slick
+
+### Playframework 2.2
+
+- https://github.com/oyediyildiz/scala-oauth2-provider-example
+- https://github.com/tuxdna/play-oauth2-server
 
 ## Application using this library
 
