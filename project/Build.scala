@@ -56,10 +56,11 @@ object ScalaOAuth2Build extends Build {
       description := "Support scala-oauth2-core library on Playframework Scala",
       resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/maven-releases/",
       libraryDependencies ++= Seq(
-        "com.typesafe.play" %% "play" % _playVersion % "provided"
+        "com.typesafe.play" %% "play"      % _playVersion % "provided",
+        "com.typesafe.play" %% "play-test" % _playVersion % "test"
       ) ++ commonDependenciesInTestScope
     )
-  ) dependsOn(scalaOAuth2Core)
+  ) dependsOn(scalaOAuth2Core % "compile->compile;test->test")
 
   def _publishTo(v: String) = {
     val nexus = "https://oss.sonatype.org/"
