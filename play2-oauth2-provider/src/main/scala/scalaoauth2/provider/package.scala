@@ -42,6 +42,7 @@ package object provider {
    * @param timeout maximum wait time
    * @return Await and return the result.
    */
+  @deprecated("Use Await in your own", "0.13.0")
   def await(f: Future[Result], timeout: Duration = 60.seconds): Result = Await.result(f, timeout)
 
 }

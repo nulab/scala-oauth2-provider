@@ -128,17 +128,6 @@ object OAuth2Controller extends Controller with OAuth2Provider {
 }
 ```
 
-NOTE: If your controller supports returning synchronous result, use ```await``` method which is package object of scalaoauth2.provider.
-
-```scala
-import scalaoauth2.provider._
-object OAuth2Controller extends Controller with OAuth2Provider {
-  def accessToken = Action { implicit request =>
-    await(issueAccessToken(new MyDataHandler()))
-  }
-}
-```
-
 Then, assign a route to the controller that OAuth clients will access to.
 
 ```
