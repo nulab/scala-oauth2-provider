@@ -10,7 +10,6 @@ import play.api.mvc.Results._
 class OAuth2ProviderActionBuildersSpec extends FlatSpec {
 
   import OAuth2ProviderActionBuilders._
-  import scala.concurrent.ExecutionContext.Implicits.global
 
   val action = AuthorizedAction(new MockDataHandler) { request =>
     Ok(request.authInfo.user.name)

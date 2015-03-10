@@ -15,5 +15,5 @@ trait OAuth2ProviderActionBuilders {
 }
 
 object OAuth2ProviderActionBuilders extends OAuth2ProviderActionBuilders {
-  val executionContext: ExecutionContext = play.api.libs.concurrent.Execution.defaultContext
+  implicit val executionContext: ExecutionContext = play.api.libs.concurrent.Execution.defaultContext
 }
