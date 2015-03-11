@@ -79,21 +79,21 @@ trait OAuth2BaseProvider extends Results {
  * OAuth2Provider supports issue access token and authorize.
  *
  * <h3>Create controller for issue access token</h3>
- * <code>
+ * @example {{{
  * object OAuth2Controller extends Controller with OAuth2Provider {
  *   def accessToken = Action.async { implicit request =>
  *     issueAccessToken(new MyDataHandler())
  *   }
  * }
- * </code>
+ * }}}
  *
  * <h3>Register routes</h3>
- * <code>
+ * @example {{{
  * POST /oauth2/access_token controllers.OAuth2Controller.accessToken
- * </code>
+ * }}}
  *
  * <h3>Authorized</h3>
- * <code>
+ * @example {{{
  * import scalaoauth2.provider._
  * object BookController extends Controller with OAuthProvider {
  *   def list = Action.async { implicit request =>
@@ -103,7 +103,7 @@ trait OAuth2BaseProvider extends Results {
  *     }
  *   }
  * }
- * </code>
+ * }}}
  */
 trait OAuth2Provider extends OAuth2BaseProvider {
 
@@ -152,21 +152,21 @@ trait OAuth2Provider extends OAuth2BaseProvider {
  * OAuth2AsyncProvider supports issue access token and authorize in asynchronous.
  *
  * <h3>Create controller for issue access token</h3>
- * <code>
+ * @example {{{
  * object OAuth2Controller extends Controller with OAuth2AsyncProvider {
  *   def accessToken = Action.async { implicit request =>
  *     issueAccessToken(new MyDataHandler())
  *   }
  * }
- * </code>
+ * }}}
  *
  * <h3>Register routes</h3>
- * <code>
+ * @example {{{
  * POST /oauth2/access_token controllers.OAuth2Controller.accessToken
- * </code>
+ * }}}
  *
  * <h3>Authorized</h3>
- * <code>
+ * @example {{{
  * import scalaoauth2.provider._
  * object BookController extends Controller with OAuth2AsyncProvider {
  *   def list = Action.async { implicit request =>
@@ -176,7 +176,7 @@ trait OAuth2Provider extends OAuth2BaseProvider {
  *     }
  *   }
  * }
- * </code>
+ * }}}
  */
 @deprecated("Use OAuth2Provider", "0.12.0")
 trait OAuth2AsyncProvider extends OAuth2Provider
