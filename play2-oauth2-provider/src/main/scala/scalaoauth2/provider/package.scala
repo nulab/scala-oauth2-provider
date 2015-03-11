@@ -11,22 +11,22 @@ package object provider {
    * Support synchronous Result for Playframework
    *
    * <h3>Create controller for issue access token</h3>
-   * <code>
+   * @example {{{
    * import scalaoauth2.provider._
    * object OAuth2Controller extends Controller with OAuth2Provider {
    *   def accessToken = Action { implicit request =>
    *     await(issueAccessToken(new MyDataHandler()))
    *   }
    * }
-   * </code>
+   * }}}
    *
    * <h3>Register routes</h3>
-   * <code>
+   * @example {{{
    * POST /oauth2/access_token controllers.OAuth2Controller.accessToken
-   * </code>
+   * }}}
    *
    * <h3>Authorized</h3>
-   * <code>
+   * @example {{{
    * import scalaoauth2.provider._
    * object BookController extends Controller with OAuthProvider {
    *   def list = Action { implicit request =>
@@ -37,7 +37,7 @@ package object provider {
    *     })
    *   }
    * }
-   * </code>
+   * }}}
    * @param f callback
    * @param timeout maximum wait time
    * @return Await and return the result.
