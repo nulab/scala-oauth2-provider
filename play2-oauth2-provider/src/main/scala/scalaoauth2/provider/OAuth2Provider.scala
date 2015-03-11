@@ -120,8 +120,7 @@ trait OAuth2Provider extends OAuth2BaseProvider {
    */
   def issueAccessToken[A, U](handler: AuthorizationHandler[U])(implicit request: Request[A], ctx: ExecutionContext): Future[Result] = {
     tokenEndpoint.handleRequest(request, handler).map {
-      case Left(e) if e.statusCode == 400 => BadRequest(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
-      case Left(e) if e.statusCode == 401 => Unauthorized(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
+      case Left(e)  => new Status(e.statusCode)(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
       case Right(r) => Ok(Json.toJson(responseAccessToken(r))).withHeaders("Cache-Control" -> "no-store", "Pragma" -> "no-cache")
     }
   }
@@ -140,8 +139,7 @@ trait OAuth2Provider extends OAuth2BaseProvider {
    */
   def authorize[A, U](handler: ProtectedResourceHandler[U])(callback: AuthInfo[U] => Future[Result])(implicit request: Request[A], ctx: ExecutionContext): Future[Result] = {
     protectedResource.handleRequest(request, handler).flatMap {
-      case Left(e) if e.statusCode == 400 => Future.successful(BadRequest.withHeaders(responseOAuthErrorHeader(e)))
-      case Left(e) if e.statusCode == 401 => Future.successful(Unauthorized.withHeaders(responseOAuthErrorHeader(e)))
+      case Left(e)         => Future.successful(new Status(e.statusCode).withHeaders(responseOAuthErrorHeader(e)))
       case Right(authInfo) => callback(authInfo)
     }
   }
