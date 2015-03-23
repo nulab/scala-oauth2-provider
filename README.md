@@ -153,8 +153,8 @@ If you'd like to change the OAuth workflow, modify handleRequest methods of Toke
 ### Customizing Grant Handlers
 
 If you want to change which grant types are supported or to use a customized handler for a grant type, you can
-override the ```handlers``` map in a customized ```TokenEndpoint``` trait since version 0.10.0.  Here's an example of a customized
-```TokenEndpoint``` that 1) only supports the ```password``` grant type, and 2) customizes the ``password``` grant
+override the ```handlers``` map in a customized ```TokenEndpoint``` trait.  Here's an example of a customized
+```TokenEndpoint``` that 1) only supports the ```password``` grant type, and 2) customizes the ```password``` grant
 type handler to not require client credentials:
 
 ```scala
@@ -166,6 +166,24 @@ class MyTokenEndpoint extends TokenEndpoint {
   override val handlers = Map(
     OAuthGrantType.PASSWORD -> passwordNoCred
   )
+}
+```
+
+### Using Action composition
+
+You can write more easily authorize action by using Action composition.
+
+Playframework's documentation is [here](https://www.playframework.com/documentation/2.3.x/ScalaActionsComposition).
+
+```scala
+object MyController extends Controller {
+
+  import scalaoauth2.provider.OAuth2ProviderActionBuilders._
+
+  def list = AuthorizedAction(new MyDataHandler()) { request =>
+    val user = request.authInfo.user // User is defined on your system
+    // access resource for the user
+  }
 }
 ```
 
