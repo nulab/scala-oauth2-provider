@@ -1,9 +1,10 @@
 package scalaoauth2.provider
 
-import org.scalatest._
 import org.scalatest.Matchers._
-import scala.concurrent.Future
+import org.scalatest._
 import play.api.libs.json._
+import play.api.mvc.{AnyContentAsFormUrlEncoded, AnyContentAsJson}
+import play.api.test.{FakeHeaders, FakeRequest}
 
 class OAuth2ProviderSpec extends FlatSpec {
 
@@ -31,5 +32,39 @@ class OAuth2ProviderSpec extends FlatSpec {
     val (name, value) = TestOAuthProvider.responseOAuthErrorHeader(new InvalidRequest("request is invalid"))
     name should be ("WWW-Authenticate")
     value should be ("""Bearer error="invalid_request", error_description="request is invalid"""")
+  }
+
+  it should "get parameters from form url encoded body" in {
+    val values = Map(
+      "id" -> List("1000"),
+      "language" -> List("Scala")
+    )
+    val request = FakeRequest(method = "GET", uri = "/", headers = FakeHeaders(), body = AnyContentAsFormUrlEncoded(values))
+    val params = TestOAuthProvider.getParam(request)
+    params.get("id") should contain (List("1000"))
+    params.get("language") should contain (List("Scala"))
+  }
+
+  it should "get parameters from query string" in {
+    val values = Map(
+      "id" -> List("1000"),
+      "language" -> List("Scala")
+    )
+    val request = FakeRequest(method = "GET", uri = "/?version=2.11", headers = FakeHeaders(), body = AnyContentAsFormUrlEncoded(values))
+    val params = TestOAuthProvider.getParam(request)
+    params.get("id") should contain (List("1000"))
+    params.get("language") should contain (List("Scala"))
+    params.get("version") should contain (List("2.11"))
+  }
+
+  it should "get parameters from JSON body" in {
+    val json = Json.obj(
+      "id" -> 1000,
+      "language" -> "Scala"
+    )
+    val request = FakeRequest(method = "GET", uri = "/", headers = FakeHeaders(), body = AnyContentAsJson(json))
+    val params = TestOAuthProvider.getParam(request)
+    params.get("id") should contain (List("1000"))
+    params.get("language") should contain (List("Scala"))
   }
 }
