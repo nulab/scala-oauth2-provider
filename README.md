@@ -202,3 +202,4 @@ object MyController extends Controller {
 
 - [Typetalk](https://typetalk.in/)
 - [Backlog](https://backlogtool.com/)
+- [Flic by Shortcut Labs](https://flic.io/)
