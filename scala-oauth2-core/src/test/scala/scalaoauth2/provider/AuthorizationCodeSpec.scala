@@ -11,6 +11,7 @@ class AuthorizationCodeSpec extends FlatSpec with ScalaFutures {
   it should "handle request" in {
     val authorizationCode = new AuthorizationCode()
     val request = AuthorizationRequest(Map(), Map("code" -> Seq("code1"), "redirect_uri" -> Seq("http://example.com/")))
+    var codeDeleted: Boolean = false
     val f = authorizationCode.handleRequest(request, Some(ClientCredential("clientId1", Some("clientSecret1"))), new MockDataHandler() {
 
       override def findAuthInfoByCode(code: String): Future[Option[AuthInfo[User]]] = Future.successful(Some(
@@ -18,14 +19,20 @@ class AuthorizationCodeSpec extends FlatSpec with ScalaFutures {
       ))
 
       override def createAccessToken(authInfo: AuthInfo[User]): Future[AccessToken] = Future.successful(AccessToken("token1", Some("refreshToken1"), Some("all"), Some(3600), new java.util.Date()))
+
+      override def deleteAuthCode(code: String): Future[Unit] = {
+        codeDeleted = true
+        Future.successful(Unit)
+      }
     })
 
     whenReady(f) { result =>
-      result.tokenType should be ("Bearer")
-      result.accessToken should be ("token1")
-      result.expiresIn should be (Some(3600))
-      result.refreshToken should be (Some("refreshToken1"))
-      result.scope should be (Some("all"))
+      codeDeleted shouldBe true
+      result.tokenType shouldBe "Bearer"
+      result.accessToken shouldBe "token1"
+      result.expiresIn shouldBe Some(3600)
+      result.refreshToken shouldBe Some("refreshToken1")
+      result.scope shouldBe Some("all")
     }
   }
 
@@ -42,11 +49,11 @@ class AuthorizationCodeSpec extends FlatSpec with ScalaFutures {
     })
 
     whenReady(f) { result =>
-      result.tokenType should be ("Bearer")
-      result.accessToken should be ("token1")
-      result.expiresIn should be (Some(3600))
-      result.refreshToken should be (Some("refreshToken1"))
-      result.scope should be (Some("all"))
+      result.tokenType shouldBe "Bearer"
+      result.accessToken shouldBe "token1"
+      result.expiresIn shouldBe Some(3600)
+      result.refreshToken shouldBe Some("refreshToken1")
+      result.scope shouldBe Some("all")
     }
   }
 }

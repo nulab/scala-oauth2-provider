@@ -6,7 +6,7 @@ import scala.concurrent.Future
  * Provide <b>Authorization</b> phases support for using OAuth 2.0.
  *
  * <h3>[Authorization phases]</h3>
- * 
+ *
  * <h4>Authorization Code Grant</h4>
  * <ul>
  *   <li>validateClient(clientCredential, grantType)</li>
@@ -16,14 +16,14 @@ import scala.concurrent.Future
  *   <li>refreshAccessToken(authInfo, token)
  *   <li>createAccessToken(authInfo)</li>
  * </ul>
- * 
+ *
  * <h4>Refresh Token Grant</h4>
  * <ul>
  *   <li>validateClient(clientCredential, grantType)</li>
  *   <li>findAuthInfoByRefreshToken(refreshToken)</li>
  *   <li>refreshAccessToken(authInfo, refreshToken)</li>
  * </ul>
- * 
+ *
  * <h4>Resource Owner Password Credentials Grant</h4>
  * <ul>
  *   <li>validateClient(clientCredential, grantType)</li>
@@ -33,7 +33,7 @@ import scala.concurrent.Future
  *   <li>refreshAccessToken(authInfo, token)
  *   <li>createAccessToken(authInfo)</li>
  * </ul>
- * 
+ *
  * <h4>Client Credentials Grant</h4>
  * <ul>
  *   <li>validateClient(clientCredential, grantType)</li>
@@ -101,6 +101,18 @@ trait AuthorizationHandler[U] {
    * @return Return authorized information that matched the code.
    */
   def findAuthInfoByCode(code: String): Future[Option[AuthInfo[U]]]
+
+  /**
+   * Deletes an authorization code.
+   *
+   * Called when an AccessToken has been successfully issued via an authorization code.
+   *
+   * If you don't support Authorization Code Grant, then you don't need to implement this
+   * method.
+   *
+   * @param code Client-sent authorization code
+   */
+  def deleteAuthCode(code: String): Future[Unit]
 
   /**
    * Find authorized information by refresh token.

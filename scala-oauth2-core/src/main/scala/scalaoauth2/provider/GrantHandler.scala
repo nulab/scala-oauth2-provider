@@ -122,7 +122,9 @@ class AuthorizationCode extends GrantHandler {
         throw new RedirectUriMismatch
       }
 
-      issueAccessToken(handler, authInfo)
+      val fGrantResult = issueAccessToken(handler, authInfo)
+      fGrantResult onSuccess { case _ => handler.deleteAuthCode(code) }
+      fGrantResult
     }
   }
 

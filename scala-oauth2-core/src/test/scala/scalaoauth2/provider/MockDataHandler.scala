@@ -26,6 +26,7 @@ class MockDataHandler extends DataHandler[User] {
 
   def refreshAccessToken(authInfo: AuthInfo[User], refreshToken: String): Future[AccessToken] = Future.successful(AccessToken("", Some(""), Some(""), Some(0L), new Date()))
 
+  def deleteAuthCode(code: String): Future[Unit] = Future.successful(Unit)
 }
 
 trait User {
