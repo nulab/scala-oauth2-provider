@@ -11,9 +11,10 @@ import scala.concurrent.Future
  * <ul>
  *   <li>validateClient(clientCredential, grantType)</li>
  *   <li>findAuthInfoByCode(code)</li>
+ *   <li>deleteAuthCode(code)</li>
  *   <li>getStoredAccessToken(authInfo)</li>
  *   <li>isAccessTokenExpired(token)</li>
- *   <li>refreshAccessToken(authInfo, token)
+ *   <li>refreshAccessToken(authInfo, token)</li>
  *   <li>createAccessToken(authInfo)</li>
  * </ul>
  *
@@ -30,7 +31,7 @@ import scala.concurrent.Future
  *   <li>findUser(username, password)</li>
  *   <li>getStoredAccessToken(authInfo)</li>
  *   <li>isAccessTokenExpired(token)</li>
- *   <li>refreshAccessToken(authInfo, token)
+ *   <li>refreshAccessToken(authInfo, token)</li>
  *   <li>createAccessToken(authInfo)</li>
  * </ul>
  *
@@ -40,7 +41,7 @@ import scala.concurrent.Future
  *   <li>findClientUser(clientCredential)</li>
  *   <li>getStoredAccessToken(authInfo)</li>
  *   <li>isAccessTokenExpired(token)</li>
- *   <li>refreshAccessToken(authInfo, token)
+ *   <li>refreshAccessToken(authInfo, token)</li>
  *   <li>createAccessToken(authInfo)</li>
  * </ul>
  *
