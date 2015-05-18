@@ -24,7 +24,7 @@ If you'd like to use this with Playframework, add "play2-oauth2-provider" to lib
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.nulab-inc" %% "play2-oauth2-provider" % "0.13.3"
+  "com.nulab-inc" %% "play2-oauth2-provider" % "0.14.0"
 )
 ```
 
@@ -42,7 +42,7 @@ Add "scala-oauth2-core" instead. In this case, you need to implement your own OA
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.nulab-inc" %% "scala-oauth2-core" % "0.13.3"
+  "com.nulab-inc" %% "scala-oauth2-core" % "0.14.0"
 )
 ```
 
@@ -72,6 +72,8 @@ class MyDataHandler extends DataHandler[User] {
   def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[User]]] = ???
 
   def findClientUser(clientCredential: ClientCredential, scope: Option[String]): Future[Option[User]] = ???
+
+  def deleteAuthCode(code: String): Future[Unit] = ???
 
   def findAccessToken(token: String): Future[Option[AccessToken]] = ???
 
