@@ -4,8 +4,8 @@ import Keys._
 object ScalaOAuth2Build extends Build {
 
   lazy val _organization = "com.nulab-inc"
-  lazy val _version =  "0.14.1-SNAPSHOT"
-  lazy val _playVersion = "2.3.7"
+  lazy val _version =  "0.15.0-SNAPSHOT"
+  lazy val _playVersion = "2.4.0"
 
   val _scalaVersion = "2.10.5"
   val _crossScalaVersions = Seq("2.10.5", "2.11.6")
