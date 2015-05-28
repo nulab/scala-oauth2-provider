@@ -2,7 +2,7 @@
 
 [The OAuth 2.0](http://tools.ietf.org/html/rfc6749) server-side implementation written in Scala.
 
-This provides OAuth 2.0 server-side functionality and supporting function for [Playframework](http://www.playframework.com/). Playframework 2.2 and 2.3 are now supported.
+This provides OAuth 2.0 server-side functionality and supporting function for [Play Framework](http://www.playframework.com/). Play Framework 2.2, 2.3 and 2.4 are now supported.
 
 The idea of this library originally comes from [oauth2-server](https://github.com/yoichiro/oauth2-server) which is Java implementation of OAuth 2.0.
 
@@ -18,9 +18,9 @@ and an access token type called [Bearer](http://tools.ietf.org/html/rfc6750).
 
 ## Setup
 
-If you'd like to use this with Playframework, add "play2-oauth2-provider" to library dependencies of your project.
+If you'd like to use this with Play Framework, add "play2-oauth2-provider" to library dependencies of your project.
 
-### For Playframework 2.4
+### For Play Framework 2.4
 
 ```scala
 libraryDependencies ++= Seq(
@@ -28,7 +28,7 @@ libraryDependencies ++= Seq(
 )
 ```
 
-### For Playframework 2.3
+### For Play Framework 2.3
 
 ```scala
 libraryDependencies ++= Seq(
@@ -36,7 +36,7 @@ libraryDependencies ++= Seq(
 )
 ```
 
-### For Playframework 2.2
+### For Play Framework 2.2
 
 ```scala
 libraryDependencies ++= Seq(
@@ -58,7 +58,7 @@ libraryDependencies ++= Seq(
 
 ### Implement DataHandler
 
-Whether you use Playframework or not, you have to implement ```DataHandler``` trait and make it work with your own ```User``` class that may be already defined in your application.
+Whether you use Play Framework or not, you have to implement ```DataHandler``` trait and make it work with your own ```User``` class that may be already defined in your application.
 
 ```scala
 case class User(id: Long, name: String, hashedPassword: String)
@@ -119,9 +119,9 @@ case class AuthInfo[User](
 - redirectUri
   - This value must be enabled on authorization code grant
 
-### Work with Playframework
+### Work with Play Framework
 
-You should follow three steps below to work with Playframework.
+You should follow three steps below to work with Play Framework.
 
 * Define a controller to issue access token
 * Assign a route to the controller
@@ -183,7 +183,7 @@ class MyTokenEndpoint extends TokenEndpoint {
 
 You can write more easily authorize action by using Action composition.
 
-Playframework's documentation is [here](https://www.playframework.com/documentation/2.3.x/ScalaActionsComposition).
+Play Framework's documentation is [here](https://www.playframework.com/documentation/2.4.x/ScalaActionsComposition).
 
 ```scala
 object MyController extends Controller {
@@ -199,12 +199,12 @@ object MyController extends Controller {
 
 ## Examples
 
-### Playframework 2.3
+### Play Framework 2.3
 
 - https://github.com/tsuyoshizawa/scala-oauth2-provider-example-skinny-orm
 - https://github.com/davidseth/scala-oauth2-provider-slick
 
-### Playframework 2.2
+### Play Framework 2.2
 
 - https://github.com/oyediyildiz/scala-oauth2-provider-example
 - https://github.com/tuxdna/play-oauth2-server
