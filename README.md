@@ -20,6 +20,14 @@ and an access token type called [Bearer](http://tools.ietf.org/html/rfc6750).
 
 If you'd like to use this with Playframework, add "play2-oauth2-provider" to library dependencies of your project.
 
+### For Playframework 2.4
+
+```scala
+libraryDependencies ++= Seq(
+  "com.nulab-inc" %% "play2-oauth2-provider" % "0.15.0"
+)
+```
+
 ### For Playframework 2.3
 
 ```scala
@@ -42,7 +50,7 @@ Add "scala-oauth2-core" instead. In this case, you need to implement your own OA
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.nulab-inc" %% "scala-oauth2-core" % "0.14.0"
+  "com.nulab-inc" %% "scala-oauth2-core" % "0.15.0"
 )
 ```
 
