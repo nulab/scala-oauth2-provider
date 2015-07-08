@@ -22,7 +22,7 @@ trait TokenEndpoint {
     fetcher.fetch(request).map { clientCredential =>
       handler.validateClient(clientCredential, grantType).flatMap { validClient =>
         if (!validClient) {
-          Future.successful(Left(new InvalidClient()))
+          Future.successful(Left(new InvalidClient("Invalid client is detected")))
         } else {
           grantHandler.handleRequest(request, Some(clientCredential), handler).map(Right(_))
         }
