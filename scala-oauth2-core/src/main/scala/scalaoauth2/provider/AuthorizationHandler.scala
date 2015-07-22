@@ -45,6 +45,15 @@ import scala.concurrent.Future
  *   <li>createAccessToken(authInfo)</li>
  * </ul>
  *
+ * <h4>Implicit Grant</h4>
+ * <ul>
+ *   <li>findUser(request)</li>
+ *   <li>getStoredAccessToken(authInfo)</li>
+ *   <li>isAccessTokenExpired(token)</li>
+ *   <li>refreshAccessToken(authInfo, token)</li>
+ *   <li>createAccessToken(authInfo)</li>
+ * </ul>
+ *
  */
 trait AuthorizationHandler[U] {
 
@@ -66,6 +75,14 @@ trait AuthorizationHandler[U] {
    * @return Including UserId to Option if could find the user, None if couldn't find.
    */
   def findUser(username: String, password: String): Future[Option[U]]
+
+  /**
+   * Authenticate the user that issued the authorization request.
+   * If you don't support Implicit Grant, then doesn't need implementing.
+   *
+   * @oaram request Request sent by client.
+   */
+  def findUser(request: AuthorizationRequest): Future[Option[U]]
 
   /**
    * Creates a new access token by authorized information.

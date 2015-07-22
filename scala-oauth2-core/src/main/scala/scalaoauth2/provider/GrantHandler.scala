@@ -129,3 +129,19 @@ class AuthorizationCode extends GrantHandler {
   }
 
 }
+
+class Implicit extends GrantHandler {
+
+  override def handleRequest[U](request: AuthorizationRequest, maybeClientCredential: Option[ClientCredential], handler: AuthorizationHandler[U]): Future[GrantHandlerResult] = {
+    val clientId = request.clientId.getOrElse(throw new InvalidRequest("Client id is required"))
+
+    handler.findUser(request).flatMap { userOption =>
+      val user = userOption.getOrElse(throw new InvalidGrant("user cannot be authenticated"))
+      val scope = request.scope
+      val authInfo = AuthInfo(user, Some(clientId), scope, None)
+
+      issueAccessToken(handler, authInfo)
+    }
+  }
+
+}
