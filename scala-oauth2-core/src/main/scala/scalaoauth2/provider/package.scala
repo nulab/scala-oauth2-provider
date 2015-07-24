@@ -7,6 +7,7 @@ package object provider {
     val REFRESH_TOKEN = "refresh_token"
     val CLIENT_CREDENTIALS = "client_credentials"
     val PASSWORD = "password"
+    val IMPLICIT = "implicit"
   }
 
 }

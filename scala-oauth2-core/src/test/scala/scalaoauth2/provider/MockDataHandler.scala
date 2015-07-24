@@ -10,6 +10,8 @@ class MockDataHandler extends DataHandler[User] {
 
   def findUser(username: String, password: String): Future[Option[User]] = Future.successful(None)
 
+  def findUser(request: AuthorizationRequest): Future[Option[User]] = Future.successful(None)
+
   def createAccessToken(authInfo: AuthInfo[User]): Future[AccessToken] = Future.successful(AccessToken("", Some(""), Some(""), Some(0L), new Date()))
 
   def findAuthInfoByCode(code: String): Future[Option[AuthInfo[User]]] = Future.successful(None)
