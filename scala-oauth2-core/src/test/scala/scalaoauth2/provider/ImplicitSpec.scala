@@ -1,5 +1,7 @@
 package scalaoauth2.provider
 
+import java.util.Date
+
 import org.scalatest._
 import org.scalatest.Matchers._
 import org.scalatest.concurrent.ScalaFutures
@@ -21,7 +23,7 @@ class ImplicitSpec extends FlatSpec with ScalaFutures {
         Future.successful(if(request.requireUsername == "user" && request.requirePassword == "pass") Some(MockUser(10000, "username")) else None)
 
       override def createAccessToken(authInfo: AuthInfo[User]): Future[AccessToken] =
-        Future.successful(AccessToken("token1", None, Some("all"), Some(3600), new java.util.Date()))
+        Future.successful(AccessToken("token1", Some("refresh_token"), Some("all"), Some(3600), new Date()))
 
     })
 

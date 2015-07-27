@@ -18,27 +18,27 @@ trait GrantHandler {
   /**
    * Returns valid access token.
    */
-  def issueAccessToken[U](handler: AuthorizationHandler[U], authInfo: AuthInfo[U]): Future[GrantHandlerResult] = {
-    handler.getStoredAccessToken(authInfo).flatMap { optionalAccessToken =>
-      (optionalAccessToken match {
-        case Some(token) if token.isExpired => token.refreshToken.map {
-          handler.refreshAccessToken(authInfo, _)
-        }.getOrElse {
-          handler.createAccessToken(authInfo)
-        }
-        case Some(token) => Future.successful(token)
-        case None => handler.createAccessToken(authInfo)
-      }).map { accessToken =>
-        GrantHandlerResult(
-          "Bearer",
-          accessToken.token,
-          accessToken.expiresIn,
-          accessToken.refreshToken,
-          accessToken.scope
-        )
+  protected def issueAccessToken[U](handler: AuthorizationHandler[U], authInfo: AuthInfo[U]): Future[GrantHandlerResult] = {
+    handler.getStoredAccessToken(authInfo).flatMap {
+      case Some(token) if shouldRefreshAccessToken(token) => token.refreshToken.map {
+        handler.refreshAccessToken(authInfo, _)
+      }.getOrElse {
+        handler.createAccessToken(authInfo)
       }
-    }
+      case Some(token) => Future.successful(token)
+      case None => handler.createAccessToken(authInfo)
+    }.map(createGrantHandlerResult)
   }
+
+  protected def shouldRefreshAccessToken(token: AccessToken) = token.isExpired
+
+  protected def createGrantHandlerResult(accessToken: AccessToken) = GrantHandlerResult(
+    "Bearer",
+    accessToken.token,
+    accessToken.expiresIn,
+    accessToken.refreshToken,
+    accessToken.scope
+  )
 
 }
 
@@ -54,15 +54,7 @@ class RefreshToken extends GrantHandler {
         throw new InvalidClient
       }
 
-      handler.refreshAccessToken(authInfo, refreshToken).map { accessToken =>
-        GrantHandlerResult(
-          "Bearer",
-          accessToken.token,
-          accessToken.expiresIn,
-          accessToken.refreshToken,
-          accessToken.scope
-        )
-      }
+      handler.refreshAccessToken(authInfo, refreshToken).map(createGrantHandlerResult)
     }
   }
 }
@@ -143,5 +135,15 @@ class Implicit extends GrantHandler {
       issueAccessToken(handler, authInfo)
     }
   }
+
+  /**
+   * Implicit grant doesn't support refresh token
+   */
+  protected override def shouldRefreshAccessToken(accessToken: AccessToken) = false
+
+  /**
+   * Implicit grant must not return refresh token
+   */
+  protected override def createGrantHandlerResult(accessToken: AccessToken) = super.createGrantHandlerResult(accessToken).copy(refreshToken = None)
 
 }
