@@ -6,7 +6,7 @@ import org.scalatest.concurrent.ScalaFutures
 
 import scala.concurrent.Future
 
-class AuthorizationCodeSpec extends FlatSpec with ScalaFutures {
+class AuthorizationCodeSpec extends FlatSpec with ScalaFutures with OptionValues {
 
   it should "handle request" in {
     val authorizationCode = new AuthorizationCode()
@@ -30,7 +30,7 @@ class AuthorizationCodeSpec extends FlatSpec with ScalaFutures {
       codeDeleted shouldBe true
       result.tokenType shouldBe "Bearer"
       result.accessToken shouldBe "token1"
-      result.expiresIn shouldBe Some(3600)
+      result.expiresIn.value should (be <= 3600L and be > 3595L)
       result.refreshToken shouldBe Some("refreshToken1")
       result.scope shouldBe Some("all")
     }
@@ -51,7 +51,7 @@ class AuthorizationCodeSpec extends FlatSpec with ScalaFutures {
     whenReady(f) { result =>
       result.tokenType shouldBe "Bearer"
       result.accessToken shouldBe "token1"
-      result.expiresIn shouldBe Some(3600)
+      result.expiresIn.value should (be <= 3600L and be > 2595L)
       result.refreshToken shouldBe Some("refreshToken1")
       result.scope shouldBe Some("all")
     }

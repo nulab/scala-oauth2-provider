@@ -13,16 +13,21 @@ trait DataHandler[U] extends AuthorizationHandler[U] with ProtectedResourceHandl
  * @param token Access token is used to authentication.
  * @param refreshToken Refresh token is used to re-issue access token.
  * @param scope Inform the client of the scope of the access token issued.
- * @param expiresIn Expiration date of access token. Unit is seconds.
+ * @param lifeSeconds Life of the access token since its creation. In seconds.
  * @param createdAt Access token is created date.
  */
-case class AccessToken(token: String, refreshToken: Option[String], scope: Option[String], expiresIn: Option[Long], createdAt: Date) {
-
-  def isExpired: Boolean = expiresIn.exists { expiresIn =>
-    val now = System.currentTimeMillis()
-    createdAt.getTime + expiresIn * 1000 <= now
+case class AccessToken(token: String, refreshToken: Option[String], scope: Option[String], lifeSeconds: Option[Long], createdAt: Date) {
+  def isExpired: Boolean = expirationTimeInMilis.exists {expTime =>
+    expTime <= System.currentTimeMillis
   }
 
+  def expiresIn: Option[Long] = expirationTimeInMilis map {expTime =>
+    (expTime - System.currentTimeMillis) / 1000
+  }
+
+  private def expirationTimeInMilis: Option[Long] = lifeSeconds map {lifeSecs =>
+    createdAt.getTime + lifeSecs * 1000
+  }
 }
 
 /**

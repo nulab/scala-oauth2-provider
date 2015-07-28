@@ -8,7 +8,7 @@ import org.scalatest.concurrent.ScalaFutures
 
 import scala.concurrent.Future
 
-class ImplicitSpec extends FlatSpec with ScalaFutures {
+class ImplicitSpec extends FlatSpec with ScalaFutures with OptionValues {
 
   val implicitGrant = new Implicit()
 
@@ -31,7 +31,7 @@ class ImplicitSpec extends FlatSpec with ScalaFutures {
       whenReady(f) { result =>
         result.tokenType should be("Bearer")
         result.accessToken should be("token1")
-        result.expiresIn should be(Some(3600))
+        result.expiresIn.value should (be <= 3600L and be > 3595L)
         result.refreshToken should be(None)
         result.scope should be(Some("all"))
       }
