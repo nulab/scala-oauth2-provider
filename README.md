@@ -24,7 +24,7 @@ If you'd like to use this with Play Framework, add "play2-oauth2-provider" to li
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.nulab-inc" %% "play2-oauth2-provider" % "0.15.0"
+  "com.nulab-inc" %% "play2-oauth2-provider" % "0.15.1"
 )
 ```
 
@@ -50,7 +50,7 @@ Add "scala-oauth2-core" instead. In this case, you need to implement your own OA
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.nulab-inc" %% "scala-oauth2-core" % "0.15.0"
+  "com.nulab-inc" %% "scala-oauth2-core" % "0.15.1"
 )
 ```
 
