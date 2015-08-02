@@ -1,12 +1,10 @@
-package scalaoauth2
+package scalaoauth2.provider
 
-package object provider {
+package object OAuthGrantType {
 
-  object OAuthGrantType {
-    val AUTHORIZATION_CODE = "authorization_code"
-    val REFRESH_TOKEN = "refresh_token"
-    val CLIENT_CREDENTIALS = "client_credentials"
-    val PASSWORD = "password"
-  }
+  val AUTHORIZATION_CODE = "authorization_code"
+  val REFRESH_TOKEN = "refresh_token"
+  val CLIENT_CREDENTIALS = "client_credentials"
+  val PASSWORD = "password"
 
 }
