@@ -16,21 +16,21 @@ trait OAuth2BaseProvider extends Results {
   val tokenEndpoint: TokenEndpoint = TokenEndpoint
 
   implicit def play2oauthRequest(request: RequestHeader): AuthorizationRequest = {
-    AuthorizationRequest(request.headers.toMap, request.queryString)
+    new AuthorizationRequest(request.headers.toMap, request.queryString)
   }
 
   implicit def play2oauthRequest[A](request: Request[A]): AuthorizationRequest = {
     val param: Map[String, Seq[String]] = getParam(request)
-    AuthorizationRequest(request.headers.toMap, param)
+    new AuthorizationRequest(request.headers.toMap, param)
   }
 
   implicit def play2protectedResourceRequest(request: RequestHeader): ProtectedResourceRequest = {
-    ProtectedResourceRequest(request.headers.toMap, request.queryString)
+    new ProtectedResourceRequest(request.headers.toMap, request.queryString)
   }
 
   implicit def play2protectedResourceRequest[A](request: Request[A]): ProtectedResourceRequest = {
     val param: Map[String, Seq[String]] = getParam(request)
-    ProtectedResourceRequest(request.headers.toMap, param)
+    new ProtectedResourceRequest(request.headers.toMap, param)
   }
 
   private[provider] def getParam[A](request: Request[A]): Map[String, Seq[String]] = {

@@ -13,14 +13,14 @@ class PasswordSpec extends FlatSpec with ScalaFutures with OptionValues {
     override def clientCredentialRequired = false
   }
 
-  "Password when client credential required" should "handle request" in handlesRequest(passwordClientCredReq, Some(ClientCredential("clientId1", Some("clientSecret1"))))
-  "Password when client credential not required" should "handle request" in handlesRequest(passwordNoClientCredReq, None)
+  "Password when client credential required" should "handle request" in handlesRequest(passwordClientCredReq, Map("client_id" -> Seq("clientId1"), "client_secret" -> Seq("clientSecret1")))
+  "Password when client credential not required" should "handle request" in handlesRequest(passwordNoClientCredReq, Map.empty)
 
-  def handlesRequest(password: Password, clientCredential: Option[ClientCredential]) = {
-    val request = AuthorizationRequest(Map(), Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all")))
-    val f = password.handleRequest(request, clientCredential, new MockDataHandler() {
+  def handlesRequest(password: Password, params: Map[String, Seq[String]]) = {
+    val request = new AuthorizationRequest(Map(), params ++ Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all")))
+    val f = password.handleRequest(request, new MockDataHandler() {
 
-      override def findUser(username: String, password: String): Future[Option[User]] = Future.successful(Some(MockUser(10000, "username")))
+      override def findUser(request: AuthorizationRequest): Future[Option[User]] = Future.successful(Some(MockUser(10000, "username")))
 
       override def createAccessToken(authInfo: AuthInfo[User]): Future[AccessToken] = Future.successful(AccessToken("token1", Some("refreshToken1"), Some("all"), Some(3600), new java.util.Date()))
 

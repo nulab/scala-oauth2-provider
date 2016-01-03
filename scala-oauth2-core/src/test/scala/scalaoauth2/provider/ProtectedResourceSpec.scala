@@ -22,7 +22,7 @@ class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
   }
 
   it should "be handled request with token into header" in {
-    val request = ProtectedResourceRequest(
+    val request = new ProtectedResourceRequest(
       Map("Authorization" -> Seq("OAuth token1")),
       Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
     )
@@ -32,7 +32,7 @@ class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
   }
 
   it should "be handled request with token into body" in {
-    val request = ProtectedResourceRequest(
+    val request = new ProtectedResourceRequest(
       Map(),
       Map("access_token" -> Seq("token1"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
     )
@@ -42,7 +42,7 @@ class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
   }
 
   it should "be lost expired" in {
-    val request = ProtectedResourceRequest(
+    val request = new ProtectedResourceRequest(
       Map("Authorization" -> Seq("OAuth token1")),
       Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
     )
@@ -70,7 +70,7 @@ class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
   }
 
   it should "be invalid request without token" in {
-    val request = ProtectedResourceRequest(
+    val request = new ProtectedResourceRequest(
       Map(),
       Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
     )
@@ -90,7 +90,7 @@ class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
   }
 
   it should "be invalid request when not find an access token" in {
-    val request = ProtectedResourceRequest(
+    val request = new ProtectedResourceRequest(
       Map("Authorization" -> Seq("OAuth token1")),
       Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
     )
@@ -117,7 +117,7 @@ class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
   }
 
   it should "be invalid request when not find AuthInfo by token" in {
-    val request = ProtectedResourceRequest(
+    val request = new ProtectedResourceRequest(
       Map("Authorization" -> Seq("OAuth token1")),
       Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
     )
