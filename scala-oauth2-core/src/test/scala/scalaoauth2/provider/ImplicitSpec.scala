@@ -16,11 +16,20 @@ class ImplicitSpec extends FlatSpec with ScalaFutures with OptionValues {
   "Implicit" should "not grant access with invalid user authentication" in handlesRequest(implicitGrant, "user", "wrong_pass", false)
 
   def handlesRequest(implicitGrant: Implicit, user: String, pass: String, ok: Boolean) = {
-    val request = AuthorizationRequest(Map(), Map("client_id" -> Seq("client"), "username" -> Seq(user), "password" -> Seq(pass), "scope" -> Seq("all")))
-    val f = implicitGrant.handleRequest(request, None, new MockDataHandler() {
+    val request = new AuthorizationRequest(Map(), Map("client_id" -> Seq("client"), "username" -> Seq(user), "password" -> Seq(pass), "scope" -> Seq("all")))
+    val f = implicitGrant.handleRequest(request, new MockDataHandler() {
 
-      override def findUser(request: AuthorizationRequest): Future[Option[User]] =
-        Future.successful(if(request.requireUsername == "user" && request.requirePassword == "pass") Some(MockUser(10000, "username")) else None)
+      override def findUser(request: AuthorizationRequest): Future[Option[User]] = {
+        val result = request match {
+          case request: ImplicitRequest =>
+            for {
+              user <- request.param("username") if user == "user"
+              password <- request.param("password") if password == "pass"
+            } yield MockUser(10000, "username")
+          case _ => None
+        }
+        Future.successful(result)
+      }
 
       override def createAccessToken(authInfo: AuthInfo[User]): Future[AccessToken] =
         Future.successful(AccessToken("token1", Some("refresh_token"), Some("all"), Some(3600), new Date()))

@@ -6,29 +6,25 @@ import scala.concurrent.Future
 
 class MockDataHandler extends DataHandler[User] {
 
-  def validateClient(clientCredential: ClientCredential, grantType: String): Future[Boolean] = Future.successful(false)
+  override def validateClient(request: AuthorizationRequest): Future[Boolean] = Future.successful(false)
 
-  def findUser(username: String, password: String): Future[Option[User]] = Future.successful(None)
+  override def findUser(request: AuthorizationRequest): Future[Option[User]] = Future.successful(None)
 
-  def findUser(request: AuthorizationRequest): Future[Option[User]] = Future.successful(None)
+  override def createAccessToken(authInfo: AuthInfo[User]): Future[AccessToken] = Future.successful(AccessToken("", Some(""), Some(""), Some(0L), new Date()))
 
-  def createAccessToken(authInfo: AuthInfo[User]): Future[AccessToken] = Future.successful(AccessToken("", Some(""), Some(""), Some(0L), new Date()))
+  override def findAuthInfoByCode(code: String): Future[Option[AuthInfo[User]]] = Future.successful(None)
 
-  def findAuthInfoByCode(code: String): Future[Option[AuthInfo[User]]] = Future.successful(None)
+  override def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[User]]] = Future.successful(None)
 
-  def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[User]]] = Future.successful(None)
+  override def findAccessToken(token: String): Future[Option[AccessToken]] = Future.successful(None)
 
-  def findClientUser(clientCredential: ClientCredential, scope: Option[String]): Future[Option[User]] = Future.successful(None)
+  override def findAuthInfoByAccessToken(accessToken: AccessToken): Future[Option[AuthInfo[User]]] = Future.successful(None)
 
-  def findAccessToken(token: String): Future[Option[AccessToken]] = Future.successful(None)
+  override def getStoredAccessToken(authInfo: AuthInfo[User]): Future[Option[AccessToken]] = Future.successful(None)
 
-  def findAuthInfoByAccessToken(accessToken: AccessToken): Future[Option[AuthInfo[User]]] = Future.successful(None)
+  override def refreshAccessToken(authInfo: AuthInfo[User], refreshToken: String): Future[AccessToken] = Future.successful(AccessToken("", Some(""), Some(""), Some(0L), new Date()))
 
-  def getStoredAccessToken(authInfo: AuthInfo[User]): Future[Option[AccessToken]] = Future.successful(None)
-
-  def refreshAccessToken(authInfo: AuthInfo[User], refreshToken: String): Future[AccessToken] = Future.successful(AccessToken("", Some(""), Some(""), Some(0L), new Date()))
-
-  def deleteAuthCode(code: String): Future[Unit] = Future.successful(Unit)
+  override def deleteAuthCode(code: String): Future[Unit] = Future.successful(Unit)
 }
 
 trait User {

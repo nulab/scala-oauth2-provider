@@ -6,8 +6,8 @@ import org.scalatest.Matchers._
 class AuthHeaderSpec extends FlatSpec {
 
   def createRequest(authorization: Option[String]): ProtectedResourceRequest = authorization match {
-    case Some(s) => ProtectedResourceRequest(Map("Authorization" -> Seq(s)), Map())
-    case _ => ProtectedResourceRequest(Map(), Map())
+    case Some(s) => new ProtectedResourceRequest(Map("Authorization" -> Seq(s)), Map())
+    case _ => new ProtectedResourceRequest(Map(), Map())
   }
 
   it should "match AuthHeader from OAuth" in {
@@ -16,7 +16,7 @@ class AuthHeaderSpec extends FlatSpec {
   }
 
   it should "match AuthHeader by case insensitive" in {
-    AuthHeader.matches(ProtectedResourceRequest(Map("authorization" -> Seq("OAuth token1")), Map())) should be (true)
+    AuthHeader.matches(new ProtectedResourceRequest(Map("authorization" -> Seq("OAuth token1")), Map())) should be (true)
   }
 
   it should "match AuthHeader from Bearer" in {
@@ -67,7 +67,7 @@ class AuthHeaderSpec extends FlatSpec {
   }
 
   it should "fetch by case insensitive" in {
-    val result = AuthHeader.fetch(ProtectedResourceRequest(Map("authorization" -> Seq("OAuth token1")), Map()))
+    val result = AuthHeader.fetch(new ProtectedResourceRequest(Map("authorization" -> Seq("OAuth token1")), Map()))
     result.token should be ("token1")
   }
 

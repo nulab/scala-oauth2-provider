@@ -9,7 +9,7 @@ import scala.concurrent.Future
  *
  * <h4>Authorization Code Grant</h4>
  * <ul>
- *   <li>validateClient(clientCredential, grantType)</li>
+ *   <li>validateClient(request)</li>
  *   <li>findAuthInfoByCode(code)</li>
  *   <li>deleteAuthCode(code)</li>
  *   <li>getStoredAccessToken(authInfo)</li>
@@ -26,8 +26,8 @@ import scala.concurrent.Future
  *
  * <h4>Resource Owner Password Credentials Grant</h4>
  * <ul>
- *   <li>validateClient(clientCredential, grantType)</li>
- *   <li>findUser(username, password)</li>
+ *   <li>validateClient(request)</li>
+ *   <li>findUser(request)</li>
  *   <li>getStoredAccessToken(authInfo)</li>
  *   <li>refreshAccessToken(authInfo, token)</li>
  *   <li>createAccessToken(authInfo)</li>
@@ -35,8 +35,8 @@ import scala.concurrent.Future
  *
  * <h4>Client Credentials Grant</h4>
  * <ul>
- *   <li>validateClient(clientCredential, grantType)</li>
- *   <li>findClientUser(clientCredential)</li>
+ *   <li>validateClient(request)</li>
+ *   <li>findUser(request)</li>
  *   <li>getStoredAccessToken(authInfo)</li>
  *   <li>refreshAccessToken(authInfo, token)</li>
  *   <li>createAccessToken(authInfo)</li>
@@ -44,7 +44,7 @@ import scala.concurrent.Future
  *
  * <h4>Implicit Grant</h4>
  * <ul>
- *   <li>validateClient(clientCredential, grantType)</li>
+ *   <li>validateClient(request)</li>
  *   <li>findUser(request)</li>
  *   <li>getStoredAccessToken(authInfo)</li>
  *   <li>createAccessToken(authInfo)</li>
@@ -56,25 +56,14 @@ trait AuthorizationHandler[U] {
   /**
    * Verify proper client with parameters for issue an access token.
    *
-   * @param clientCredential Client sends clientId and clientSecret which are registered by application.
-   * @param grantType Client sends this value which is registered by application.
+   * @param request Request sent by client.
    * @return true if request is a regular client, false if request is a illegal client.
    */
-  def validateClient(clientCredential: ClientCredential, grantType: String): Future[Boolean]
-
-  /**
-   * Find userId with username and password these are used on your system.
-   * If you don't support Resource Owner Password Credentials Grant then doesn't need implementing.
-   *
-   * @param username Client sends this value which is used on your system.
-   * @param password Client sends this value which is used on your system.
-   * @return Including UserId to Option if could find the user, None if couldn't find.
-   */
-  def findUser(username: String, password: String): Future[Option[U]]
+  def validateClient(request: AuthorizationRequest): Future[Boolean]
 
   /**
    * Authenticate the user that issued the authorization request.
-   * If you don't support Implicit Grant, then doesn't need implementing.
+   * Client credential, Password and Implicit Grant call this method.
    *
    * @param request Request sent by client.
    */
@@ -137,15 +126,5 @@ trait AuthorizationHandler[U] {
    * @return Return authorized information that matched the refresh token.
    */
   def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[U]]]
-
-  /**
-   * Find user by clientId and clientSecret.
-   *
-   * If you don't support Client Credentials Grant then doesn't need implementing.
-   *
-   * @param clientCredential Client sends clientId and clientSecret which are registered by application.
-   * @return Return user that matched both values.
-   */
-  def findClientUser(clientCredential: ClientCredential, scope: Option[String]): Future[Option[U]]
 
 }
