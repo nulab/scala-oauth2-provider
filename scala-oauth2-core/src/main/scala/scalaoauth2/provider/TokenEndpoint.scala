@@ -6,13 +6,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scalaoauth2.provider.OAuthGrantType._
 
 trait TokenEndpoint {
-  val handlers = Map(
-    AUTHORIZATION_CODE  -> new AuthorizationCode(),
-    REFRESH_TOKEN       -> new RefreshToken(),
-    CLIENT_CREDENTIALS  -> new ClientCredentials(),
-    PASSWORD            -> new Password(),
-    IMPLICIT            -> new Implicit()
-  )
+  val handlers = Map.empty[String, GrantHandler]
 
   def handleRequest[U](request: AuthorizationRequest, handler: AuthorizationHandler[U]): Future[Either[OAuthError, GrantHandlerResult]] = try {
     val grantType = request.grantType

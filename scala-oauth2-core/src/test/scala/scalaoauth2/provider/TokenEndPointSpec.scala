@@ -28,7 +28,11 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
     )
 
     val dataHandler = successfulDataHandler()
-    val f = TokenEndpoint.handleRequest(request, dataHandler)
+    val f = new TokenEndpoint {
+      override val handlers = Map(
+        "password" -> new Password()
+      )
+    }.handleRequest(request, dataHandler)
 
     whenReady(f) { result => result should be ('right)}
   }
@@ -80,7 +84,11 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
     )
 
     val dataHandler = successfulDataHandler()
-    val f = TokenEndpoint.handleRequest(request, dataHandler)
+    val f = new TokenEndpoint {
+      override val handlers = Map(
+        "password" -> new Password()
+      )
+    }.handleRequest(request, dataHandler)
 
     whenReady(f) {result =>
       val e = intercept[InvalidRequest] {
@@ -103,13 +111,12 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
     val passwordNoCred = new Password() {
       override def clientCredentialRequired = false
     }
-    class MyTokenEndpoint extends TokenEndpoint {
+
+    val f = new TokenEndpoint {
       override val handlers = Map(
         "password" -> passwordNoCred
       )
-    }
-
-    val f = (new MyTokenEndpoint().handleRequest(request, dataHandler))
+    }.handleRequest(request, dataHandler)
 
     whenReady(f) { result => result should be ('right)}
   }
@@ -126,7 +133,11 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
 
     }
 
-    val f = TokenEndpoint.handleRequest(request, dataHandler)
+    val f = new TokenEndpoint {
+      override val handlers = Map(
+        "password" -> new Password()
+      )
+    }.handleRequest(request, dataHandler)
 
     whenReady(f) { result =>
       intercept[InvalidClient] {
