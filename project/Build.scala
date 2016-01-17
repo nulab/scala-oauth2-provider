@@ -5,7 +5,7 @@ import com.typesafe.sbt.SbtScalariform._
 object ScalaOAuth2Build extends Build {
 
   lazy val _organization = "com.nulab-inc"
-  lazy val _version =  "0.16.0"
+  lazy val _version =  "0.16.1-SNAPSHOT"
   lazy val _playVersion = "2.4.6"
 
   val _scalaVersion = "2.10.5"
