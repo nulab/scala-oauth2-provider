@@ -34,7 +34,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
       )
     }.handleRequest(request, dataHandler)
 
-    whenReady(f) { result => result should be ('right)}
+    whenReady(f) { result => result should be('right) }
   }
 
   it should "be error if grant type doesn't exist" in {
@@ -53,7 +53,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
           case _ =>
         }
       }
-      e.description should be ("required parameter: grant_type")
+      e.description should be("required parameter: grant_type")
     }
   }
 
@@ -73,7 +73,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
           case _ =>
         }
       }
-      e.description should be ("test is not supported")
+      e.description should be("test is not supported")
     }
   }
 
@@ -90,14 +90,14 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
       )
     }.handleRequest(request, dataHandler)
 
-    whenReady(f) {result =>
+    whenReady(f) { result =>
       val e = intercept[InvalidRequest] {
         result match {
           case Left(e) => throw e
           case _ =>
         }
       }
-      e.description should be ("Client credential is not found")
+      e.description should be("Client credential is not found")
     }
   }
 
@@ -118,7 +118,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
       )
     }.handleRequest(request, dataHandler)
 
-    whenReady(f) { result => result should be ('right)}
+    whenReady(f) { result => result should be('right) }
   }
 
   it should "be invalid client if client information is wrong" in {
@@ -168,7 +168,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
     val f = TokenEndpoint.handleRequest(request, dataHandler)
     f.onComplete {
       case Success(value) => fail("Must be failed by createAccessToken")
-      case Failure(e) => e.getMessage should be ("Failure")
+      case Failure(e) => e.getMessage should be("Failure")
     }
   }
 
@@ -188,7 +188,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
           case _ =>
         }
       }
-      e.description should be ("client_credentials is not supported")
+      e.description should be("client_credentials is not supported")
     }
   }
 }

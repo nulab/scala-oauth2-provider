@@ -19,11 +19,11 @@ class ClientCredentialsSpec extends FlatSpec with ScalaFutures with OptionValues
     })
 
     whenReady(f) { result =>
-      result.tokenType should be ("Bearer")
-      result.accessToken should be ("token1")
+      result.tokenType should be("Bearer")
+      result.accessToken should be("token1")
       result.expiresIn.value should (be <= 3600L and be > 3595L)
-      result.refreshToken should be (None)
-      result.scope should be (Some("all"))
+      result.refreshToken should be(None)
+      result.scope should be(Some("all"))
     }
   }
 }

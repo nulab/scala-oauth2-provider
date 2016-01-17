@@ -17,15 +17,15 @@ trait DataHandler[U] extends AuthorizationHandler[U] with ProtectedResourceHandl
  * @param createdAt Access token is created date.
  */
 case class AccessToken(token: String, refreshToken: Option[String], scope: Option[String], lifeSeconds: Option[Long], createdAt: Date) {
-  def isExpired: Boolean = expirationTimeInMilis.exists {expTime =>
+  def isExpired: Boolean = expirationTimeInMilis.exists { expTime =>
     expTime <= System.currentTimeMillis
   }
 
-  def expiresIn: Option[Long] = expirationTimeInMilis map {expTime =>
+  def expiresIn: Option[Long] = expirationTimeInMilis map { expTime =>
     (expTime - System.currentTimeMillis) / 1000
   }
 
-  private def expirationTimeInMilis: Option[Long] = lifeSeconds map {lifeSecs =>
+  private def expirationTimeInMilis: Option[Long] = lifeSeconds map { lifeSecs =>
     createdAt.getTime + lifeSecs * 1000
   }
 }

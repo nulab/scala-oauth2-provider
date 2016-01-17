@@ -76,6 +76,6 @@ class ExpiredToken() extends OAuthError(401, "The access token expired") {
 
 class InsufficientScope(description: String = "") extends OAuthError(401, description) {
 
-  override  val errorType = "insufficient_scope"
+  override val errorType = "insufficient_scope"
 
 }

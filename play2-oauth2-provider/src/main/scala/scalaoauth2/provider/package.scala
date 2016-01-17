@@ -3,7 +3,7 @@ package scalaoauth2
 import play.api.mvc.Result
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{ Await, Future }
 
 package object provider {
 

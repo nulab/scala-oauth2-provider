@@ -8,19 +8,19 @@ class AuthorizationRequest(headers: Map[String, Seq[String]], params: Map[String
 
   /**
    * Returns grant_type.
-   * 
-   * OAuth defines four grant types: 
+   *
+   * OAuth defines four grant types:
    * authorization code
    * implicit
    * resource owner password credentials, and client credentials.
-   * 
+   *
    * @return grant_type
    */
   def grantType: String = requireParam("grant_type")
 
   /**
    * Returns scope.
-   * 
+   *
    * @return scope
    */
   def scope: Option[String] = param("scope")
@@ -49,11 +49,11 @@ class AuthorizationRequest(headers: Map[String, Seq[String]], params: Map[String
 
 case class RefreshTokenRequest(request: AuthorizationRequest) extends AuthorizationRequest(request.headers, request.params) {
   /**
-    * returns refresh_token.
-    *
-    * @return code.
-    * @throws InvalidRequest if the parameter is not found
-    */
+   * returns refresh_token.
+   *
+   * @return code.
+   * @throws InvalidRequest if the parameter is not found
+   */
   def refreshToken: String = requireParam("refresh_token")
 
   override lazy val clientCredential = request.clientCredential
@@ -61,19 +61,19 @@ case class RefreshTokenRequest(request: AuthorizationRequest) extends Authorizat
 
 case class PasswordRequest(request: AuthorizationRequest) extends AuthorizationRequest(request.headers, request.params) {
   /**
-    * returns username.
-    *
-    * @return username.
-    * @throws InvalidRequest if the parameter is not found
-    */
+   * returns username.
+   *
+   * @return username.
+   * @throws InvalidRequest if the parameter is not found
+   */
   def username = requireParam("username")
 
   /**
-    * returns password.
-    *
-    * @return password.
-    * @throws InvalidRequest if the parameter is not found
-    */
+   * returns password.
+   *
+   * @return password.
+   * @throws InvalidRequest if the parameter is not found
+   */
   def password = requireParam("password")
 
   override lazy val clientCredential = request.clientCredential
@@ -85,18 +85,18 @@ case class ClientCredentialsRequest(request: AuthorizationRequest) extends Autho
 
 case class AuthorizationCodeRequest(request: AuthorizationRequest) extends AuthorizationRequest(request.headers, request.params) {
   /**
-    * returns code.
-    *
-    * @return code.
-    * @throws InvalidRequest if code is not found
-    */
+   * returns code.
+   *
+   * @return code.
+   * @throws InvalidRequest if code is not found
+   */
   def code: String = requireParam("code")
 
   /**
-    * Returns redirect_uri.
-    *
-    * @return redirect_uri
-    */
+   * Returns redirect_uri.
+   *
+   * @return redirect_uri
+   */
   def redirectUri: Option[String] = param("redirect_uri")
 
   override lazy val clientCredential = request.clientCredential

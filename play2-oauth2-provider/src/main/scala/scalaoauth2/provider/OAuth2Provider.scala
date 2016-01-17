@@ -3,7 +3,7 @@ package scalaoauth2.provider
 import play.api.libs.json._
 import play.api.mvc._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.language.implicitConversions
 
 /**
@@ -68,12 +68,12 @@ trait OAuth2BaseProvider extends Results {
       "token_type" -> JsString(r.tokenType),
       "access_token" -> JsString(r.accessToken)
     ) ++ r.expiresIn.map {
-      "expires_in" -> JsNumber(_)
-    } ++ r.refreshToken.map {
-      "refresh_token" -> JsString(_)
-    } ++ r.scope.map {
-      "scope" -> JsString(_)
-    }
+        "expires_in" -> JsNumber(_)
+      } ++ r.refreshToken.map {
+        "refresh_token" -> JsString(_)
+      } ++ r.scope.map {
+        "scope" -> JsString(_)
+      }
   }
 
   protected[scalaoauth2] def responseOAuthErrorJson(e: OAuthError): JsValue = Json.obj(
@@ -136,7 +136,7 @@ trait OAuth2Provider extends OAuth2BaseProvider {
    */
   def issueAccessToken[A, U](handler: AuthorizationHandler[U])(implicit request: Request[A], ctx: ExecutionContext): Future[Result] = {
     tokenEndpoint.handleRequest(request, handler).map {
-      case Left(e)  => new Status(e.statusCode)(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
+      case Left(e) => new Status(e.statusCode)(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
       case Right(r) => Ok(Json.toJson(responseAccessToken(r))).withHeaders("Cache-Control" -> "no-store", "Pragma" -> "no-cache")
     }
   }
@@ -155,7 +155,7 @@ trait OAuth2Provider extends OAuth2BaseProvider {
    */
   def authorize[A, U](handler: ProtectedResourceHandler[U])(callback: AuthInfo[U] => Future[Result])(implicit request: Request[A], ctx: ExecutionContext): Future[Result] = {
     protectedResource.handleRequest(request, handler).flatMap {
-      case Left(e)         => Future.successful(new Status(e.statusCode).withHeaders(responseOAuthErrorHeader(e)))
+      case Left(e) => Future.successful(new Status(e.statusCode).withHeaders(responseOAuthErrorHeader(e)))
       case Right(authInfo) => callback(authInfo)
     }
   }

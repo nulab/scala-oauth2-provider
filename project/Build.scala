@@ -1,5 +1,6 @@
 import sbt._
 import Keys._
+import com.typesafe.sbt.SbtScalariform._
 
 object ScalaOAuth2Build extends Build {
 
@@ -14,18 +15,21 @@ object ScalaOAuth2Build extends Build {
     "org.scalatest" %% "scalatest" % "2.2.4" % "test"
   )
 
-  lazy val scalaOAuth2ProviderSettings = Defaults.coreDefaultSettings ++ Seq(
-    organization := _organization,
-    version := _version,
-    scalaVersion := _scalaVersion,
-    crossScalaVersions := _crossScalaVersions,
-    scalacOptions ++= _scalacOptions,
-    publishTo <<= version { (v: String) => _publishTo(v) },
-    publishMavenStyle := true,
-    publishArtifact in Test := false,
-    pomIncludeRepository := { x => false },
-    pomExtra := _pomExtra
-  )
+  lazy val scalaOAuth2ProviderSettings =
+    Defaults.coreDefaultSettings ++
+    scalariformSettings ++
+    Seq(
+      organization := _organization,
+      version := _version,
+      scalaVersion := _scalaVersion,
+      crossScalaVersions := _crossScalaVersions,
+      scalacOptions ++= _scalacOptions,
+      publishTo <<= version { (v: String) => _publishTo(v) },
+      publishMavenStyle := true,
+      publishArtifact in Test := false,
+      pomIncludeRepository := { x => false },
+      pomExtra := _pomExtra
+    )
 
   lazy val root = Project(
     id = "scala-oauth2-provider",

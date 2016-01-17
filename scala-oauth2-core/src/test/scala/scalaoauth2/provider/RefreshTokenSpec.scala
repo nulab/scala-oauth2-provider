@@ -1,6 +1,6 @@
 package scalaoauth2.provider
 
-import org.scalatest.{FlatSpec, OptionValues}
+import org.scalatest.{ FlatSpec, OptionValues }
 import org.scalatest.Matchers._
 import org.scalatest.concurrent.ScalaFutures
 
@@ -21,11 +21,11 @@ class RefreshTokenSpec extends FlatSpec with ScalaFutures with OptionValues {
     })
 
     whenReady(f) { result =>
-      result.tokenType should be ("Bearer")
-      result.accessToken should be ("token1")
+      result.tokenType should be("Bearer")
+      result.accessToken should be("token1")
       result.expiresIn.value should (be <= 3600L and be > 3595L)
-      result.refreshToken should be (Some("refreshToken1"))
-      result.scope should be (None)
+      result.refreshToken should be(Some("refreshToken1"))
+      result.scope should be(None)
     }
   }
 }

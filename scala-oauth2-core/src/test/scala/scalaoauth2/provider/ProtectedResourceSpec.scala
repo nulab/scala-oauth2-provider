@@ -28,7 +28,7 @@ class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
     )
 
     val dataHandler = successfulProtectedResourceHandler()
-    ProtectedResource.handleRequest(request, dataHandler).map(_ should be ('right))
+    ProtectedResource.handleRequest(request, dataHandler).map(_ should be('right))
   }
 
   it should "be handled request with token into body" in {
@@ -38,7 +38,7 @@ class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
     )
 
     val dataHandler = successfulProtectedResourceHandler()
-    ProtectedResource.handleRequest(request, dataHandler).map(_ should be ('right))
+    ProtectedResource.handleRequest(request, dataHandler).map(_ should be('right))
   }
 
   it should "be lost expired" in {
@@ -85,7 +85,7 @@ class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
           case _ =>
         }
       }
-      e.description should be ("Access token is not found")
+      e.description should be("Access token is not found")
     }
   }
 
@@ -112,7 +112,7 @@ class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
           case _ =>
         }
       }
-      e.description should be ("The access token is not found")
+      e.description should be("The access token is not found")
     }
   }
 
@@ -139,7 +139,7 @@ class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
           case _ =>
         }
       }
-      e.description should be ("The access token is invalid")
+      e.description should be("The access token is invalid")
     }
   }
 }

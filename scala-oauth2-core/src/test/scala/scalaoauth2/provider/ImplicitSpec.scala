@@ -36,7 +36,7 @@ class ImplicitSpec extends FlatSpec with ScalaFutures with OptionValues {
 
     })
 
-    if(ok) {
+    if (ok) {
       whenReady(f) { result =>
         result.tokenType should be("Bearer")
         result.accessToken should be("token1")

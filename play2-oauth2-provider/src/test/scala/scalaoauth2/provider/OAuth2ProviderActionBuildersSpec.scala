@@ -17,8 +17,8 @@ class OAuth2ProviderActionBuildersSpec extends FlatSpec {
 
   it should "return BadRequest" in {
     val result = action(FakeRequest())
-    status(result) should be (400)
-    contentAsString(result) should be ("")
+    status(result) should be(400)
+    contentAsString(result) should be("")
   }
 
 }
