@@ -1,7 +1,6 @@
 package scalaoauth2.provider
 
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ ExecutionContext, Future }
 
 case class GrantHandlerResult[U](
   authInfo: AuthInfo[U],
@@ -19,12 +18,12 @@ trait GrantHandler {
    */
   def clientCredentialRequired = true
 
-  def handleRequest[U](request: AuthorizationRequest, authorizationHandler: AuthorizationHandler[U]): Future[GrantHandlerResult[U]]
+  def handleRequest[U](request: AuthorizationRequest, authorizationHandler: AuthorizationHandler[U])(implicit ctx: ExecutionContext): Future[GrantHandlerResult[U]]
 
   /**
    * Returns valid access token.
    */
-  protected def issueAccessToken[U](handler: AuthorizationHandler[U], authInfo: AuthInfo[U]): Future[GrantHandlerResult[U]] = {
+  protected def issueAccessToken[U](handler: AuthorizationHandler[U], authInfo: AuthInfo[U])(implicit ctx: ExecutionContext): Future[GrantHandlerResult[U]] = {
     handler.getStoredAccessToken(authInfo).flatMap {
       case Some(token) if shouldRefreshAccessToken(token) => token.refreshToken.map {
         handler.refreshAccessToken(authInfo, _)
@@ -51,7 +50,7 @@ trait GrantHandler {
 
 class RefreshToken extends GrantHandler {
 
-  override def handleRequest[U](request: AuthorizationRequest, handler: AuthorizationHandler[U]): Future[GrantHandlerResult[U]] = {
+  override def handleRequest[U](request: AuthorizationRequest, handler: AuthorizationHandler[U])(implicit ctx: ExecutionContext): Future[GrantHandlerResult[U]] = {
     val refreshTokenRequest = new RefreshTokenRequest(request)
     val clientCredential = refreshTokenRequest.clientCredential.getOrElse(throw new InvalidRequest("Client credential is required"))
     val refreshToken = refreshTokenRequest.refreshToken
@@ -69,7 +68,7 @@ class RefreshToken extends GrantHandler {
 
 class Password extends GrantHandler {
 
-  override def handleRequest[U](request: AuthorizationRequest, handler: AuthorizationHandler[U]): Future[GrantHandlerResult[U]] = {
+  override def handleRequest[U](request: AuthorizationRequest, handler: AuthorizationHandler[U])(implicit ctx: ExecutionContext): Future[GrantHandlerResult[U]] = {
     val passwordRequest = new PasswordRequest(request)
     if (clientCredentialRequired && passwordRequest.clientCredential.isEmpty) {
       throw new InvalidRequest("Client credential is required")
@@ -88,7 +87,7 @@ class Password extends GrantHandler {
 
 class ClientCredentials extends GrantHandler {
 
-  override def handleRequest[U](request: AuthorizationRequest, handler: AuthorizationHandler[U]): Future[GrantHandlerResult[U]] = {
+  override def handleRequest[U](request: AuthorizationRequest, handler: AuthorizationHandler[U])(implicit ctx: ExecutionContext): Future[GrantHandlerResult[U]] = {
     val clientCredentialsRequest = new ClientCredentialsRequest(request)
     val clientCredential = clientCredentialsRequest.clientCredential.getOrElse(throw new InvalidRequest("Client credential is required"))
     val scope = clientCredentialsRequest.scope
@@ -105,7 +104,7 @@ class ClientCredentials extends GrantHandler {
 
 class AuthorizationCode extends GrantHandler {
 
-  override def handleRequest[U](request: AuthorizationRequest, handler: AuthorizationHandler[U]): Future[GrantHandlerResult[U]] = {
+  override def handleRequest[U](request: AuthorizationRequest, handler: AuthorizationHandler[U])(implicit ctx: ExecutionContext): Future[GrantHandlerResult[U]] = {
     val authorizationCodeRequest = new AuthorizationCodeRequest(request)
     val clientCredential = authorizationCodeRequest.clientCredential.getOrElse(throw new InvalidRequest("Client credential is required"))
     val clientId = clientCredential.clientId
@@ -132,7 +131,7 @@ class AuthorizationCode extends GrantHandler {
 
 class Implicit extends GrantHandler {
 
-  override def handleRequest[U](request: AuthorizationRequest, handler: AuthorizationHandler[U]): Future[GrantHandlerResult[U]] = {
+  override def handleRequest[U](request: AuthorizationRequest, handler: AuthorizationHandler[U])(implicit ctx: ExecutionContext): Future[GrantHandlerResult[U]] = {
     val implicitRequest = new ImplicitRequest(request)
     val clientCredential = implicitRequest.clientCredential.getOrElse(throw new InvalidRequest("Client credential is required"))
 
