@@ -8,12 +8,23 @@ import play.api.test.{ FakeHeaders, FakeRequest }
 
 class OAuth2ProviderSpec extends FlatSpec {
 
+  case class User(id: Long, name: String)
+
   object TestOAuthProvider extends OAuth2Provider {
-    override def responseAccessToken(r: GrantHandlerResult) = super.responseAccessToken(r) ++ Map("custom_key" -> JsString("custom_value"))
+    override def responseAccessToken[U](r: GrantHandlerResult[U]) = super.responseAccessToken(r) ++ Map("custom_key" -> JsString("custom_value"))
   }
 
   it should "return including access token" in {
-    val map = TestOAuthProvider.responseAccessToken(GrantHandlerResult(tokenType = "Bearer", accessToken = "access_token", expiresIn = Some(3600), refreshToken = None, scope = None))
+    val map = TestOAuthProvider.responseAccessToken(
+      GrantHandlerResult(
+        authInfo = AuthInfo[User](user = User(0L, "name"), Some("client_id"), None, None),
+        tokenType = "Bearer",
+        accessToken = "access_token",
+        expiresIn = Some(3600),
+        refreshToken = None,
+        scope = None
+      )
+    )
     map.get("token_type") should contain(JsString("Bearer"))
     map.get("access_token") should contain(JsString("access_token"))
     map.get("expires_in") should contain(JsNumber(3600))

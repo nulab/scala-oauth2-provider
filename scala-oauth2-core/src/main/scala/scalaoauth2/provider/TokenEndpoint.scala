@@ -1,14 +1,12 @@
 package scalaoauth2.provider
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-
-import scalaoauth2.provider.OAuthGrantType._
+import scala.concurrent.Future
 
 trait TokenEndpoint {
   val handlers = Map.empty[String, GrantHandler]
 
-  def handleRequest[U](request: AuthorizationRequest, handler: AuthorizationHandler[U]): Future[Either[OAuthError, GrantHandlerResult]] = try {
+  def handleRequest[U](request: AuthorizationRequest, handler: AuthorizationHandler[U]): Future[Either[OAuthError, GrantHandlerResult[U]]] = try {
     val grantType = request.grantType
     val grantHandler = handlers.getOrElse(grantType, throw new UnsupportedGrantType(s"${grantType} is not supported"))
 
