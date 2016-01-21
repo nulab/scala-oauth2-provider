@@ -63,7 +63,7 @@ trait OAuth2BaseProvider extends Results {
 
   }
 
-  protected[scalaoauth2] def responseAccessToken(r: GrantHandlerResult) = {
+  protected[scalaoauth2] def responseAccessToken[U](r: GrantHandlerResult[U]) = {
     Map[String, JsValue](
       "token_type" -> JsString(r.tokenType),
       "access_token" -> JsString(r.accessToken)
