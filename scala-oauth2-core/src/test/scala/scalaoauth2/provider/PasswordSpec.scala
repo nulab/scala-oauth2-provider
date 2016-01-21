@@ -5,6 +5,7 @@ import org.scalatest.Matchers._
 import org.scalatest.concurrent.ScalaFutures
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class PasswordSpec extends FlatSpec with ScalaFutures with OptionValues {
 

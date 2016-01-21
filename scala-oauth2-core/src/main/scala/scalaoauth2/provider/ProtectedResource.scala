@@ -1,13 +1,12 @@
 package scalaoauth2.provider
 
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ ExecutionContext, Future }
 
 trait ProtectedResource {
 
   val fetchers = Seq(AuthHeader, RequestParameter)
 
-  def handleRequest[U](request: ProtectedResourceRequest, handler: ProtectedResourceHandler[U]): Future[Either[OAuthError, AuthInfo[U]]] = try {
+  def handleRequest[U](request: ProtectedResourceRequest, handler: ProtectedResourceHandler[U])(implicit ctx: ExecutionContext): Future[Either[OAuthError, AuthInfo[U]]] = try {
     fetchers.find { fetcher =>
       fetcher.matches(request)
     }.map { fetcher =>
