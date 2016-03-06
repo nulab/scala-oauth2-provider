@@ -59,7 +59,7 @@ Add "scala-oauth2-core" instead. In this case, you need to implement your own OA
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.nulab-inc" %% "scala-oauth2-core" % "0.16.1"
+  "com.nulab-inc" %% "scala-oauth2-core" % "0.17.0"
 )
 ```
 
