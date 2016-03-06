@@ -218,7 +218,7 @@ object MyController extends Controller {
 
 ## Examples
 
-### Play Framework 2.4
+### Play Framework 2.5
 
 - https://github.com/tsuyoshizawa/scala-oauth2-provider-example-skinny-orm
 
