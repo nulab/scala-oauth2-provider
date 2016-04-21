@@ -202,7 +202,7 @@ If you'd like to change the OAuth workflow, modify handleRequest methods of `Tok
 
 You can write more easily authorize action by using Action composition.
 
-Play Framework's documentation is [here](https://www.playframework.com/documentation/2.4.x/ScalaActionsComposition).
+Play Framework's documentation is [here](https://www.playframework.com/documentation/2.5.x/ScalaActionsComposition).
 
 ```scala
 object MyController extends Controller {
