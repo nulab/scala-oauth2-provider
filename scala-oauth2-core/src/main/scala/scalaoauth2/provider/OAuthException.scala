@@ -20,13 +20,13 @@ class InvalidClient(description: String = "") extends OAuthError(401, descriptio
 
 }
 
-class UnauthorizedClient(description: String = "") extends OAuthError(401, description) {
+class UnauthorizedClient(description: String = "") extends OAuthError(description) {
 
   override val errorType = "unauthorized_client"
 
 }
 
-class RedirectUriMismatch(description: String = "") extends OAuthError(401, description) {
+class RedirectUriMismatch(description: String = "") extends OAuthError(description) {
 
   override val errorType = "redirect_uri_mismatch"
 
@@ -44,7 +44,7 @@ class UnsupportedResponseType(description: String = "") extends OAuthError(descr
 
 }
 
-class InvalidGrant(description: String = "") extends OAuthError(401, description) {
+class InvalidGrant(description: String = "") extends OAuthError(description) {
 
   override val errorType = "invalid_grant"
 
@@ -56,7 +56,7 @@ class UnsupportedGrantType(description: String = "") extends OAuthError(descript
 
 }
 
-class InvalidScope(description: String = "") extends OAuthError(401, description) {
+class InvalidScope(description: String = "") extends OAuthError(description) {
 
   override val errorType = "invalid_scope"
 
@@ -74,7 +74,7 @@ class ExpiredToken() extends OAuthError(401, "The access token expired") {
 
 }
 
-class InsufficientScope(description: String = "") extends OAuthError(401, description) {
+class InsufficientScope(description: String = "") extends OAuthError(403, description) {
 
   override val errorType = "insufficient_scope"
 

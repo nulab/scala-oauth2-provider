@@ -8,7 +8,8 @@ case class GrantHandlerResult[U](
   accessToken: String,
   expiresIn: Option[Long],
   refreshToken: Option[String],
-  scope: Option[String])
+  scope: Option[String]
+)
 
 trait GrantHandler {
   /**
