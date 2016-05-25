@@ -59,4 +59,25 @@ class AuthorizationCodeSpec extends FlatSpec with ScalaFutures with OptionValues
       result.scope shouldBe Some("all")
     }
   }
+
+  it should "return a Failure Future" in {
+    val authorizationCode = new AuthorizationCode()
+    val request = new AuthorizationRequest(Map(), Map("client_id" -> Seq("clientId1"), "client_secret" -> Seq("clientSecret1"), "code" -> Seq("code1"), "redirect_uri" -> Seq("http://example.com/")))
+    val f = authorizationCode.handleRequest(request, new MockDataHandler() {
+
+      override def findAuthInfoByCode(code: String): Future[Option[AuthInfo[User]]] = Future.successful(Some(
+        AuthInfo(user = MockUser(10000, "username"), clientId = Some("clientId1"), scope = Some("all"), redirectUri = Some("http://example.com/"))
+      ))
+
+      override def createAccessToken(authInfo: AuthInfo[User]): Future[AccessToken] = Future.successful(AccessToken("token1", Some("refreshToken1"), Some("all"), Some(3600), new java.util.Date()))
+
+      override def deleteAuthCode(code: String): Future[Unit] = {
+        Future.failed[Unit](new Exception())
+      }
+    })
+
+    whenReady(f.failed) { e =>
+      e shouldBe a[Exception]
+    }
+  }
 }
