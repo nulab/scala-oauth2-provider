@@ -72,7 +72,7 @@ class AuthorizationCodeSpec extends FlatSpec with ScalaFutures with OptionValues
       override def createAccessToken(authInfo: AuthInfo[User]): Future[AccessToken] = Future.successful(AccessToken("token1", Some("refreshToken1"), Some("all"), Some(3600), new java.util.Date()))
 
       override def deleteAuthCode(code: String): Future[Unit] = {
-        Future.failed[Unit](new Exception())
+        Future.failed(new Exception())
       }
     })
 
