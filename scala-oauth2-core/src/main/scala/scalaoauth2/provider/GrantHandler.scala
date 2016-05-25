@@ -123,8 +123,7 @@ class AuthorizationCode extends GrantHandler {
       }
 
       val f = issueAccessToken(handler, authInfo)
-      f onSuccess { case _ => handler.deleteAuthCode(code) }
-      f
+      f andThen { case _ => handler.deleteAuthCode(code) }
     }
   }
 
