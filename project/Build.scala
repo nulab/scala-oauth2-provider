@@ -7,7 +7,7 @@ object ScalaOAuth2Build extends Build {
   lazy val _organization = "com.nulab-inc"
   lazy val _version =  "0.17.3-SNAPSHOT"
   lazy val _playVersion = "2.5.0"
-
+  lazy val akkaV = "2.4.2"
   val _scalaVersion = "2.11.7"
   val _crossScalaVersions = Seq("2.11.7")
 
@@ -38,7 +38,7 @@ object ScalaOAuth2Build extends Build {
       name := "scala-oauth2-provider",
       description := "OAuth 2.0 server-side implementation written in Scala"
     )
-  ).aggregate(scalaOAuth2Core, play2OAuth2Provider)
+  ).aggregate(scalaOAuth2Core, play2OAuth2Provider, akkahttpOAuth2Provider)
 
   lazy val scalaOAuth2Core = Project(
     id = "scala-oauth2-core",
@@ -62,6 +62,23 @@ object ScalaOAuth2Build extends Build {
       libraryDependencies ++= Seq(
         "com.typesafe.play" %% "play"      % _playVersion % "provided",
         "com.typesafe.play" %% "play-test" % _playVersion % "test"
+      ) ++ commonDependenciesInTestScope
+    )
+  ) dependsOn(scalaOAuth2Core % "compile->compile;test->test")
+
+  lazy val akkahttpOAuth2Provider = Project(
+    id = "akka-http-oauth2-provider",
+    base = file("akka-http-oauth2-provider"),
+    settings = scalaOAuth2ProviderSettings ++ Seq(
+      name := "akka-http-oauth2-provider",
+      description := "Support scala-oauth2-core library on akka-http",
+      resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/maven-releases/",
+      libraryDependencies ++= Seq(
+        "com.typesafe.akka"   %%  "akka-http-experimental"    % akkaV,
+        "com.typesafe.akka"   %%  "akka-http-core"    % akkaV,
+        "com.typesafe.akka"   %%  "akka-http-testkit" % akkaV,
+        "com.typesafe.akka"	  %%  "akka-http-spray-json-experimental"	% akkaV,
+        "com.typesafe.akka"   %%  "akka-actor"    % akkaV
       ) ++ commonDependenciesInTestScope
     )
   ) dependsOn(scalaOAuth2Core % "compile->compile;test->test")
