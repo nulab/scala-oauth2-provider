@@ -16,14 +16,7 @@ trait OAuth2Provider[U] extends Directives with DefaultJsonProtocol {
 
   val oauth2DataHandler: DataHandler[U]
 
-  val tokenEndpoint = new TokenEndpoint {
-    override val handlers = Map(
-      OAuthGrantType.CLIENT_CREDENTIALS -> new ClientCredentials,
-      OAuthGrantType.PASSWORD -> new Password,
-      OAuthGrantType.AUTHORIZATION_CODE -> new AuthorizationCode,
-      OAuthGrantType.REFRESH_TOKEN -> new RefreshToken
-    )
-  }
+  val tokenEndpoint: TokenEndpoint
 
   def grantResultToTokenResponse(grantResult: GrantHandlerResult[U]): TokenResponse =
     TokenResponse(grantResult.tokenType, grantResult.accessToken, grantResult.expiresIn.getOrElse(1L), grantResult.refreshToken.getOrElse(""))
