@@ -31,8 +31,8 @@ trait GrantHandler {
       }.getOrElse {
         handler.createAccessToken(authInfo)
       }
-      case Some(token) => Future.successful(token)
-      case None => handler.createAccessToken(authInfo)
+      case Some(token) if !token.isExpired => Future.successful(token)
+      case _ => handler.createAccessToken(authInfo)
     }.map(createGrantHandlerResult(authInfo, _))
   }
 
