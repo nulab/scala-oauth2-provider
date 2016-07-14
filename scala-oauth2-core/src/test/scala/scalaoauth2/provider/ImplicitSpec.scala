@@ -14,13 +14,13 @@ class ImplicitSpec extends FlatSpec with ScalaFutures with OptionValues {
 
   val implicitGrant = new Implicit()
 
-  "Implicit" should "grant access with valid user authentication" in handlesRequest(implicitGrant, "user", "pass", true)
-  "Implicit" should "not grant access with invalid user authentication" in handlesRequest(implicitGrant, "user", "wrong_pass", false)
+  "Implicit" should "grant access with valid user authentication" in handlesRequest(implicitGrant, "secret_param", true)
+  "Implicit" should "not grant access with invalid user authentication" in handlesRequest(implicitGrant, "wrong_key", false)
 
   def newAccessToken(d: Date) = AccessToken("token1", Some("refresh_token"), Some("all"), Some(3600), d)
 
-  def handlesRequest(implicitGrant: Implicit, user: String, pass: String, ok: Boolean) = {
-    val request = new AuthorizationRequest(Map(), Map("client_id" -> Seq("client"), "username" -> Seq(user), "password" -> Seq(pass), "scope" -> Seq("all")))
+  def handlesRequest(implicitGrant: Implicit, secretParam: String, ok: Boolean) = {
+    val request = new AuthorizationRequest(Map(), Map("client_id" -> Seq("client"), "secret_param" -> Seq(secretParam), "scope" -> Seq("all")))
     val f = implicitGrant.handleRequest(request, new MockDataHandler() {
 
       override def getStoredAccessToken(authInfo: AuthInfo[User]): Future[Option[AccessToken]] =
@@ -30,8 +30,7 @@ class ImplicitSpec extends FlatSpec with ScalaFutures with OptionValues {
         val result = request match {
           case request: ImplicitRequest =>
             for {
-              user <- request.param("username") if user == "user"
-              password <- request.param("password") if password == "pass"
+              p <- request.param("secret_param") if p == "secret_param"
             } yield MockUser(10000, "username")
           case _ => None
         }
