@@ -52,13 +52,13 @@ trait GrantHandler {
 class RefreshToken extends GrantHandler {
 
   override def handleRequest[U](request: AuthorizationRequest, handler: AuthorizationHandler[U])(implicit ctx: ExecutionContext): Future[GrantHandlerResult[U]] = {
-    val refreshTokenRequest = new RefreshTokenRequest(request)
+    val refreshTokenRequest = RefreshTokenRequest(request)
     val clientCredential = refreshTokenRequest.clientCredential.getOrElse(throw new InvalidRequest("Client credential is required"))
     val refreshToken = refreshTokenRequest.refreshToken
 
     handler.findAuthInfoByRefreshToken(refreshToken).flatMap { authInfoOption =>
       val authInfo = authInfoOption.getOrElse(throw new InvalidGrant("Authorized information is not found by the refresh token"))
-      if (authInfo.clientId != Some(clientCredential.clientId)) {
+      if (!authInfo.clientId.contains(clientCredential.clientId)) {
         throw new InvalidClient
       }
 
@@ -70,7 +70,7 @@ class RefreshToken extends GrantHandler {
 class Password extends GrantHandler {
 
   override def handleRequest[U](request: AuthorizationRequest, handler: AuthorizationHandler[U])(implicit ctx: ExecutionContext): Future[GrantHandlerResult[U]] = {
-    val passwordRequest = new PasswordRequest(request)
+    val passwordRequest = PasswordRequest(request)
     if (clientCredentialRequired && passwordRequest.clientCredential.isEmpty) {
       throw new InvalidRequest("Client credential is required")
     }
@@ -89,7 +89,7 @@ class Password extends GrantHandler {
 class ClientCredentials extends GrantHandler {
 
   override def handleRequest[U](request: AuthorizationRequest, handler: AuthorizationHandler[U])(implicit ctx: ExecutionContext): Future[GrantHandlerResult[U]] = {
-    val clientCredentialsRequest = new ClientCredentialsRequest(request)
+    val clientCredentialsRequest = ClientCredentialsRequest(request)
     val clientCredential = clientCredentialsRequest.clientCredential.getOrElse(throw new InvalidRequest("Client credential is required"))
     val scope = clientCredentialsRequest.scope
 
@@ -106,7 +106,7 @@ class ClientCredentials extends GrantHandler {
 class AuthorizationCode extends GrantHandler {
 
   override def handleRequest[U](request: AuthorizationRequest, handler: AuthorizationHandler[U])(implicit ctx: ExecutionContext): Future[GrantHandlerResult[U]] = {
-    val authorizationCodeRequest = new AuthorizationCodeRequest(request)
+    val authorizationCodeRequest = AuthorizationCodeRequest(request)
     val clientCredential = authorizationCodeRequest.clientCredential.getOrElse(throw new InvalidRequest("Client credential is required"))
     val clientId = clientCredential.clientId
     val code = authorizationCodeRequest.code
@@ -114,7 +114,7 @@ class AuthorizationCode extends GrantHandler {
 
     handler.findAuthInfoByCode(code).flatMap { optionalAuthInfo =>
       val authInfo = optionalAuthInfo.getOrElse(throw new InvalidGrant("Authorized information is not found by the code"))
-      if (authInfo.clientId != Some(clientId)) {
+      if (!authInfo.clientId.contains(clientId)) {
         throw new InvalidClient
       }
 
@@ -135,7 +135,7 @@ class AuthorizationCode extends GrantHandler {
 class Implicit extends GrantHandler {
 
   override def handleRequest[U](request: AuthorizationRequest, handler: AuthorizationHandler[U])(implicit ctx: ExecutionContext): Future[GrantHandlerResult[U]] = {
-    val implicitRequest = new ImplicitRequest(request)
+    val implicitRequest = ImplicitRequest(request)
     val clientCredential = implicitRequest.clientCredential.getOrElse(throw new InvalidRequest("Client credential is required"))
 
     handler.findUser(implicitRequest).flatMap { maybeUser =>
