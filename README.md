@@ -220,6 +220,7 @@ object MyController extends Controller {
 
 ### Play Framework 2.5
 
+- https://github.com/lglossman/scala-oauth2-deadbolt-redis
 - https://github.com/tsuyoshizawa/scala-oauth2-provider-example-skinny-orm
 
 ### Play Framework 2.3
