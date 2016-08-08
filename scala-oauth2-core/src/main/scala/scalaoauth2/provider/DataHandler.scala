@@ -15,8 +15,9 @@ trait DataHandler[U] extends AuthorizationHandler[U] with ProtectedResourceHandl
  * @param scope Inform the client of the scope of the access token issued.
  * @param lifeSeconds Life of the access token since its creation. In seconds.
  * @param createdAt Access token is created date.
+ * @param params Additional parameters to add information/restriction on given Access token.
  */
-case class AccessToken(token: String, refreshToken: Option[String], scope: Option[String], lifeSeconds: Option[Long], createdAt: Date) {
+case class AccessToken(token: String, refreshToken: Option[String], scope: Option[String], lifeSeconds: Option[Long], createdAt: Date, params: Map[String, String] = Map.empty[String, String]) {
   def isExpired: Boolean = expirationTimeInMilis.exists { expTime =>
     expTime <= System.currentTimeMillis
   }

@@ -8,7 +8,8 @@ case class GrantHandlerResult[U](
   accessToken: String,
   expiresIn: Option[Long],
   refreshToken: Option[String],
-  scope: Option[String]
+  scope: Option[String],
+  params: Map[String, String]
 )
 
 trait GrantHandler {
@@ -44,7 +45,8 @@ trait GrantHandler {
     accessToken.token,
     accessToken.expiresIn,
     accessToken.refreshToken,
-    accessToken.scope
+    accessToken.scope,
+    accessToken.params
   )
 
 }

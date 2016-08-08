@@ -22,7 +22,8 @@ class OAuth2ProviderSpec extends FlatSpec {
         accessToken = "access_token",
         expiresIn = Some(3600),
         refreshToken = None,
-        scope = None
+        scope = None,
+        params = Map.empty
       )
     )
     map.get("token_type") should contain(JsString("Bearer"))
