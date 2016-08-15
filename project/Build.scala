@@ -8,8 +8,8 @@ object ScalaOAuth2Build extends Build {
   lazy val _version =  "0.17.3-SNAPSHOT"
   lazy val _playVersion = "2.5.0"
   lazy val akkaV = "2.4.7"
-  val _scalaVersion = "2.11.7"
-  val _crossScalaVersions = Seq("2.11.7")
+  val _scalaVersion = "2.11.8"
+  val _crossScalaVersions = Seq("2.11.8")
 
   val commonDependenciesInTestScope = Seq(
     "org.scalatest" %% "scalatest" % "2.2.4" % "test"
@@ -110,4 +110,3 @@ object ScalaOAuth2Build extends Build {
         </developer>
       </developers>
 }
-
