@@ -167,36 +167,3 @@ trait OAuth2TokenEndpointProvider extends OAuth2BaseProvider {
  * }}}
  */
 trait OAuth2Provider extends OAuth2ProtectedResourceProvider with OAuth2TokenEndpointProvider
-
-/**
- * OAuth2AsyncProvider supports issue access token and authorize in asynchronous.
- *
- * <h3>Create controller for issue access token</h3>
- * @example {{{
- * object OAuth2Controller extends Controller with OAuth2AsyncProvider {
- *   def accessToken = Action.async { implicit request =>
- *     issueAccessToken(new MyDataHandler())
- *   }
- * }
- * }}}
- *
- * <h3>Register routes</h3>
- * @example {{{
- * POST /oauth2/access_token controllers.OAuth2Controller.accessToken
- * }}}
- *
- * <h3>Authorized</h3>
- * @example {{{
- * import scalaoauth2.provider._
- * object BookController extends Controller with OAuth2AsyncProvider {
- *   def list = Action.async { implicit request =>
- *     authorize(new MyDataHandler()) { authInfo =>
- *       val user = authInfo.user // User is defined on your system
- *       // access resource for the user
- *     }
- *   }
- * }
- * }}}
- */
-@deprecated("Use OAuth2Provider", "0.12.0")
-trait OAuth2AsyncProvider extends OAuth2Provider
