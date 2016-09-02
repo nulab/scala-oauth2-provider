@@ -12,7 +12,8 @@ object ScalaOAuth2Build extends Build {
   val _crossScalaVersions = Seq("2.11.8")
 
   val commonDependenciesInTestScope = Seq(
-    "org.scalatest" %% "scalatest" % "2.2.4" % "test"
+    "org.scalatest" %% "scalatest" % "2.2.4" % "test",
+    "ch.qos.logback" % "logback-classic" % "1.1.7" % "test"
   )
 
   lazy val scalaOAuth2ProviderSettings =
@@ -46,9 +47,7 @@ object ScalaOAuth2Build extends Build {
     settings = scalaOAuth2ProviderSettings ++ Seq(
       name := "scala-oauth2-core",
       description := "OAuth 2.0 server-side implementation written in Scala",
-      libraryDependencies ++= Seq(
-        "commons-codec" % "commons-codec" % "1.8"
-      ) ++ commonDependenciesInTestScope
+      libraryDependencies ++= commonDependenciesInTestScope
     )
   )
 
