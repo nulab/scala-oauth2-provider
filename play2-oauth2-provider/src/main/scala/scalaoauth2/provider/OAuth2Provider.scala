@@ -11,28 +11,6 @@ import scala.language.implicitConversions
  */
 trait OAuth2BaseProvider extends Results {
 
-  val protectedResource: ProtectedResource = ProtectedResource
-
-  val tokenEndpoint: TokenEndpoint = TokenEndpoint
-
-  implicit def play2oauthRequest(request: RequestHeader): AuthorizationRequest = {
-    new AuthorizationRequest(request.headers.toMap, request.queryString)
-  }
-
-  implicit def play2oauthRequest[A](request: Request[A]): AuthorizationRequest = {
-    val param: Map[String, Seq[String]] = getParam(request)
-    new AuthorizationRequest(request.headers.toMap, param)
-  }
-
-  implicit def play2protectedResourceRequest(request: RequestHeader): ProtectedResourceRequest = {
-    new ProtectedResourceRequest(request.headers.toMap, request.queryString)
-  }
-
-  implicit def play2protectedResourceRequest[A](request: Request[A]): ProtectedResourceRequest = {
-    val param: Map[String, Seq[String]] = getParam(request)
-    new ProtectedResourceRequest(request.headers.toMap, param)
-  }
-
   private[provider] def getParam[A](request: Request[A]): Map[String, Seq[String]] = {
     (request.body match {
       case body: play.api.mvc.AnyContent if body.asFormUrlEncoded.isDefined => body.asFormUrlEncoded.get
@@ -63,6 +41,86 @@ trait OAuth2BaseProvider extends Results {
 
   }
 
+  protected[scalaoauth2] def responseOAuthErrorHeader(e: OAuthError): (String, String) = "WWW-Authenticate" -> ("Bearer " + toOAuthErrorString(e))
+
+  protected def toOAuthErrorString(e: OAuthError): String = {
+    val params = Seq("error=\"" + e.errorType + "\"") ++
+      (if (!e.description.isEmpty) { Seq("error_description=\"" + e.description + "\"") } else { Nil })
+    params.mkString(", ")
+  }
+
+}
+
+trait OAuth2ProtectedResourceProvider extends OAuth2BaseProvider {
+
+  val protectedResource: ProtectedResource = ProtectedResource
+
+  implicit def play2protectedResourceRequest(request: RequestHeader): ProtectedResourceRequest = {
+    new ProtectedResourceRequest(request.headers.toMap, request.queryString)
+  }
+
+  implicit def play2protectedResourceRequest[A](request: Request[A]): ProtectedResourceRequest = {
+    val param: Map[String, Seq[String]] = getParam(request)
+    new ProtectedResourceRequest(request.headers.toMap, param)
+  }
+
+  /**
+   * Authorize to already created access token in ProtectedResourceHandler process and return the response to client.
+   *
+   * @param handler Implemented ProtectedResourceHandler for authenticate to your system.
+   * @param callback Callback is called when authentication is successful.
+   * @param request Play Framework is provided HTTP request interface.
+   * @param ctx This contxt is used by ProtectedResource.
+   * @tparam A play.api.mvc.Request has type.
+   * @tparam U set the type in AuthorizationHandler.
+   * @return Authentication is successful then the response use your API result.
+   *         Authentication is failed then return BadRequest or Unauthorized status to client with cause into the JSON.
+   */
+  def authorize[A, U](handler: ProtectedResourceHandler[U])(callback: AuthInfo[U] => Future[Result])(implicit request: Request[A], ctx: ExecutionContext): Future[Result] = {
+    protectedResource.handleRequest(request, handler).flatMap {
+      case Left(e) => Future.successful(new Status(e.statusCode).withHeaders(responseOAuthErrorHeader(e)))
+      case Right(authInfo) => callback(authInfo)
+    }
+  }
+
+}
+
+trait OAuth2TokenEndpointProvider extends OAuth2BaseProvider {
+
+  val tokenEndpoint: TokenEndpoint = TokenEndpoint
+
+  implicit def play2oauthRequest(request: RequestHeader): AuthorizationRequest = {
+    new AuthorizationRequest(request.headers.toMap, request.queryString)
+  }
+
+  implicit def play2oauthRequest[A](request: Request[A]): AuthorizationRequest = {
+    val param: Map[String, Seq[String]] = getParam(request)
+    new AuthorizationRequest(request.headers.toMap, param)
+  }
+
+  /**
+   * Issue access token in AuthorizationHandler process and return the response to client.
+   *
+   * @param handler Implemented AuthorizationHandler for register access token to your system.
+   * @param request Play Framework is provided HTTP request interface.
+   * @param ctx This context is used by TokenEndPoint.
+   * @tparam A play.api.mvc.Request has type.
+   * @tparam U set the type in AuthorizationHandler.
+   * @return Request is successful then return JSON to client in OAuth 2.0 format.
+   *         Request is failed then return BadRequest or Unauthorized status to client with cause into the JSON.
+   */
+  def issueAccessToken[A, U](handler: AuthorizationHandler[U])(implicit request: Request[A], ctx: ExecutionContext): Future[Result] = {
+    tokenEndpoint.handleRequest(request, handler).map {
+      case Left(e) => new Status(e.statusCode)(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
+      case Right(r) => Ok(Json.toJson(responseAccessToken(r))).withHeaders("Cache-Control" -> "no-store", "Pragma" -> "no-cache")
+    }
+  }
+
+  protected[scalaoauth2] def responseOAuthErrorJson(e: OAuthError): JsValue = Json.obj(
+    "error" -> e.errorType,
+    "error_description" -> e.description
+  )
+
   protected[scalaoauth2] def responseAccessToken[U](r: GrantHandlerResult[U]) = {
     Map[String, JsValue](
       "token_type" -> JsString(r.tokenType),
@@ -74,19 +132,6 @@ trait OAuth2BaseProvider extends Results {
       } ++ r.scope.map {
         "scope" -> JsString(_)
       }
-  }
-
-  protected[scalaoauth2] def responseOAuthErrorJson(e: OAuthError): JsValue = Json.obj(
-    "error" -> e.errorType,
-    "error_description" -> e.description
-  )
-
-  protected[scalaoauth2] def responseOAuthErrorHeader(e: OAuthError): (String, String) = "WWW-Authenticate" -> ("Bearer " + toOAuthErrorString(e))
-
-  protected def toOAuthErrorString(e: OAuthError): String = {
-    val params = Seq("error=\"" + e.errorType + "\"") ++
-      (if (!e.description.isEmpty) { Seq("error_description=\"" + e.description + "\"") } else { Nil })
-    params.mkString(", ")
   }
 
 }
@@ -111,7 +156,7 @@ trait OAuth2BaseProvider extends Results {
  * <h3>Authorized</h3>
  * @example {{{
  * import scalaoauth2.provider._
- * object BookController extends Controller with OAuthProvider {
+ * object BookController extends Controller with OAuth2Provider {
  *   def list = Action.async { implicit request =>
  *     authorize(new MyDataHandler()) { authInfo =>
  *       val user = authInfo.user // User is defined on your system
@@ -121,46 +166,7 @@ trait OAuth2BaseProvider extends Results {
  * }
  * }}}
  */
-trait OAuth2Provider extends OAuth2BaseProvider {
-
-  /**
-   * Issue access token in AuthorizationHandler process and return the response to client.
-   *
-   * @param handler Implemented AuthorizationHandler for register access token to your system.
-   * @param request Playframework is provided HTTP request interface.
-   * @param ctx This context is used by TokenEndPoint.
-   * @tparam A play.api.mvc.Request has type.
-   * @tparam U set the type in AuthorizationHandler.
-   * @return Request is successful then return JSON to client in OAuth 2.0 format.
-   *         Request is failed then return BadRequest or Unauthorized status to client with cause into the JSON.
-   */
-  def issueAccessToken[A, U](handler: AuthorizationHandler[U])(implicit request: Request[A], ctx: ExecutionContext): Future[Result] = {
-    tokenEndpoint.handleRequest(request, handler).map {
-      case Left(e) => new Status(e.statusCode)(responseOAuthErrorJson(e)).withHeaders(responseOAuthErrorHeader(e))
-      case Right(r) => Ok(Json.toJson(responseAccessToken(r))).withHeaders("Cache-Control" -> "no-store", "Pragma" -> "no-cache")
-    }
-  }
-
-  /**
-   * Authorize to already created access token in ProtectedResourceHandler process and return the response to client.
-   *
-   * @param handler Implemented ProtectedResourceHandler for authenticate to your system.
-   * @param callback Callback is called when authentication is successful.
-   * @param request Playframework is provided HTTP request interface.
-   * @param ctx This contxt is used by ProtectedResource.
-   * @tparam A play.api.mvc.Request has type.
-   * @tparam U set the type in AuthorizationHandler.
-   * @return Authentication is successful then the response use your API result.
-   *         Authentication is failed then return BadRequest or Unauthorized status to client with cause into the JSON.
-   */
-  def authorize[A, U](handler: ProtectedResourceHandler[U])(callback: AuthInfo[U] => Future[Result])(implicit request: Request[A], ctx: ExecutionContext): Future[Result] = {
-    protectedResource.handleRequest(request, handler).flatMap {
-      case Left(e) => Future.successful(new Status(e.statusCode).withHeaders(responseOAuthErrorHeader(e)))
-      case Right(authInfo) => callback(authInfo)
-    }
-  }
-
-}
+trait OAuth2Provider extends OAuth2ProtectedResourceProvider with OAuth2TokenEndpointProvider
 
 /**
  * OAuth2AsyncProvider supports issue access token and authorize in asynchronous.
