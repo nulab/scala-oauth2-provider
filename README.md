@@ -37,7 +37,6 @@ Library version | Play version
 0.7.4           | 2.2.x
 
 ### Akka HTTP
-#### 2.4
 
 ```scala
 libraryDependencies ++= Seq(
