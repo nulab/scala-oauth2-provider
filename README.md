@@ -22,54 +22,40 @@ and an access token type called [Bearer](http://tools.ietf.org/html/rfc6750).
 If you'd like to use this with Play Framework, add "play2-oauth2-provider" to library dependencies of your project.
 
 ### Play Framework
-#### 2.5
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.nulab-inc" %% "play2-oauth2-provider" % "0.18.0"
+  "com.nulab-inc" %% "play2-oauth2-provider" % "1.0.0"
 )
 ```
 
-#### 2.4
-
-```scala
-libraryDependencies ++= Seq(
-  "com.nulab-inc" %% "play2-oauth2-provider" % "0.16.1"
-)
-```
-
-#### 2.3
-
-```scala
-libraryDependencies ++= Seq(
-  "com.nulab-inc" %% "play2-oauth2-provider" % "0.14.0"
-)
-```
-
-#### 2.2
-
-```scala
-libraryDependencies ++= Seq(
-  "com.nulab-inc" %% "play2-oauth2-provider" % "0.7.4"
-)
-```
+Library version | Play version
+--------------- | ------------
+1.0.0           | 2.5.x
+0.16.1          | 2.4.x
+0.14.0          | 2.3.x
+0.7.4           | 2.2.x
 
 ### Akka HTTP
 #### 2.4
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.nulab-inc" %% "akka-http-oauth2-provider" % "0.18.0"
+  "com.nulab-inc" %% "akka-http-oauth2-provider" % "1.0.0"
 )
 ```
 
+Library version | Akka HTTP version
+--------------- | ------------
+1.0.0           | 2.4.x
+
 ### Other frameworks
 
-Add "scala-oauth2-core" instead. In this case, you need to implement your own OAuth provider working with web framework you use.
+Add `scala-oauth2-core` instead. In this case, you need to implement your own OAuth provider working with web framework you use.
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.nulab-inc" %% "scala-oauth2-core" % "0.18.0"
+  "com.nulab-inc" %% "scala-oauth2-core" % "1.0.0"
 )
 ```
 
