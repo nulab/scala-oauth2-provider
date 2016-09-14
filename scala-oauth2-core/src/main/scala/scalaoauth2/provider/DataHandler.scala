@@ -18,11 +18,9 @@ trait DataHandler[U] extends AuthorizationHandler[U] with ProtectedResourceHandl
  * @param params Additional parameters to add information/restriction on given Access token.
  */
 case class AccessToken(token: String, refreshToken: Option[String], scope: Option[String], lifeSeconds: Option[Long], createdAt: Date, params: Map[String, String] = Map.empty[String, String]) {
-  def isExpired: Boolean = expirationTimeInMilis.exists { expTime =>
-    expTime <= System.currentTimeMillis
-  }
+  def isExpired: Boolean = expiresIn.exists(_ < 0)
 
-  def expiresIn: Option[Long] = expirationTimeInMilis map { expTime =>
+  val expiresIn: Option[Long] = expirationTimeInMilis map { expTime =>
     (expTime - System.currentTimeMillis) / 1000
   }
 
