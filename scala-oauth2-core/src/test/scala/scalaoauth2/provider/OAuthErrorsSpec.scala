@@ -32,7 +32,9 @@ class OAuthErrorsSpec extends FlatSpec {
   }
 
   it should "produce a 400 status code for redirect_uri_mismatch" in {
-    new RedirectUriMismatch().statusCode should be(400)
+    val error = new RedirectUriMismatch()
+    error.statusCode should be(400)
+    error.errorType should be("invalid_request")
   }
 
   behavior of "OAuth Error Handling for Bearer Tokens RFC 6750 Section 3.1"

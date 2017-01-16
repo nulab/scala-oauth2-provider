@@ -26,9 +26,9 @@ class UnauthorizedClient(description: String = "") extends OAuthError(descriptio
 
 }
 
-class RedirectUriMismatch(description: String = "") extends OAuthError(description) {
+class RedirectUriMismatch(description: String = "redirect_uri_mismatch") extends OAuthError(description) {
 
-  override val errorType = "redirect_uri_mismatch"
+  override val errorType = "invalid_request"
 
 }
 
