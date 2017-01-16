@@ -1,31 +1,36 @@
 package scalaoauth2.provider
 
+import java.time.{ LocalDateTime, ZoneId }
 import java.util.Date
 
-import org.scalatest._
 import org.scalatest.Matchers._
+import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class ImplicitSpec extends FlatSpec with ScalaFutures with OptionValues {
 
   val implicitGrant = new Implicit()
 
-  "Implicit" should "grant access with valid user authentication" in handlesRequest(implicitGrant, "user", "pass", true)
-  "Implicit" should "not grant access with invalid user authentication" in handlesRequest(implicitGrant, "user", "wrong_pass", false)
+  "Implicit" should "grant access with valid user authentication" in handlesRequest(implicitGrant, "secret_param", true)
+  "Implicit" should "not grant access with invalid user authentication" in handlesRequest(implicitGrant, "wrong_key", false)
 
-  def handlesRequest(implicitGrant: Implicit, user: String, pass: String, ok: Boolean) = {
-    val request = new AuthorizationRequest(Map(), Map("client_id" -> Seq("client"), "username" -> Seq(user), "password" -> Seq(pass), "scope" -> Seq("all")))
+  def newAccessToken(d: Date) = AccessToken("token1", Some("refresh_token"), Some("all"), Some(3600), d)
+
+  def handlesRequest(implicitGrant: Implicit, secretParam: String, ok: Boolean) = {
+    val request = new AuthorizationRequest(Map(), Map("client_id" -> Seq("client"), "secret_param" -> Seq(secretParam), "scope" -> Seq("all")))
     val f = implicitGrant.handleRequest(request, new MockDataHandler() {
+
+      override def getStoredAccessToken(authInfo: AuthInfo[User]): Future[Option[AccessToken]] =
+        Future.successful(Some(newAccessToken(Date.from(LocalDateTime.now().minusDays(1).atZone(ZoneId.systemDefault()).toInstant))))
 
       override def findUser(request: AuthorizationRequest): Future[Option[User]] = {
         val result = request match {
           case request: ImplicitRequest =>
             for {
-              user <- request.param("username") if user == "user"
-              password <- request.param("password") if password == "pass"
+              p <- request.param("secret_param") if p == "secret_param"
             } yield MockUser(10000, "username")
           case _ => None
         }
@@ -33,7 +38,7 @@ class ImplicitSpec extends FlatSpec with ScalaFutures with OptionValues {
       }
 
       override def createAccessToken(authInfo: AuthInfo[User]): Future[AccessToken] =
-        Future.successful(AccessToken("token1", Some("refresh_token"), Some("all"), Some(3600), new Date()))
+        Future.successful(newAccessToken(new Date()))
 
     })
 
