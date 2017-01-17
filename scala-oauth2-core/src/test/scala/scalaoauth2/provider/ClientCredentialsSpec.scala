@@ -12,7 +12,8 @@ class ClientCredentialsSpec extends FlatSpec with ScalaFutures with OptionValues
   it should "handle request" in {
     val clientCredentials = new ClientCredentials()
     val request = new AuthorizationRequest(Map(), Map("client_id" -> Seq("clientId1"), "client_secret" -> Seq("clientSecret1"), "scope" -> Seq("all")))
-    val f = clientCredentials.handleRequest(request, new MockDataHandler() {
+    val clientId = request.clientCredential.fold[Option[String]](None)(_.fold(_ => None, c => Some(c.clientId)))
+    val f = clientCredentials.handleRequest(clientId, request, new MockDataHandler() {
 
       override def findUser(request: AuthorizationRequest): Future[Option[User]] = Future.successful(Some(MockUser(10000, "username")))
 
