@@ -12,24 +12,32 @@ class AuthorizationRequest(headers: Map[String, Seq[String]], params: Map[String
 
   def grantType: String = requireParam("grant_type")
 
-  lazy val clientCredential: Option[ClientCredential] =
+  def parseClientCredential: Option[Either[InvalidClient, ClientCredential]] =
     findAuthorization
-      .flatMap(clientCredentialByAuthorization)
-      .orElse(clientCredentialByParam)
+      .flatMap(x => Some(x.fold(
+        left => Left(left),
+        header => clientCredentialByAuthorization(header)
+      )))
+      .orElse(clientCredentialByParam.map(Right(_)))
 
-  private def findAuthorization = for {
-    authorization <- header("Authorization")
-    matcher <- """^\s*Basic\s+(.+?)\s*$""".r.findFirstMatchIn(authorization)
-  } yield matcher.group(1)
+  private def findAuthorization: Option[Either[InvalidClient, String]] = {
+    header("Authorization").map { auth =>
+      val basicAuthCred = for {
+        matcher <- """^\s*Basic\s+(.+?)\s*$""".r.findFirstMatchIn(auth)
+      } yield matcher.group(1)
 
-  private def clientCredentialByAuthorization(s: String) =
+      basicAuthCred.fold[Either[InvalidClient, String]](Left(new InvalidClient("Authorization header could not be parsed")))(x => Right(x))
+    }
+  }
+
+  private def clientCredentialByAuthorization(s: String): Either[InvalidClient, ClientCredential] =
     Try(new String(Base64.getDecoder.decode(s), "UTF-8"))
       .map(_.split(":", 2))
       .getOrElse(Array.empty) match {
         case Array(clientId, clientSecret) =>
-          Some(ClientCredential(clientId, if (clientSecret.isEmpty) None else Some(clientSecret)))
+          Right(ClientCredential(clientId, if (clientSecret.isEmpty) None else Some(clientSecret)))
         case _ =>
-          None
+          Left(new InvalidClient())
       }
 
   private def clientCredentialByParam = param("client_id").map(ClientCredential(_, param("client_secret")))
@@ -44,8 +52,6 @@ case class RefreshTokenRequest(request: AuthorizationRequest) extends Authorizat
    * @throws InvalidRequest if the parameter is not found
    */
   def refreshToken: String = requireParam("refresh_token")
-
-  override lazy val clientCredential = request.clientCredential
 }
 
 case class PasswordRequest(request: AuthorizationRequest) extends AuthorizationRequest(request.headers, request.params) {
@@ -64,13 +70,9 @@ case class PasswordRequest(request: AuthorizationRequest) extends AuthorizationR
    * @throws InvalidRequest if the parameter is not found
    */
   def password = requireParam("password")
-
-  override lazy val clientCredential = request.clientCredential
 }
 
-case class ClientCredentialsRequest(request: AuthorizationRequest) extends AuthorizationRequest(request.headers, request.params) {
-  override lazy val clientCredential = request.clientCredential
-}
+case class ClientCredentialsRequest(request: AuthorizationRequest) extends AuthorizationRequest(request.headers, request.params)
 
 case class AuthorizationCodeRequest(request: AuthorizationRequest) extends AuthorizationRequest(request.headers, request.params) {
   /**
@@ -87,11 +89,6 @@ case class AuthorizationCodeRequest(request: AuthorizationRequest) extends Autho
    * @return redirect_uri
    */
   def redirectUri: Option[String] = param("redirect_uri")
-
-  override lazy val clientCredential = request.clientCredential
-
 }
 
-case class ImplicitRequest(request: AuthorizationRequest) extends AuthorizationRequest(request.headers, request.params) {
-  override lazy val clientCredential = request.clientCredential
-}
+case class ImplicitRequest(request: AuthorizationRequest) extends AuthorizationRequest(request.headers, request.params)

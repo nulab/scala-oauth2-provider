@@ -7,23 +7,29 @@ trait TokenEndpoint {
 
   def handleRequest[U](request: AuthorizationRequest, handler: AuthorizationHandler[U])(implicit ctx: ExecutionContext): Future[Either[OAuthError, GrantHandlerResult[U]]] = try {
     val grantType = request.grantType
-    val grantHandler = handlers.getOrElse(grantType, throw new UnsupportedGrantType(s"${grantType} is not supported"))
+    val grantHandler = () => handlers.getOrElse(grantType, throw new UnsupportedGrantType(s"$grantType is not supported"))
 
-    request.clientCredential.map { clientCredential =>
-      handler.validateClient(request).flatMap { validClient =>
-        if (!validClient) {
-          Future.successful(Left(new InvalidClient("Invalid client is detected")))
-        } else {
-          grantHandler.handleRequest(request, handler).map(Right(_))
+    request.parseClientCredential.map { maybeCredential =>
+      maybeCredential.fold(
+        invalid => Future.successful(Left(invalid)),
+        clientCredential => {
+          handler.validateClient(request).flatMap { isValidClient =>
+            if (!isValidClient) {
+              Future.successful(Left(new InvalidClient("Invalid client or client is not authorized")))
+            } else {
+              grantHandler().handleRequest(Some(clientCredential), request, handler).map(Right(_))
+            }
+          }.recover {
+            case e: OAuthError => Left(e)
+          }
         }
-      }.recover {
-        case e: OAuthError => Left(e)
-      }
+      )
     }.getOrElse {
-      if (grantHandler.clientCredentialRequired) {
+      val gh = grantHandler()
+      if (gh.clientCredentialRequired) {
         throw new InvalidRequest("Client credential is not found")
       } else {
-        grantHandler.handleRequest(request, handler).map(Right(_)).recover {
+        gh.handleRequest(None, request, handler).map(Right(_)).recover {
           case e: OAuthError => Left(e)
         }
       }

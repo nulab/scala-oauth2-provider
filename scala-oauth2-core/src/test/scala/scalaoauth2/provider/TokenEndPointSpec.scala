@@ -191,4 +191,62 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
       e.description should be("client_credentials is not supported")
     }
   }
+
+  it should "be a 401 InvalidClient failure when the Authorization header is present and there is a problem extracting the client credentials" in {
+    val request = new AuthorizationRequest(
+      //Use Digest instead of Bearer.
+      Map("Authorization" -> Seq("Digest Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU=")),
+      Map("grant_type" -> Seq("password"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
+    )
+
+    val dataHandler = new MockDataHandler() {
+
+      override def validateClient(request: AuthorizationRequest): Future[Boolean] = Future.successful(true)
+
+    }
+
+    val f = new TokenEndpoint {
+      override val handlers = Map(
+        "password" -> new Password()
+      )
+    }.handleRequest(request, dataHandler)
+
+    whenReady(f) { result =>
+      intercept[InvalidClient] {
+        result match {
+          case Left(e) => throw e
+          case _ =>
+        }
+      }
+    }
+  }
+
+  it should "be a 401 InvalidClient failure when the Authorization header is present but invalid - even when an invalid grant handler is provided" in {
+    val request = new AuthorizationRequest(
+      //Use Digest instead of Bearer.
+      Map("Authorization" -> Seq("Digest Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU=")),
+      Map("grant_type" -> Seq("made_up_grant"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
+    )
+
+    val dataHandler = new MockDataHandler() {
+
+      override def validateClient(request: AuthorizationRequest): Future[Boolean] = Future.successful(true)
+
+    }
+
+    val f = new TokenEndpoint {
+      override val handlers = Map(
+        "password" -> new Password()
+      )
+    }.handleRequest(request, dataHandler)
+
+    whenReady(f) { result =>
+      intercept[InvalidClient] {
+        result match {
+          case Left(e) => throw e
+          case _ =>
+        }
+      }
+    }
+  }
 }

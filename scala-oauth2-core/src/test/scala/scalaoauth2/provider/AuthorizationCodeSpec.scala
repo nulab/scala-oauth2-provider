@@ -14,7 +14,8 @@ class AuthorizationCodeSpec extends FlatSpec with ScalaFutures with OptionValues
     val authorizationCode = new AuthorizationCode()
     val request = new AuthorizationRequest(Map(), Map("client_id" -> Seq("clientId1"), "client_secret" -> Seq("clientSecret1"), "code" -> Seq("code1"), "redirect_uri" -> Seq("http://example.com/")))
     var codeDeleted: Boolean = false
-    val f = authorizationCode.handleRequest(request, new MockDataHandler() {
+    val clientCred = request.parseClientCredential.fold[Option[ClientCredential]](None)(_.fold(_ => None, c => Some(c)))
+    val f = authorizationCode.handleRequest(clientCred, request, new MockDataHandler() {
 
       override def findAuthInfoByCode(code: String): Future[Option[AuthInfo[User]]] = Future.successful(Some(
         AuthInfo(user = MockUser(10000, "username"), clientId = Some("clientId1"), scope = Some("all"), redirectUri = Some("http://example.com/"))
@@ -42,7 +43,8 @@ class AuthorizationCodeSpec extends FlatSpec with ScalaFutures with OptionValues
   it should "handle request if redirectUrl is none" in {
     val authorizationCode = new AuthorizationCode()
     val request = new AuthorizationRequest(Map(), Map("client_id" -> Seq("clientId1"), "client_secret" -> Seq("clientSecret1"), "code" -> Seq("code1"), "redirect_uri" -> Seq("http://example.com/")))
-    val f = authorizationCode.handleRequest(request, new MockDataHandler() {
+    val clientCred = request.parseClientCredential.fold[Option[ClientCredential]](None)(_.fold(_ => None, c => Some(c)))
+    val f = authorizationCode.handleRequest(clientCred, request, new MockDataHandler() {
 
       override def findAuthInfoByCode(code: String): Future[Option[AuthInfo[MockUser]]] = Future.successful(Some(
         AuthInfo(user = MockUser(10000, "username"), clientId = Some("clientId1"), scope = Some("all"), redirectUri = None)
@@ -63,7 +65,8 @@ class AuthorizationCodeSpec extends FlatSpec with ScalaFutures with OptionValues
   it should "return a Failure Future" in {
     val authorizationCode = new AuthorizationCode()
     val request = new AuthorizationRequest(Map(), Map("client_id" -> Seq("clientId1"), "client_secret" -> Seq("clientSecret1"), "code" -> Seq("code1"), "redirect_uri" -> Seq("http://example.com/")))
-    val f = authorizationCode.handleRequest(request, new MockDataHandler() {
+    val clientCred = request.parseClientCredential.fold[Option[ClientCredential]](None)(_.fold(_ => None, c => Some(c)))
+    val f = authorizationCode.handleRequest(clientCred, request, new MockDataHandler() {
 
       override def findAuthInfoByCode(code: String): Future[Option[AuthInfo[User]]] = Future.successful(Some(
         AuthInfo(user = MockUser(10000, "username"), clientId = Some("clientId1"), scope = Some("all"), redirectUri = Some("http://example.com/"))

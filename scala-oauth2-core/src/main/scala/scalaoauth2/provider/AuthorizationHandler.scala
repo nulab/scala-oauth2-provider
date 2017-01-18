@@ -55,6 +55,9 @@ trait AuthorizationHandler[U] {
 
   /**
    * Verify proper client with parameters for issue an access token.
+   * Note that per the OAuth Specification, a Client may be valid if it only contains a client ID but no client
+   * secret (common with Public Clients). However, if the registered client has a client secret value the specification
+   * requires that a client secret must always be provided and verified for that client ID.
    *
    * @param request Request sent by client.
    * @return true if request is a regular client, false if request is a illegal client.

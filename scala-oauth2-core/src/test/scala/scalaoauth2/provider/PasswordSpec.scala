@@ -19,7 +19,8 @@ class PasswordSpec extends FlatSpec with ScalaFutures with OptionValues {
 
   def handlesRequest(password: Password, params: Map[String, Seq[String]]) = {
     val request = new AuthorizationRequest(Map(), params ++ Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all")))
-    val f = password.handleRequest(request, new MockDataHandler() {
+    val clientCred = request.parseClientCredential.fold[Option[ClientCredential]](None)(_.fold(_ => None, c => Some(c)))
+    val f = password.handleRequest(clientCred, request, new MockDataHandler() {
 
       override def findUser(request: AuthorizationRequest): Future[Option[User]] = Future.successful(Some(MockUser(10000, "username")))
 
