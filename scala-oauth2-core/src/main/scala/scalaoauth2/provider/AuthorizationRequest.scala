@@ -12,7 +12,7 @@ class AuthorizationRequest(headers: Map[String, Seq[String]], params: Map[String
 
   def grantType: String = requireParam("grant_type")
 
-  lazy val clientCredential: Option[Either[InvalidClient, ClientCredential]] =
+  def parseClientCredential: Option[Either[InvalidClient, ClientCredential]] =
     findAuthorization
       .flatMap(x => Some(x.fold(
         left => Left(left),

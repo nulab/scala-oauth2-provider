@@ -18,8 +18,8 @@ class ImplicitSpec extends FlatSpec with ScalaFutures with OptionValues {
 
   def handlesRequest(implicitGrant: Implicit, user: String, pass: String, ok: Boolean) = {
     val request = new AuthorizationRequest(Map(), Map("client_id" -> Seq("client"), "username" -> Seq(user), "password" -> Seq(pass), "scope" -> Seq("all")))
-    val clientId = request.clientCredential.fold[Option[String]](None)(_.fold(_ => None, c => Some(c.clientId)))
-    val f = implicitGrant.handleRequest(clientId, request, new MockDataHandler() {
+    val clientCred = request.parseClientCredential.fold[Option[ClientCredential]](None)(_.fold(_ => None, c => Some(c)))
+    val f = implicitGrant.handleRequest(clientCred, request, new MockDataHandler() {
 
       override def findUser(request: AuthorizationRequest): Future[Option[User]] = {
         val result = request match {

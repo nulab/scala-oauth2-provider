@@ -9,7 +9,7 @@ trait TokenEndpoint {
     val grantType = request.grantType
     val grantHandler = () => handlers.getOrElse(grantType, throw new UnsupportedGrantType(s"$grantType is not supported"))
 
-    request.clientCredential.map { maybeCredential =>
+    request.parseClientCredential.map { maybeCredential =>
       maybeCredential.fold(
         invalid => Future.successful(Left(invalid)),
         clientCredential => {
@@ -17,7 +17,7 @@ trait TokenEndpoint {
             if (!isValidClient) {
               Future.successful(Left(new InvalidClient("Invalid client or client is not authorized")))
             } else {
-              grantHandler().handleRequest(Some(clientCredential.clientId), request, handler).map(Right(_))
+              grantHandler().handleRequest(Some(clientCredential), request, handler).map(Right(_))
             }
           }.recover {
             case e: OAuthError => Left(e)
