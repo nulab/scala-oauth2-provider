@@ -6,9 +6,9 @@ import scala.concurrent.Future
 
 class MockDataHandler extends DataHandler[User] {
 
-  override def validateClient(request: AuthorizationRequest): Future[Boolean] = Future.successful(false)
+  override def validateClient(maybeClientCredential: Option[ClientCredential], request: AuthorizationRequest): Future[Boolean] = Future.successful(false)
 
-  override def findUser(request: AuthorizationRequest): Future[Option[User]] = Future.successful(None)
+  override def findUser(maybeClientCredential: Option[ClientCredential], request: AuthorizationRequest): Future[Option[User]] = Future.successful(None)
 
   override def createAccessToken(authInfo: AuthInfo[User]): Future[AccessToken] = Future.successful(AccessToken("", Some(""), Some(""), Some(0L), new Date()))
 

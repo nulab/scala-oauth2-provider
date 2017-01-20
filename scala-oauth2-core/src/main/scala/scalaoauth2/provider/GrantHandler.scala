@@ -77,7 +77,7 @@ class Password extends GrantHandler {
       throw new InvalidRequest("Client credential is required")
     } else {
       val passwordRequest = PasswordRequest(request)
-      handler.findUser(passwordRequest).flatMap { maybeUser =>
+      handler.findUser(maybeValidatedClientCred, passwordRequest).flatMap { maybeUser =>
         val user = maybeUser.getOrElse(throw new InvalidGrant("username or password is incorrect"))
         val scope = passwordRequest.scope
         val authInfo = AuthInfo(user, maybeValidatedClientCred.map(_.clientId), scope, None)
@@ -95,7 +95,7 @@ class ClientCredentials extends GrantHandler {
     val clientCredentialsRequest = ClientCredentialsRequest(request)
     val scope = clientCredentialsRequest.scope
 
-    handler.findUser(clientCredentialsRequest).flatMap { optionalUser =>
+    handler.findUser(maybeValidatedClientCred, clientCredentialsRequest).flatMap { optionalUser =>
       val user = optionalUser.getOrElse(throw new InvalidGrant("client_id or client_secret or scope is incorrect"))
       val authInfo = AuthInfo(user, Some(clientId), scope, None)
 
@@ -139,7 +139,7 @@ class Implicit extends GrantHandler {
     val clientId = maybeValidatedClientCred.getOrElse(throw new InvalidRequest("Client credential is required")).clientId
     val implicitRequest = ImplicitRequest(request)
 
-    handler.findUser(implicitRequest).flatMap { maybeUser =>
+    handler.findUser(maybeValidatedClientCred, implicitRequest).flatMap { maybeUser =>
       val user = maybeUser.getOrElse(throw new InvalidGrant("user cannot be authenticated"))
       val scope = implicitRequest.scope
       val authInfo = AuthInfo(user, Some(clientId), scope, None)

@@ -15,7 +15,7 @@ class ClientCredentialsSpec extends FlatSpec with ScalaFutures with OptionValues
     val clientCred = request.parseClientCredential.fold[Option[ClientCredential]](None)(_.fold(_ => None, c => Some(c)))
     val f = clientCredentials.handleRequest(clientCred, request, new MockDataHandler() {
 
-      override def findUser(request: AuthorizationRequest): Future[Option[User]] = Future.successful(Some(MockUser(10000, "username")))
+      override def findUser(maybeClientCredential: Option[ClientCredential], request: AuthorizationRequest): Future[Option[User]] = Future.successful(Some(MockUser(10000, "username")))
 
       override def createAccessToken(authInfo: AuthInfo[User]): Future[AccessToken] = Future.successful(AccessToken("token1", None, Some("all"), Some(3600), new java.util.Date()))
     })
