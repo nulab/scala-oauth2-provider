@@ -59,18 +59,20 @@ trait AuthorizationHandler[U] {
    * secret (common with Public Clients). However, if the registered client has a client secret value the specification
    * requires that a client secret must always be provided and verified for that client ID.
    *
+   * @param maybeCredential client credential parsed from request
    * @param request Request sent by client.
    * @return true if request is a regular client, false if request is a illegal client.
    */
-  def validateClient(request: AuthorizationRequest): Future[Boolean]
+  def validateClient(maybeCredential: Option[ClientCredential], request: AuthorizationRequest): Future[Boolean]
 
   /**
    * Authenticate the user that issued the authorization request.
    * Client credential, Password and Implicit Grant call this method.
    *
+   * @param maybeCredential client credential parsed from request
    * @param request Request sent by client.
    */
-  def findUser(request: AuthorizationRequest): Future[Option[U]]
+  def findUser(maybeCredential: Option[ClientCredential], request: AuthorizationRequest): Future[Option[U]]
 
   /**
    * Creates a new access token by authorized information.

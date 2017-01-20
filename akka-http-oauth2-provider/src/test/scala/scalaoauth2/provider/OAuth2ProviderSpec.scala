@@ -35,9 +35,9 @@ class OAuth2ProviderSpec extends WordSpec with Matchers with ScalatestRouteTest 
         Future.successful(Some(accessToken))
       override def findAuthInfoByAccessToken(accessToken: AccessToken): Future[Option[AuthInfo[User]]] =
         Future.successful(someAuthInfo)
-      override def findUser(request: AuthorizationRequest): Future[Option[User]] =
+      override def findUser(maybeClientCredential: Option[ClientCredential], request: AuthorizationRequest): Future[Option[User]] =
         Future.successful(Some(user))
-      override def validateClient(request: AuthorizationRequest): Future[Boolean] =
+      override def validateClient(maybeClientCredential: Option[ClientCredential], request: AuthorizationRequest): Future[Boolean] =
         Future.successful(true)
       override def getStoredAccessToken(authInfo: AuthInfo[User]): Future[Option[AccessToken]] =
         Future.successful(Some(accessToken))

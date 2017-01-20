@@ -13,7 +13,7 @@ trait TokenEndpoint {
       maybeCredential.fold(
         invalid => Future.successful(Left(invalid)),
         clientCredential => {
-          handler.validateClient(request).flatMap { isValidClient =>
+          handler.validateClient(Some(clientCredential), request).flatMap { isValidClient =>
             if (!isValidClient) {
               Future.successful(Left(new InvalidClient("Invalid client or client is not authorized")))
             } else {

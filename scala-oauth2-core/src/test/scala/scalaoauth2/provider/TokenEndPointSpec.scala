@@ -13,9 +13,9 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
 
   def successfulDataHandler() = new MockDataHandler() {
 
-    override def validateClient(request: AuthorizationRequest): Future[Boolean] = Future.successful(true)
+    override def validateClient(maybeClientCredential: Option[ClientCredential], request: AuthorizationRequest): Future[Boolean] = Future.successful(true)
 
-    override def findUser(request: AuthorizationRequest): Future[Option[User]] = Future.successful(Some(MockUser(10000, "username")))
+    override def findUser(maybeClientCredential: Option[ClientCredential], request: AuthorizationRequest): Future[Option[User]] = Future.successful(Some(MockUser(10000, "username")))
 
     override def createAccessToken(authInfo: AuthInfo[User]): Future[AccessToken] = Future.successful(AccessToken("token1", None, Some("all"), Some(3600), new Date()))
 
@@ -129,7 +129,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
 
     val dataHandler = new MockDataHandler() {
 
-      override def validateClient(request: AuthorizationRequest): Future[Boolean] = Future.successful(false)
+      override def validateClient(maybeClientCredential: Option[ClientCredential], request: AuthorizationRequest): Future[Boolean] = Future.successful(false)
 
     }
 
@@ -157,9 +157,9 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
 
     def dataHandler = new MockDataHandler() {
 
-      override def validateClient(request: AuthorizationRequest): Future[Boolean] = Future.successful(true)
+      override def validateClient(maybeClientCredential: Option[ClientCredential], request: AuthorizationRequest): Future[Boolean] = Future.successful(true)
 
-      override def findUser(request: AuthorizationRequest): Future[Option[User]] = Future.successful(Some(MockUser(10000, "username")))
+      override def findUser(maybeClientCredential: Option[ClientCredential], request: AuthorizationRequest): Future[Option[User]] = Future.successful(Some(MockUser(10000, "username")))
 
       override def createAccessToken(authInfo: AuthInfo[User]): Future[AccessToken] = throw new Exception("Failure")
 
@@ -201,7 +201,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
 
     val dataHandler = new MockDataHandler() {
 
-      override def validateClient(request: AuthorizationRequest): Future[Boolean] = Future.successful(true)
+      override def validateClient(maybeClientCredential: Option[ClientCredential], request: AuthorizationRequest): Future[Boolean] = Future.successful(true)
 
     }
 
@@ -230,7 +230,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
 
     val dataHandler = new MockDataHandler() {
 
-      override def validateClient(request: AuthorizationRequest): Future[Boolean] = Future.successful(true)
+      override def validateClient(maybeClientCredential: Option[ClientCredential], request: AuthorizationRequest): Future[Boolean] = Future.successful(true)
 
     }
 
