@@ -57,7 +57,7 @@ lazy val scalaOAuth2Core = Project(
   settings = scalaOAuth2ProviderSettings ++ Seq(
     name := "scala-oauth2-core",
     description := "OAuth 2.0 server-side implementation written in Scala",
-    version := "1.2.0",
+    version := "1.2.1-SNAPSHOT",
     libraryDependencies ++= commonDependenciesInTestScope
   )
 )
@@ -68,7 +68,7 @@ lazy val play2OAuth2Provider = Project(
   settings = scalaOAuth2ProviderSettings ++ Seq(
     name := "play2-oauth2-provider",
     description := "Support scala-oauth2-core library on Playframework Scala",
-    version := "1.2.0",
+    version := "1.2.1-SNAPSHOT",
     resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/maven-releases/",
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play" % playVersion % "provided",
@@ -83,7 +83,7 @@ lazy val akkahttpOAuth2Provider = Project(
   settings = scalaOAuth2ProviderSettings ++ Seq(
     name := "akka-http-oauth2-provider",
     description := "Support scala-oauth2-core library on akka-http",
-    version := "1.2.0",
+    version := "1.2.1-SNAPSHOT",
     resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/maven-releases/",
     libraryDependencies ++= Seq(
       "com.typesafe.akka" %% "akka-http-experimental" % akkaVersion,
