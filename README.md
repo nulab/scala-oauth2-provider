@@ -69,9 +69,9 @@ case class User(id: Long, name: String, hashedPassword: String)
 
 class MyDataHandler extends DataHandler[User] {
 
-  def validateClient(request: AuthorizationRequest): Future[Boolean] = ???
+  def validateClient(maybeClientCredential: Option[ClientCredential], request: AuthorizationRequest): Future[Boolean] = ???
 
-  def findUser(request: AuthorizationRequest): Future[Option[User]] = ???
+  def findUser(maybeClientCredential: Option[ClientCredential], request: AuthorizationRequest): Future[Option[User]] = ???
 
   def createAccessToken(authInfo: AuthInfo[User]): Future[AccessToken] = ???
 
