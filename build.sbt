@@ -32,6 +32,13 @@ lazy val scalaOAuth2ProviderSettings =
           <url>https://github.com/nulab/scala-oauth2-provider</url>
           <connection>scm:git:git@github.com:nulab/scala-oauth2-provider.git</connection>
         </scm>
+        <developers>
+          <developer>
+            <id>tsuyoshizawa</id>
+            <name>Tsuyoshi Yoshizawa</name>
+            <url>https://github.com/tsuyoshizawa</url>
+          </developer>
+        </developers>
     )
 
 lazy val root = Project(
@@ -40,7 +47,7 @@ lazy val root = Project(
   settings = scalaOAuth2ProviderSettings ++ Seq(
     name := "scala-oauth2-core",
     description := "OAuth 2.0 server-side implementation written in Scala",
-    version := "1.2.1-SNAPSHOT",
+    version := "1.3.0",
     libraryDependencies ++= commonDependenciesInTestScope
   )
 )
