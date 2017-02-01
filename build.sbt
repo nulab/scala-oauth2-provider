@@ -3,6 +3,11 @@ val commonDependenciesInTestScope = Seq(
   "ch.qos.logback" % "logback-classic" % "1.1.8" % "test"
 )
 
+val unusedWarnings = Seq(
+  "-Ywarn-unused",
+  "-Ywarn-unused-import"
+)
+
 lazy val scalaOAuth2ProviderSettings =
   Defaults.coreDefaultSettings ++
     scalariformSettings ++
@@ -11,6 +16,7 @@ lazy val scalaOAuth2ProviderSettings =
       scalaVersion := "2.12.1",
       crossScalaVersions := Seq("2.12.1", "2.11.8"),
       scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature"),
+      scalacOptions ++= unusedWarnings,
       publishTo := {
         val v = version.value
         val nexus = "https://oss.sonatype.org/"
@@ -39,6 +45,8 @@ lazy val scalaOAuth2ProviderSettings =
             <url>https://github.com/tsuyoshizawa</url>
           </developer>
         </developers>
+    ) ++ Seq(Compile, Test).flatMap(c =>
+      scalacOptions in (c, console) --= unusedWarnings
     )
 
 lazy val root = Project(
