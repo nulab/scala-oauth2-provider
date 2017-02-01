@@ -23,6 +23,19 @@ lazy val scalaOAuth2ProviderSettings =
         if (v.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus + "content/repositories/snapshots")
         else Some("releases" at nexus + "service/local/staging/deploy/maven2")
       },
+      scalacOptions in (Compile, doc) ++= {
+        val v = if(isSnapshot.value) {
+          sys.process.Process("git rev-parse HEAD").lines_!.head
+        } else {
+          version.value
+        }
+        Seq(
+          "-sourcepath",
+          (baseDirectory in LocalRootProject).value.getAbsolutePath,
+          "-doc-source-url",
+          s"https://github.com/nulab/scala-oauth2-provider/${v}€{FILE_PATH}.scala"
+        )
+      },
       publishMavenStyle := true,
       publishArtifact in Test := false,
       pomIncludeRepository := { x => false },
