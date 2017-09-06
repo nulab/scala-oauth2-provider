@@ -20,7 +20,7 @@ trait DataHandler[U] extends AuthorizationHandler[U] with ProtectedResourceHandl
 case class AccessToken(token: String, refreshToken: Option[String], scope: Option[String], lifeSeconds: Option[Long], createdAt: Date, params: Map[String, String] = Map.empty[String, String]) {
   def isExpired: Boolean = expiresIn.exists(_ < 0)
 
-  val expiresIn: Option[Long] = expirationTimeInMilis map { expTime =>
+  def expiresIn: Option[Long] = expirationTimeInMilis map { expTime =>
     (expTime - System.currentTimeMillis) / 1000
   }
 
