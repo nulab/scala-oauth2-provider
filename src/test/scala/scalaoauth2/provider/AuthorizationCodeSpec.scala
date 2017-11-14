@@ -18,8 +18,7 @@ class AuthorizationCodeSpec extends FlatSpec with ScalaFutures with OptionValues
     val f = authorizationCode.handleRequest(clientCred, request, new MockDataHandler() {
 
       override def findAuthInfoByCode(code: String): Future[Option[AuthInfo[User]]] = Future.successful(Some(
-        AuthInfo(user = MockUser(10000, "username"), clientId = Some("clientId1"), scope = Some("all"), redirectUri = Some("http://example.com/"))
-      ))
+        AuthInfo(user = MockUser(10000, "username"), clientId = Some("clientId1"), scope = Some("all"), redirectUri = Some("http://example.com/"))))
 
       override def createAccessToken(authInfo: AuthInfo[User]): Future[AccessToken] = Future.successful(AccessToken("token1", Some("refreshToken1"), Some("all"), Some(3600), new java.util.Date()))
 
@@ -47,8 +46,7 @@ class AuthorizationCodeSpec extends FlatSpec with ScalaFutures with OptionValues
     val f = authorizationCode.handleRequest(clientCred, request, new MockDataHandler() {
 
       override def findAuthInfoByCode(code: String): Future[Option[AuthInfo[MockUser]]] = Future.successful(Some(
-        AuthInfo(user = MockUser(10000, "username"), clientId = Some("clientId1"), scope = Some("all"), redirectUri = None)
-      ))
+        AuthInfo(user = MockUser(10000, "username"), clientId = Some("clientId1"), scope = Some("all"), redirectUri = None)))
 
       override def createAccessToken(authInfo: AuthInfo[User]): Future[AccessToken] = Future.successful(AccessToken("token1", Some("refreshToken1"), Some("all"), Some(3600), new java.util.Date()))
     })
@@ -69,8 +67,7 @@ class AuthorizationCodeSpec extends FlatSpec with ScalaFutures with OptionValues
     val f = authorizationCode.handleRequest(clientCred, request, new MockDataHandler() {
 
       override def findAuthInfoByCode(code: String): Future[Option[AuthInfo[User]]] = Future.successful(Some(
-        AuthInfo(user = MockUser(10000, "username"), clientId = Some("clientId1"), scope = Some("all"), redirectUri = Some("http://example.com/"))
-      ))
+        AuthInfo(user = MockUser(10000, "username"), clientId = Some("clientId1"), scope = Some("all"), redirectUri = Some("http://example.com/"))))
 
       override def createAccessToken(authInfo: AuthInfo[User]): Future[AccessToken] = Future.successful(AccessToken("token1", Some("refreshToken1"), Some("all"), Some(3600), new java.util.Date()))
 

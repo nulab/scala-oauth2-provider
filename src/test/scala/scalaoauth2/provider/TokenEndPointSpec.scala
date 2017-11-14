@@ -24,14 +24,12 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
   it should "be handled request" in {
     val request = new AuthorizationRequest(
       Map("Authorization" -> Seq("Basic Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU=")),
-      Map("grant_type" -> Seq("password"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
-    )
+      Map("grant_type" -> Seq("password"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all")))
 
     val dataHandler = successfulDataHandler()
     val f = new TokenEndpoint {
       override val handlers = Map(
-        "password" -> new Password()
-      )
+        "password" -> new Password())
     }.handleRequest(request, dataHandler)
 
     whenReady(f) { result => result should be('right) }
@@ -40,8 +38,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
   it should "be error if grant type doesn't exist" in {
     val request = new AuthorizationRequest(
       Map("Authorization" -> Seq("Basic Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU=")),
-      Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
-    )
+      Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all")))
 
     val dataHandler = successfulDataHandler()
     val f = TokenEndpoint.handleRequest(request, dataHandler)
@@ -60,8 +57,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
   it should "be error if grant type is wrong" in {
     val request = new AuthorizationRequest(
       Map("Authorization" -> Seq("Basic Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU=")),
-      Map("grant_type" -> Seq("test"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
-    )
+      Map("grant_type" -> Seq("test"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all")))
 
     val dataHandler = successfulDataHandler()
     val f = TokenEndpoint.handleRequest(request, dataHandler)
@@ -80,14 +76,12 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
   it should "be invalid request without client credential" in {
     val request = new AuthorizationRequest(
       Map(),
-      Map("grant_type" -> Seq("password"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
-    )
+      Map("grant_type" -> Seq("password"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all")))
 
     val dataHandler = successfulDataHandler()
     val f = new TokenEndpoint {
       override val handlers = Map(
-        "password" -> new Password()
-      )
+        "password" -> new Password())
     }.handleRequest(request, dataHandler)
 
     whenReady(f) { result =>
@@ -104,8 +98,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
   it should "not be invalid request without client credential when not required" in {
     val request = new AuthorizationRequest(
       Map(),
-      Map("grant_type" -> Seq("password"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
-    )
+      Map("grant_type" -> Seq("password"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all")))
 
     val dataHandler = successfulDataHandler()
     val passwordNoCred = new Password() {
@@ -114,8 +107,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
 
     val f = new TokenEndpoint {
       override val handlers = Map(
-        "password" -> passwordNoCred
-      )
+        "password" -> passwordNoCred)
     }.handleRequest(request, dataHandler)
 
     whenReady(f) { result => result should be('right) }
@@ -124,8 +116,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
   it should "be invalid client if client information is wrong" in {
     val request = new AuthorizationRequest(
       Map("Authorization" -> Seq("Basic Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU=")),
-      Map("grant_type" -> Seq("password"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
-    )
+      Map("grant_type" -> Seq("password"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all")))
 
     val dataHandler = new MockDataHandler() {
 
@@ -135,8 +126,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
 
     val f = new TokenEndpoint {
       override val handlers = Map(
-        "password" -> new Password()
-      )
+        "password" -> new Password())
     }.handleRequest(request, dataHandler)
 
     whenReady(f) { result =>
@@ -152,8 +142,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
   it should "be Failure when DataHandler throws Exception" in {
     val request = new AuthorizationRequest(
       Map("Authorization" -> Seq("Basic Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU=")),
-      Map("grant_type" -> Seq("password"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
-    )
+      Map("grant_type" -> Seq("password"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all")))
 
     def dataHandler = new MockDataHandler() {
 
@@ -167,7 +156,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
 
     val f = TokenEndpoint.handleRequest(request, dataHandler)
     f.onComplete {
-      case Success(value) => fail("Must be failed by createAccessToken")
+      case Success(_) => fail("Must be failed by createAccessToken")
       case Failure(e) => e.getMessage should be("Failure")
     }
   }
@@ -176,8 +165,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
 
     object TestTokenEndpoint extends TokenEndpoint {
       override val handlers = Map(
-        "password" -> new Password()
-      )
+        "password" -> new Password())
     }
 
     val f = TestTokenEndpoint.handleRequest(new AuthorizationRequest(Map(), Map("grant_type" -> Seq("client_credentials"))), successfulDataHandler())
@@ -196,8 +184,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
     val request = new AuthorizationRequest(
       //Use Digest instead of Bearer.
       Map("Authorization" -> Seq("Digest Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU=")),
-      Map("grant_type" -> Seq("password"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
-    )
+      Map("grant_type" -> Seq("password"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all")))
 
     val dataHandler = new MockDataHandler() {
 
@@ -207,8 +194,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
 
     val f = new TokenEndpoint {
       override val handlers = Map(
-        "password" -> new Password()
-      )
+        "password" -> new Password())
     }.handleRequest(request, dataHandler)
 
     whenReady(f) { result =>
@@ -225,8 +211,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
     val request = new AuthorizationRequest(
       //Use Digest instead of Bearer.
       Map("Authorization" -> Seq("Digest Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU=")),
-      Map("grant_type" -> Seq("made_up_grant"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all"))
-    )
+      Map("grant_type" -> Seq("made_up_grant"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all")))
 
     val dataHandler = new MockDataHandler() {
 
@@ -236,8 +221,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
 
     val f = new TokenEndpoint {
       override val handlers = Map(
-        "password" -> new Password()
-      )
+        "password" -> new Password())
     }.handleRequest(request, dataHandler)
 
     whenReady(f) { result =>

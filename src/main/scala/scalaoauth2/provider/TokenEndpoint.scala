@@ -22,8 +22,7 @@ trait TokenEndpoint {
           }.recover {
             case e: OAuthError => Left(e)
           }
-        }
-      )
+        })
     }.getOrElse {
       val gh = grantHandler()
       if (gh.clientCredentialRequired) {
