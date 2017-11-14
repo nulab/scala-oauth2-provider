@@ -81,8 +81,7 @@ class AuthorizationRequestSpec extends FlatSpec {
   it should "not fetch if Authorization header is invalid, but client_id and client_secret are valid and present in parms" in {
     val request = new AuthorizationRequest(
       Map("Authorization" -> Seq("fakeheader aaaa")),
-      Map("client_id" -> Seq("client_id_value"), "client_secret" -> Seq("client_secret_value"))
-    )
+      Map("client_id" -> Seq("client_id_value"), "client_secret" -> Seq("client_secret_value")))
     val parsedCred = request.parseClientCredential
     parsedCred.isDefined shouldBe true
     parsedCred.get.isLeft shouldBe true

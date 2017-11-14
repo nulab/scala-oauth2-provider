@@ -16,8 +16,7 @@ class AuthorizationRequest(headers: Map[String, Seq[String]], params: Map[String
     findAuthorization
       .flatMap(x => Some(x.fold(
         left => Left(left),
-        header => clientCredentialByAuthorization(header)
-      )))
+        header => clientCredentialByAuthorization(header))))
       .orElse(clientCredentialByParam.map(Right(_)))
 
   private def findAuthorization: Option[Either[InvalidClient, String]] = {

@@ -10,7 +10,6 @@ val unusedWarnings = Seq(
 
 lazy val scalaOAuth2ProviderSettings =
   Defaults.coreDefaultSettings ++
-    scalariformSettings ++
     Seq(
       organization := "com.nulab-inc",
       scalaVersion := "2.12.1",
@@ -25,7 +24,7 @@ lazy val scalaOAuth2ProviderSettings =
       },
       scalacOptions in (Compile, doc) ++= {
         val v = if(isSnapshot.value) {
-          sys.process.Process("git rev-parse HEAD").lines_!.head
+          sys.process.Process("git rev-parse HEAD").lineStream_!.head
         } else {
           version.value
         }
@@ -62,13 +61,11 @@ lazy val scalaOAuth2ProviderSettings =
       scalacOptions in (c, console) --= unusedWarnings
     )
 
-lazy val root = Project(
-  id = "scala-oauth2-core",
-  base = file("."),
-  settings = scalaOAuth2ProviderSettings ++ Seq(
+lazy val root = (project in file("."))
+  .settings(
+    scalaOAuth2ProviderSettings,
     name := "scala-oauth2-core",
     description := "OAuth 2.0 server-side implementation written in Scala",
     version := "1.3.1-SNAPSHOT",
     libraryDependencies ++= commonDependenciesInTestScope
   )
-)
