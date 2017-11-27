@@ -1,6 +1,6 @@
 package scalaoauth2.provider
 
-abstract class OAuthError(val statusCode: Int, val description: String) extends Exception {
+abstract class OAuthError(val statusCode: Int, val description: String) extends Exception(description) {
 
   def this(description: String) = this(400, description)
 
