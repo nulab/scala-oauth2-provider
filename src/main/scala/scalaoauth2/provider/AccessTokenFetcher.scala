@@ -21,7 +21,7 @@ object RequestParameter extends AccessTokenFetcher {
   override def fetch(request: ProtectedResourceRequest): FetchResult = {
     val t = request.oauthToken.getOrElse(request.requireAccessToken)
     val params = request.params.filter { case (_, v) => !v.isEmpty } map { case (k, v) => (k, v.head) }
-    FetchResult(t, params - ("oauth_token", "access_token"))
+    FetchResult(t, params -- Seq("oauth_token", "access_token"))
   }
 }
 
