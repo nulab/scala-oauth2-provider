@@ -1,19 +1,18 @@
 val commonDependenciesInTestScope = Seq(
-  "org.scalatest" %% "scalatest" % "3.0.6-SNAP1" % "test",
+  "org.scalatest" %% "scalatest" % "3.0.6-SNAP4" % "test",
   "ch.qos.logback" % "logback-classic" % "1.2.3" % "test"
 )
 
 val unusedWarnings = Seq(
-  "-Ywarn-unused",
-  "-Ywarn-unused-import"
+  "-Ywarn-unused"
 )
 
 lazy val scalaOAuth2ProviderSettings =
   Defaults.coreDefaultSettings ++
     Seq(
       organization := "com.nulab-inc",
-      scalaVersion := "2.12.6",
-      crossScalaVersions := Seq("2.12.6", "2.11.12", "2.13.0-M4"),
+      scalaVersion := "2.12.7",
+      crossScalaVersions := Seq("2.12.7", "2.11.12", "2.13.0-M5"),
       scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature"),
       scalacOptions ++= unusedWarnings,
       publishTo := {
