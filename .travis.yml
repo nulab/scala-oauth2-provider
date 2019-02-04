@@ -1,10 +1,11 @@
 language: scala
 scala:
-  - 2.12.7
+  - 2.12.8
   - 2.11.12
   - 2.13.0-M5
 jdk:
   - oraclejdk8
+  - openjdk11
 notifications:
   webhooks:
     urls:
