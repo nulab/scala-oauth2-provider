@@ -10,12 +10,12 @@ trait DataHandler[U] extends AuthorizationHandler[U] with ProtectedResourceHandl
 /**
  * Access token
  *
- * @param token Access token is used to authentication.
+ * @param token        Access token is used to authentication.
  * @param refreshToken Refresh token is used to re-issue access token.
- * @param scope Inform the client of the scope of the access token issued.
- * @param lifeSeconds Life of the access token since its creation. In seconds.
- * @param createdAt Access token is created date.
- * @param params Additional parameters to add information/restriction on given Access token.
+ * @param scope        Inform the client of the scope of the access token issued.
+ * @param lifeSeconds  Life of the access token since its creation. In seconds.
+ * @param createdAt    Access token is created date.
+ * @param params       Additional parameters to add information/restriction on given Access token.
  */
 case class AccessToken(token: String, refreshToken: Option[String], scope: Option[String], lifeSeconds: Option[Long], createdAt: Date, params: Map[String, String] = Map.empty[String, String]) {
   def isExpired: Boolean = expiresIn.exists(_ < 0)
@@ -29,12 +29,33 @@ case class AccessToken(token: String, refreshToken: Option[String], scope: Optio
   }
 }
 
+object AuthInfo {
+  def apply[U](user: U, clientId: Option[String], scope: Option[String], redirectUri: Option[String]): AuthInfo[U] = {
+    DefaultAuthInfo(user, clientId, scope, redirectUri)
+  }
+}
+
 /**
  * Authorized information
  *
- * @param user Authorized user which is registered on system.
- * @param clientId Using client id which is registered on system.
- * @param scope Inform the client of the scope of the access token issued.
+ * @param user        Authorized user which is registered on system.
+ * @param clientId    Using client id which is registered on system.
+ * @param scope       Inform the client of the scope of the access token issued.
  * @param redirectUri This value is used by Authorization Code Grant.
  */
-case class AuthInfo[+U](user: U, clientId: Option[String], scope: Option[String], redirectUri: Option[String])
+trait AuthInfo[+U] {
+  def user: U
+  def clientId: Option[String]
+  def scope: Option[String]
+  def redirectUri: Option[String]
+}
+
+/**
+ * Default Authorized information
+ *
+ * @param user        Authorized user which is registered on system.
+ * @param clientId    Using client id which is registered on system.
+ * @param scope       Inform the client of the scope of the access token issued.
+ * @param redirectUri This value is used by Authorization Code Grant.
+ */
+case class DefaultAuthInfo[+U](user: U, clientId: Option[String], scope: Option[String], redirectUri: Option[String]) extends AuthInfo[U]

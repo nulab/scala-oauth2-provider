@@ -132,4 +132,20 @@ trait AuthorizationHandler[U] {
    */
   def findAuthInfoByRefreshToken(refreshToken: String): Future[Option[AuthInfo[U]]]
 
+  /**
+   * Creates authorized information.
+   *
+   * Client credential, Password and Implicit Grant call this method.
+   *
+   * @param request Request sent by client
+   * @param user Authorized user
+   * @param clientId Authorized clientId
+   * @param scope Authorized scope
+   * @param redirectUri Authorized redirectUri
+   * @return Return authorized information
+   */
+  def createAuthInfo(request: AuthorizationRequest, user: U, clientId: Option[String], scope: Option[String], redirectUri: Option[String]): AuthInfo[U] = {
+    AuthInfo(user, clientId, scope, redirectUri)
+  }
+
 }
