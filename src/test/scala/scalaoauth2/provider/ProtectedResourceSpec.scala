@@ -26,7 +26,7 @@ class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
       Map("username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all")))
 
     val dataHandler = successfulProtectedResourceHandler()
-    ProtectedResource.handleRequest(request, dataHandler).map(_ should be('right))
+    ProtectedResource.handleRequest(request, dataHandler).map(_ should be(Symbol("right")))
   }
 
   it should "be handled request with token into body" in {
@@ -35,7 +35,7 @@ class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
       Map("access_token" -> Seq("token1"), "username" -> Seq("user"), "password" -> Seq("pass"), "scope" -> Seq("all")))
 
     val dataHandler = successfulProtectedResourceHandler()
-    ProtectedResource.handleRequest(request, dataHandler).map(_ should be('right))
+    ProtectedResource.handleRequest(request, dataHandler).map(_ should be(Symbol("right")))
   }
 
   it should "be lost expired" in {
