@@ -25,7 +25,7 @@ class AuthorizationCodeSpec extends FlatSpec with ScalaFutures with OptionValues
       override def deleteAuthCode(code: String): Future[Unit] = {
         Thread.sleep(300)
         codeDeleted = true
-        Future.successful(Unit)
+        Future.successful(())
       }
     })
 
