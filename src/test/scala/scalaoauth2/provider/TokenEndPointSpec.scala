@@ -32,7 +32,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
         "password" -> new Password())
     }.handleRequest(request, dataHandler)
 
-    whenReady(f) { result => result should be('right) }
+    whenReady(f) { result => result should be(Symbol("right")) }
   }
 
   it should "be error if grant type doesn't exist" in {
@@ -110,7 +110,7 @@ class TokenEndPointSpec extends FlatSpec with ScalaFutures {
         "password" -> passwordNoCred)
     }.handleRequest(request, dataHandler)
 
-    whenReady(f) { result => result should be('right) }
+    whenReady(f) { result => result should be(Symbol("right")) }
   }
 
   it should "be invalid client if client information is wrong" in {

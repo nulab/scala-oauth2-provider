@@ -55,7 +55,7 @@ object AuthHeader extends AccessTokenFetcher {
         (key, URLDecoder.decode(value.replaceFirst("\"$", ""), "UTF-8"))
       }
 
-      Map(pairs: _*)
+      Map(pairs.toIndexedSeq: _*)
     } else {
       Map.empty[String, String]
     }
