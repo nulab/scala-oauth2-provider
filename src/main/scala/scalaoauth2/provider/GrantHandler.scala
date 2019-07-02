@@ -36,7 +36,7 @@ trait GrantHandler {
     }.map(createGrantHandlerResult(authInfo, _))
   }
 
-  protected def shouldRefreshAccessToken(token: AccessToken) = token.isExpired
+  protected def shouldRefreshAccessToken(token: AccessToken): Boolean = token.isExpired
 
   protected def createGrantHandlerResult[U](authInfo: AuthInfo[U], accessToken: AccessToken) = GrantHandlerResult(
     authInfo,
@@ -78,7 +78,7 @@ class Password extends GrantHandler {
       handler.findUser(maybeValidatedClientCred, passwordRequest).flatMap { maybeUser =>
         val user = maybeUser.getOrElse(throw new InvalidGrant("username or password is incorrect"))
         val scope = passwordRequest.scope
-        val authInfo = AuthInfo(user, maybeValidatedClientCred.map(_.clientId), scope, None)
+        val authInfo = handler.createAuthInfo(passwordRequest, user, maybeValidatedClientCred.map(_.clientId), scope, None)
 
         issueAccessToken(handler, authInfo)
       }
@@ -95,7 +95,7 @@ class ClientCredentials extends GrantHandler {
 
     handler.findUser(maybeValidatedClientCred, clientCredentialsRequest).flatMap { optionalUser =>
       val user = optionalUser.getOrElse(throw new InvalidGrant("client_id or client_secret or scope is incorrect"))
-      val authInfo = AuthInfo(user, Some(clientId), scope, None)
+      val authInfo = handler.createAuthInfo(clientCredentialsRequest, user, Some(clientId), scope, None)
 
       issueAccessToken(handler, authInfo)
     }
@@ -124,7 +124,7 @@ class AuthorizationCode extends GrantHandler {
       val f = issueAccessToken(handler, authInfo)
       for {
         accessToken <- f
-        deleteResult <- handler.deleteAuthCode(code)
+        _ <- handler.deleteAuthCode(code)
       } yield accessToken
     }
   }
@@ -140,7 +140,7 @@ class Implicit extends GrantHandler {
     handler.findUser(maybeValidatedClientCred, implicitRequest).flatMap { maybeUser =>
       val user = maybeUser.getOrElse(throw new InvalidGrant("user cannot be authenticated"))
       val scope = implicitRequest.scope
-      val authInfo = AuthInfo(user, Some(clientId), scope, None)
+      val authInfo = handler.createAuthInfo(implicitRequest, user, Some(clientId), scope, None)
 
       issueAccessToken(handler, authInfo)
     }
@@ -154,7 +154,7 @@ class Implicit extends GrantHandler {
   /**
    * Implicit grant must not return refresh token
    */
-  protected override def createGrantHandlerResult[U](authInfo: AuthInfo[U], accessToken: AccessToken) =
+  protected override def createGrantHandlerResult[U](authInfo: AuthInfo[U], accessToken: AccessToken): GrantHandlerResult[U] =
     super.createGrantHandlerResult(authInfo, accessToken).copy(refreshToken = None)
 
 }
