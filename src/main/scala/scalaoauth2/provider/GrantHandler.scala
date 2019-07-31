@@ -1,5 +1,8 @@
 package scalaoauth2.provider
 
+import java.util.Base64
+import java.security.MessageDigest
+
 import scala.concurrent.{ ExecutionContext, Future }
 
 case class GrantHandlerResult[U](
@@ -78,7 +81,7 @@ class Password extends GrantHandler {
       handler.findUser(maybeValidatedClientCred, passwordRequest).flatMap { maybeUser =>
         val user = maybeUser.getOrElse(throw new InvalidGrant("username or password is incorrect"))
         val scope = passwordRequest.scope
-        val authInfo = AuthInfo(user, maybeValidatedClientCred.map(_.clientId), scope, None)
+        val authInfo = AuthInfo(user, maybeValidatedClientCred.map(_.clientId), scope, None, None, None)
 
         issueAccessToken(handler, authInfo)
       }
@@ -95,7 +98,7 @@ class ClientCredentials extends GrantHandler {
 
     handler.findUser(maybeValidatedClientCred, clientCredentialsRequest).flatMap { optionalUser =>
       val user = optionalUser.getOrElse(throw new InvalidGrant("client_id or client_secret or scope is incorrect"))
-      val authInfo = AuthInfo(user, Some(clientId), scope, None)
+      val authInfo = AuthInfo(user, Some(clientId), scope, None, None, None)
 
       issueAccessToken(handler, authInfo)
     }
@@ -121,10 +124,27 @@ class AuthorizationCode extends GrantHandler {
         throw new RedirectUriMismatch
       }
 
+      authInfo.codeChallenge.foreach { codeChallenge =>
+        val codeVerifier = authorizationCodeRequest.codeVerifier.getOrElse(throw new InvalidGrant("PKCE validation failed, no verifier included in request"))
+
+        val isValid: Boolean = authInfo.codeChallengeMethod.getOrElse(Plain) match {
+          case Plain => codeVerifier == codeChallenge
+          case S256 =>
+            val codeVerifierBytes = codeVerifier.getBytes("ASCII")
+            val digest = MessageDigest.getInstance("SHA-256").digest(codeVerifierBytes)
+            val computedChallenge = Base64.getUrlEncoder.withoutPadding().encodeToString(digest)
+
+            computedChallenge == codeChallenge
+        }
+
+        if (!isValid)
+          throw new InvalidGrant("PKCE validation failed, values not equal.")
+      }
+
       val f = issueAccessToken(handler, authInfo)
       for {
         accessToken <- f
-        deleteResult <- handler.deleteAuthCode(code)
+        _ <- handler.deleteAuthCode(code)
       } yield accessToken
     }
   }
@@ -140,7 +160,7 @@ class Implicit extends GrantHandler {
     handler.findUser(maybeValidatedClientCred, implicitRequest).flatMap { maybeUser =>
       val user = maybeUser.getOrElse(throw new InvalidGrant("user cannot be authenticated"))
       val scope = implicitRequest.scope
-      val authInfo = AuthInfo(user, Some(clientId), scope, None)
+      val authInfo = AuthInfo(user, Some(clientId), scope, None, None, None)
 
       issueAccessToken(handler, authInfo)
     }

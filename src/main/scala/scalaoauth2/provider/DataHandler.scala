@@ -2,6 +2,8 @@ package scalaoauth2.provider
 
 import java.util.Date
 
+import scala.util.{ Failure, Success, Try }
+
 /**
  * Provide accessing to data storage for using OAuth 2.0.
  */
@@ -29,6 +31,20 @@ case class AccessToken(token: String, refreshToken: Option[String], scope: Optio
   }
 }
 
+sealed trait CodeChallengeMethod
+case object Plain extends CodeChallengeMethod
+case object S256 extends CodeChallengeMethod
+
+object CodeChallengeMethod {
+  def apply(value: String): Try[CodeChallengeMethod] = {
+    value match {
+      case "S256" => Success(S256)
+      case "plain" => Success(Plain)
+      case _ => Failure(new InvalidRequest("transform algorithm not supported"))
+    }
+  }
+}
+
 /**
  * Authorized information
  *
@@ -36,5 +52,7 @@ case class AccessToken(token: String, refreshToken: Option[String], scope: Optio
  * @param clientId Using client id which is registered on system.
  * @param scope Inform the client of the scope of the access token issued.
  * @param redirectUri This value is used by Authorization Code Grant.
+ * @param codeChallenge This value is used by Authorization Code Grant for PKCE support.
+ * @param codeChallengeMethod This value is used by Authorization Code Grant for PKCE support.
  */
-case class AuthInfo[+U](user: U, clientId: Option[String], scope: Option[String], redirectUri: Option[String])
+case class AuthInfo[+U](user: U, clientId: Option[String], scope: Option[String], redirectUri: Option[String], codeChallenge: Option[String] = None, codeChallengeMethod: Option[CodeChallengeMethod] = None)
