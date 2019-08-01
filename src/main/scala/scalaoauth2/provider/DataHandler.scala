@@ -32,8 +32,12 @@ case class AccessToken(token: String, refreshToken: Option[String], scope: Optio
 }
 
 sealed trait CodeChallengeMethod
-case object Plain extends CodeChallengeMethod
-case object S256 extends CodeChallengeMethod
+case object Plain extends CodeChallengeMethod {
+  override def toString: String = "plain"
+}
+case object S256 extends CodeChallengeMethod {
+  override def toString: String = "S256"
+}
 
 object CodeChallengeMethod {
   def apply(value: String): Try[CodeChallengeMethod] = {
