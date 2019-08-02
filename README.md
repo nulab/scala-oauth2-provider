@@ -10,7 +10,7 @@ The idea of this library originally comes from [oauth2-server](https://github.co
 
 This library supports all grant types.
 
-- Authorization Code Grant
+- Authorization Code Grant (PKCE Authorization Code Grants are supported)
 - Resource Owner Password Credentials Grant
 - Client Credentials Grant
 - Implicit Grant
@@ -86,7 +86,9 @@ case class AuthInfo[User](
   user: User,
   clientId: Option[String],
   scope: Option[String],
-  redirectUri: Option[String]
+  redirectUri: Option[String],
+  codeChallenge: Option[String] = None,
+  codeChallengeMethod: Option[CodeChallengeMethod] = None
 )
 ```
 
@@ -100,3 +102,9 @@ case class AuthInfo[User](
   - inform the client of the scope of the access token issued
 - redirectUri
   - This value must be enabled on authorization code grant
+- codeChallenge:
+  - This value is OPTIONAL. Only set this value if doing a PKCE authorization request. When set, PKCE rules apply on the AuthorizationCode Grant Handler
+  - This value is from a PKCE authorization request. This is the challenge supplied during the auth request if given.
+- codeChallengeMethod:
+  - This value is OPTIONAL and used only by PKCE when a codeChallenge value is also set.
+  - This value is from a PKCE authorization request. This is the method used to transform the code verifier. Must be either Plain or S256. If not specified and codeChallenge is provided then Plain is assumed (per RFC7636)
