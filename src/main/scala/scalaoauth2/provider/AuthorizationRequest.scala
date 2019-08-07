@@ -88,6 +88,13 @@ case class AuthorizationCodeRequest(request: AuthorizationRequest) extends Autho
    * @return redirect_uri
    */
   def redirectUri: Option[String] = param("redirect_uri")
+
+  /**
+   * Returns code_verifier
+   *
+   * @return
+   */
+  def codeVerifier: Option[String] = param("code_verifier")
 }
 
 case class ImplicitRequest(request: AuthorizationRequest) extends AuthorizationRequest(request.headers, request.params)
