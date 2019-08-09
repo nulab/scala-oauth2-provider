@@ -34,7 +34,7 @@ In this case, you need to implement your own OAuth provider working with web fra
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.nulab-inc" %% "scala-oauth2-core" % "1.4.0"
+  "com.nulab-inc" %% "scala-oauth2-core" % "1.5.0"
 )
 ```
 
