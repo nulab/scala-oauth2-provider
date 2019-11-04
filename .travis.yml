@@ -6,6 +6,8 @@ scala:
 jdk:
   - openjdk8
   - openjdk11
+script:
+  - sbt scalafmtSbtCheck scalafmtCheck test:scalafmtCheck test
 notifications:
   webhooks:
     urls:

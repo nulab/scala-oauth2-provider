@@ -20,7 +20,9 @@ object RequestParameter extends AccessTokenFetcher {
 
   override def fetch(request: ProtectedResourceRequest): FetchResult = {
     val t = request.oauthToken.getOrElse(request.requireAccessToken)
-    val params = request.params.filter { case (_, v) => !v.isEmpty } map { case (k, v) => (k, v.head) }
+    val params = request.params.filter { case (_, v) => !v.isEmpty } map {
+      case (k, v) => (k, v.head)
+    }
     FetchResult(t, params -- Seq("oauth_token", "access_token"))
   }
 }
@@ -49,7 +51,7 @@ object AuthHeader extends AccessTokenFetcher {
       val pairs = REGEXP_DIV_COMMA.split(trimmedHeader).map { exp =>
         val (key, value) = exp.split("=", 2) match {
           case Array(k, v) => (k, v.replaceFirst("^\"", ""))
-          case Array(k) => (k, "")
+          case Array(k)    => (k, "")
         }
 
         (key, URLDecoder.decode(value.replaceFirst("\"$", ""), "UTF-8"))

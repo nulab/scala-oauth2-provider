@@ -18,11 +18,12 @@ lazy val scalaOAuth2ProviderSettings =
       publishTo := {
         val v = version.value
         val nexus = "https://oss.sonatype.org/"
-        if (v.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus + "content/repositories/snapshots")
+        if (v.trim.endsWith("SNAPSHOT"))
+          Some("snapshots" at nexus + "content/repositories/snapshots")
         else Some("releases" at nexus + "service/local/staging/deploy/maven2")
       },
       scalacOptions in (Compile, doc) ++= {
-        val v = if(isSnapshot.value) {
+        val v = if (isSnapshot.value) {
           sys.process.Process("git rev-parse HEAD").lineStream_!.head
         } else {
           version.value
@@ -36,7 +37,9 @@ lazy val scalaOAuth2ProviderSettings =
       },
       publishMavenStyle := true,
       publishArtifact in Test := false,
-      pomIncludeRepository := { x => false },
+      pomIncludeRepository := { x =>
+        false
+      },
       pomExtra := <url>https://github.com/nulab/scala-oauth2-provider</url>
         <licenses>
           <license>
@@ -56,9 +59,9 @@ lazy val scalaOAuth2ProviderSettings =
             <url>https://github.com/tsuyoshizawa</url>
           </developer>
         </developers>
-    ) ++ Seq(Compile, Test).flatMap(c =>
-      scalacOptions in (c, console) --= unusedWarnings
-    )
+    ) ++ Seq(Compile, Test).flatMap(
+    c => scalacOptions in (c, console) --= unusedWarnings
+  )
 
 lazy val root = (project in file("."))
   .settings(

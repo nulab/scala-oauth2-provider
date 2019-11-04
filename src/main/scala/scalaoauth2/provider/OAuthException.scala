@@ -1,6 +1,7 @@
 package scalaoauth2.provider
 
-abstract class OAuthError(val statusCode: Int, val description: String) extends Exception(description) {
+abstract class OAuthError(val statusCode: Int, val description: String)
+    extends Exception(description) {
 
   def this(description: String) = this(400, description)
 
@@ -14,31 +15,36 @@ class InvalidRequest(description: String = "") extends OAuthError(description) {
 
 }
 
-class InvalidClient(description: String = "") extends OAuthError(401, description) {
+class InvalidClient(description: String = "")
+    extends OAuthError(401, description) {
 
   override val errorType = "invalid_client"
 
 }
 
-class UnauthorizedClient(description: String = "") extends OAuthError(description) {
+class UnauthorizedClient(description: String = "")
+    extends OAuthError(description) {
 
   override val errorType = "unauthorized_client"
 
 }
 
-class RedirectUriMismatch(description: String = "redirect_uri_mismatch") extends OAuthError(description) {
+class RedirectUriMismatch(description: String = "redirect_uri_mismatch")
+    extends OAuthError(description) {
 
   override val errorType = "invalid_request"
 
 }
 
-class AccessDenied(description: String = "") extends OAuthError(401, description) {
+class AccessDenied(description: String = "")
+    extends OAuthError(401, description) {
 
   override val errorType = "access_denied"
 
 }
 
-class UnsupportedResponseType(description: String = "") extends OAuthError(description) {
+class UnsupportedResponseType(description: String = "")
+    extends OAuthError(description) {
 
   override val errorType = "unsupported_response_type"
 
@@ -50,7 +56,8 @@ class InvalidGrant(description: String = "") extends OAuthError(description) {
 
 }
 
-class UnsupportedGrantType(description: String = "") extends OAuthError(description) {
+class UnsupportedGrantType(description: String = "")
+    extends OAuthError(description) {
 
   override val errorType = "unsupported_grant_type"
 
@@ -62,7 +69,8 @@ class InvalidScope(description: String = "") extends OAuthError(description) {
 
 }
 
-class InvalidToken(description: String = "") extends OAuthError(401, description) {
+class InvalidToken(description: String = "")
+    extends OAuthError(401, description) {
 
   override val errorType = "invalid_token"
 
@@ -74,7 +82,8 @@ class ExpiredToken() extends OAuthError(401, "The access token expired") {
 
 }
 
-class InsufficientScope(description: String = "") extends OAuthError(403, description) {
+class InsufficientScope(description: String = "")
+    extends OAuthError(403, description) {
 
   override val errorType = "insufficient_scope"
 

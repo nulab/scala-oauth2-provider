@@ -29,6 +29,8 @@ class DataHandlerSpec extends FlatSpec with TryValues {
     val attempt = CodeChallengeMethod("made-up")
     attempt.isFailure shouldBe true
     attempt.failure.exception.isInstanceOf[InvalidRequest]
-    attempt.failure.exception.getMessage should be("transform algorithm not supported")
+    attempt.failure.exception.getMessage should be(
+      "transform algorithm not supported"
+    )
   }
 }

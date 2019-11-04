@@ -5,15 +5,27 @@ import org.scalatest.FlatSpec
 
 class RequestParameterSpec extends FlatSpec {
 
-  def createRequest(oauthToken: Option[String], accessToken: Option[String], another: Map[String, Seq[String]] = Map()): ProtectedResourceRequest = {
-    val params = oauthToken.map { "oauth_token" -> Seq(_) } ++ accessToken.map { "access_token" -> Seq(_) }
+  def createRequest(
+      oauthToken: Option[String],
+      accessToken: Option[String],
+      another: Map[String, Seq[String]] = Map()
+  ): ProtectedResourceRequest = {
+    val params = oauthToken.map { "oauth_token" -> Seq(_) } ++ accessToken.map {
+      "access_token" -> Seq(_)
+    }
     new ProtectedResourceRequest(Map(), Map() ++ params ++ another)
   }
 
   it should "match RequestParameter" in {
-    RequestParameter.matches(createRequest(Some("token1"), None)) should be(true)
-    RequestParameter.matches(createRequest(None, Some("token2"))) should be(true)
-    RequestParameter.matches(createRequest(Some("token1"), Some("token2"))) should be(true)
+    RequestParameter.matches(createRequest(Some("token1"), None)) should be(
+      true
+    )
+    RequestParameter.matches(createRequest(None, Some("token2"))) should be(
+      true
+    )
+    RequestParameter.matches(createRequest(Some("token1"), Some("token2"))) should be(
+      true
+    )
   }
 
   it should "doesn't match RequestParameter" in {
@@ -33,7 +45,9 @@ class RequestParameterSpec extends FlatSpec {
   }
 
   it should "fetch with another parameter" in {
-    val result = RequestParameter.fetch(createRequest(None, Some("token2"), Map("foo" -> Seq("bar"))))
+    val result = RequestParameter.fetch(
+      createRequest(None, Some("token2"), Map("foo" -> Seq("bar")))
+    )
     result.token should be("token2")
     result.params.get("foo") should be(Some("bar"))
   }
