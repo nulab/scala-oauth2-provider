@@ -35,8 +35,8 @@ trait ProtectedResource {
                   )
                 )
             }
-            .recover {
-              case e: OAuthError => Left(e)
+            .recover { case e: OAuthError =>
+              Left(e)
             }
         }
         .getOrElse(throw new InvalidRequest("Access token is not found"))

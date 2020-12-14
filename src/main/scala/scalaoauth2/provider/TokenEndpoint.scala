@@ -8,8 +8,8 @@ trait TokenEndpoint {
   def handleRequest[U](
       request: AuthorizationRequest,
       handler: AuthorizationHandler[U]
-  )(
-      implicit ctx: ExecutionContext
+  )(implicit
+      ctx: ExecutionContext
   ): Future[Either[OAuthError, GrantHandlerResult[U]]] =
     try {
       val grantType = request.grantType
@@ -41,8 +41,8 @@ trait TokenEndpoint {
                       .map(Right(_))
                   }
                 }
-                .recover {
-                  case e: OAuthError => Left(e)
+                .recover { case e: OAuthError =>
+                  Left(e)
                 }
             }
           )

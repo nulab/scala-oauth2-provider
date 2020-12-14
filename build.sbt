@@ -59,9 +59,9 @@ lazy val scalaOAuth2ProviderSettings =
             <url>https://github.com/tsuyoshizawa</url>
           </developer>
         </developers>
-    ) ++ Seq(Compile, Test).flatMap(
-    c => scalacOptions in (c, console) --= unusedWarnings
-  )
+    ) ++ Seq(Compile, Test).flatMap(c =>
+      scalacOptions in (c, console) --= unusedWarnings
+    )
 
 lazy val root = (project in file("."))
   .settings(

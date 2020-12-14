@@ -23,7 +23,9 @@ class RequestParameterSpec extends FlatSpec {
     RequestParameter.matches(createRequest(None, Some("token2"))) should be(
       true
     )
-    RequestParameter.matches(createRequest(Some("token1"), Some("token2"))) should be(
+    RequestParameter.matches(
+      createRequest(Some("token1"), Some("token2"))
+    ) should be(
       true
     )
   }
