@@ -1,5 +1,5 @@
 val commonDependenciesInTestScope = Seq(
-  "org.scalatest" %% "scalatest" % "3.0.8" % "test",
+  "org.scalatest" %% "scalatest" % "3.2.3" % "test",
   "ch.qos.logback" % "logback-classic" % "1.2.3" % "test"
 )
 

@@ -1,9 +1,9 @@
 package scalaoauth2.provider
 
-import org.scalatest.FlatSpec
-import org.scalatest.Matchers._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers._
 
-class AuthorizationRequestSpec extends FlatSpec {
+class AuthorizationRequestSpec extends AnyFlatSpec {
 
   it should "fetch Basic64" in {
     val request = new AuthorizationRequest(

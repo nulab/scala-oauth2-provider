@@ -1,9 +1,9 @@
 package scalaoauth2.provider
 
-import org.scalatest.Matchers._
-import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers._
 
-class OAuthErrorsSpec extends FlatSpec {
+class OAuthErrorsSpec extends AnyFlatSpec {
 
   behavior of "OAuth Error Handling RFC 6749 Section 5.2"
 

@@ -1,15 +1,15 @@
 package scalaoauth2.provider
 
 import java.util.Date
-import org.scalatest._
-import org.scalatest.Matchers._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers._
 import org.scalatest.concurrent.ScalaFutures
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Success, Failure}
 
-class TokenEndPointSpec extends FlatSpec with ScalaFutures {
+class TokenEndPointSpec extends AnyFlatSpec with ScalaFutures {
 
   def successfulDataHandler() = new MockDataHandler() {
 

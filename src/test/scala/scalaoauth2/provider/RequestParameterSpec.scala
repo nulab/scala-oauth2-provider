@@ -1,9 +1,9 @@
 package scalaoauth2.provider
 
-import org.scalatest.Matchers._
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers._
 
-class RequestParameterSpec extends FlatSpec {
+class RequestParameterSpec extends AnyFlatSpec {
 
   def createRequest(
       oauthToken: Option[String],

@@ -2,14 +2,14 @@ package scalaoauth2.provider
 
 import java.util.Date
 
-import org.scalatest._
-import org.scalatest.Matchers._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers._
 import org.scalatest.concurrent.ScalaFutures
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ProtectedResourceSpec extends FlatSpec with ScalaFutures {
+class ProtectedResourceSpec extends AnyFlatSpec with ScalaFutures {
 
   def successfulProtectedResourceHandler() =
     new ProtectedResourceHandler[User] {

@@ -1,9 +1,9 @@
 package scalaoauth2.provider
 
-import org.scalatest._
-import org.scalatest.Matchers._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers._
 
-class AuthHeaderSpec extends FlatSpec {
+class AuthHeaderSpec extends AnyFlatSpec {
 
   def createRequest(authorization: Option[String]): ProtectedResourceRequest =
     authorization match {
