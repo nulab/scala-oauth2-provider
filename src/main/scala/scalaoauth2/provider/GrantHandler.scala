@@ -17,8 +17,7 @@ case class GrantHandlerResult[U](
 
 trait GrantHandler {
 
-  /**
-    * Controls whether client credentials are required.  Defaults to true but can be overridden to be false when needed.
+  /** Controls whether client credentials are required.  Defaults to true but can be overridden to be false when needed.
     * Per the OAuth2 specification, client credentials are required for all grant types except password, where it is up
     * to the authorization provider whether to make them required or not.
     */
@@ -30,8 +29,7 @@ trait GrantHandler {
       authorizationHandler: AuthorizationHandler[U]
   )(implicit ctx: ExecutionContext): Future[GrantHandlerResult[U]]
 
-  /**
-    * Returns valid access token.
+  /** Returns valid access token.
     */
   protected def issueAccessToken[U](
       handler: AuthorizationHandler[U],
@@ -107,8 +105,7 @@ class Password extends GrantHandler {
       handler: AuthorizationHandler[U]
   )(implicit ctx: ExecutionContext): Future[GrantHandlerResult[U]] = {
 
-    /**
-      * Given that client credentials may be optional, if they are required, they must be fully validated before
+    /** Given that client credentials may be optional, if they are required, they must be fully validated before
       * further processing.
       */
     if (clientCredentialRequired && maybeValidatedClientCred.isEmpty) {
@@ -189,7 +186,9 @@ class AuthorizationCode extends GrantHandler {
         throw new InvalidClient
       }
 
-      if (authInfo.redirectUri.isDefined && authInfo.redirectUri != redirectUri) {
+      if (
+        authInfo.redirectUri.isDefined && authInfo.redirectUri != redirectUri
+      ) {
         throw new RedirectUriMismatch
       }
 
@@ -250,14 +249,12 @@ class Implicit extends GrantHandler {
     }
   }
 
-  /**
-    * Implicit grant doesn't support refresh token
+  /** Implicit grant doesn't support refresh token
     */
   protected override def shouldRefreshAccessToken(accessToken: AccessToken) =
     false
 
-  /**
-    * Implicit grant must not return refresh token
+  /** Implicit grant must not return refresh token
     */
   protected override def createGrantHandlerResult[U](
       authInfo: AuthInfo[U],

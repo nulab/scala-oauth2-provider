@@ -17,14 +17,13 @@ class AuthorizationRequest(
 
   def parseClientCredential: Option[Either[InvalidClient, ClientCredential]] =
     findAuthorization
-      .flatMap(
-        x =>
-          Some(
-            x.fold(
-              left => Left(left),
-              header => clientCredentialByAuthorization(header)
-            )
+      .flatMap(x =>
+        Some(
+          x.fold(
+            left => Left(left),
+            header => clientCredentialByAuthorization(header)
           )
+        )
       )
       .orElse(clientCredentialByParam.map(Right(_)))
 
@@ -66,8 +65,7 @@ class AuthorizationRequest(
 case class RefreshTokenRequest(request: AuthorizationRequest)
     extends AuthorizationRequest(request.headers, request.params) {
 
-  /**
-    * returns refresh_token.
+  /** returns refresh_token.
     *
     * @return code.
     * @throws InvalidRequest if the parameter is not found
@@ -78,16 +76,14 @@ case class RefreshTokenRequest(request: AuthorizationRequest)
 case class PasswordRequest(request: AuthorizationRequest)
     extends AuthorizationRequest(request.headers, request.params) {
 
-  /**
-    * returns username.
+  /** returns username.
     *
     * @return username.
     * @throws InvalidRequest if the parameter is not found
     */
   def username = requireParam("username")
 
-  /**
-    * returns password.
+  /** returns password.
     *
     * @return password.
     * @throws InvalidRequest if the parameter is not found
@@ -101,23 +97,20 @@ case class ClientCredentialsRequest(request: AuthorizationRequest)
 case class AuthorizationCodeRequest(request: AuthorizationRequest)
     extends AuthorizationRequest(request.headers, request.params) {
 
-  /**
-    * returns code.
+  /** returns code.
     *
     * @return code.
     * @throws InvalidRequest if code is not found
     */
   def code: String = requireParam("code")
 
-  /**
-    * Returns redirect_uri.
+  /** Returns redirect_uri.
     *
     * @return redirect_uri
     */
   def redirectUri: Option[String] = param("redirect_uri")
 
-  /**
-    * Returns code_verifier
+  /** Returns code_verifier
     *
     * @return
     */

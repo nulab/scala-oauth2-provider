@@ -4,15 +4,13 @@ import java.util.Date
 
 import scala.util.{Failure, Success, Try}
 
-/**
-  * Provide accessing to data storage for using OAuth 2.0.
+/** Provide accessing to data storage for using OAuth 2.0.
   */
 trait DataHandler[U]
     extends AuthorizationHandler[U]
     with ProtectedResourceHandler[U]
 
-/**
-  * Access token
+/** Access token
   *
   * @param token Access token is used to authentication.
   * @param refreshToken Refresh token is used to re-issue access token.
@@ -59,8 +57,7 @@ object CodeChallengeMethod {
   }
 }
 
-/**
-  * Authorized information
+/** Authorized information
   *
   * @param user Authorized user which is registered on system.
   * @param clientId Using client id which is registered on system.
