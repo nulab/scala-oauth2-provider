@@ -1,15 +1,10 @@
 language: scala
 scala:
-  - 2.12.8
+  - 2.13.4
+  - 2.12.12
   - 2.11.12
-  - 2.13.0
 jdk:
   - openjdk8
   - openjdk11
 script:
   - sbt scalafmtSbtCheck scalafmtCheck test:scalafmtCheck test
-notifications:
-  webhooks:
-    urls:
-      - https://nulab-inc.com/hubot/travis?room=3741
-    on_success: change
