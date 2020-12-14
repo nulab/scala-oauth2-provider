@@ -2,11 +2,10 @@ package scalaoauth2.provider
 
 import java.time.{ZoneOffset, ZonedDateTime}
 import java.util.Date
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers._
 
-import org.scalatest.Matchers._
-import org.scalatest._
-
-class AccessTokenSpec extends FlatSpec {
+class AccessTokenSpec extends AnyFlatSpec {
 
   it should "say a token is active that is not yet expired" in {
     val token = AccessToken(

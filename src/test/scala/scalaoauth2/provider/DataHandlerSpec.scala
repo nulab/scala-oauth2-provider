@@ -1,11 +1,12 @@
 package scalaoauth2.provider
 
-import org.scalatest.Matchers._
-import org.scalatest._
+import org.scalatest.TryValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers._
 
 import scala.util.Success
 
-class DataHandlerSpec extends FlatSpec with TryValues {
+class DataHandlerSpec extends AnyFlatSpec with TryValues {
 
   it should "parse a PKCE code challenge method of plain" in {
     CodeChallengeMethod("plain") should be(Success(Plain))

@@ -1,14 +1,15 @@
 package scalaoauth2.provider
 
-import org.scalatest.Matchers._
-import org.scalatest._
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers._
 import org.scalatest.concurrent.ScalaFutures
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class ClientCredentialsSpec
-    extends FlatSpec
+    extends AnyFlatSpec
     with ScalaFutures
     with OptionValues {
 

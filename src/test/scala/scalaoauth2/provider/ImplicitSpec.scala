@@ -1,15 +1,16 @@
 package scalaoauth2.provider
 
-import java.util.Date
+import org.scalatest.OptionValues
 
-import org.scalatest._
-import org.scalatest.Matchers._
+import java.util.Date
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers._
 import org.scalatest.concurrent.ScalaFutures
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ImplicitSpec extends FlatSpec with ScalaFutures with OptionValues {
+class ImplicitSpec extends AnyFlatSpec with ScalaFutures with OptionValues {
 
   val implicitGrant = new Implicit()
 
