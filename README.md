@@ -1,4 +1,4 @@
-# oauth2-server for Scala [![Build Status](https://travis-ci.org/nulab/scala-oauth2-provider.svg?branch=master)](https://travis-ci.org/nulab/scala-oauth2-provider)
+# oauth2-server for Scala [![Build Status](https://travis-ci.com/nulab/scala-oauth2-provider.svg?branch=master)](https://travis-ci.com/nulab/scala-oauth2-provider)
 
 [The OAuth 2.0](http://tools.ietf.org/html/rfc6749) server-side implementation written in Scala.
 
