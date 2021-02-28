@@ -1,0 +1,26 @@
+name: CI
+on:
+  pull_request:
+  push:
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            java: 8
+          - os: ubuntu-latest
+            java: 11
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup
+        uses: olafurpg/setup-scala@v10
+        with:
+          java-version: "adopt@1.${{ matrix.java }}"
+      - name: Coursier cache
+        uses: coursier/cache-action@v5
+      - name: Build and test
+        run: sbt scalafmtSbtCheck scalafmtCheck test:scalafmtCheck +test
