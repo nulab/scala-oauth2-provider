@@ -44,7 +44,7 @@ class AuthorizationRequest(
   ): Either[InvalidClient, ClientCredential] =
     Try(new String(Base64.getDecoder.decode(s), "UTF-8"))
       .map(_.split(":", 2))
-      .getOrElse(Array.empty) match {
+      .getOrElse(Array.empty[String]) match {
       case Array(clientId, clientSecret) =>
         Right(
           ClientCredential(
