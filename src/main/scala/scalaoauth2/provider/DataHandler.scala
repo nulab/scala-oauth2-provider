@@ -12,12 +12,19 @@ trait DataHandler[U]
 
 /** Access token
   *
-  * @param token Access token is used to authentication.
-  * @param refreshToken Refresh token is used to re-issue access token.
-  * @param scope Inform the client of the scope of the access token issued.
-  * @param lifeSeconds Life of the access token since its creation. In seconds.
-  * @param createdAt Access token is created date.
-  * @param params Additional parameters to add information/restriction on given Access token.
+  * @param token
+  *   Access token is used to authentication.
+  * @param refreshToken
+  *   Refresh token is used to re-issue access token.
+  * @param scope
+  *   Inform the client of the scope of the access token issued.
+  * @param lifeSeconds
+  *   Life of the access token since its creation. In seconds.
+  * @param createdAt
+  *   Access token is created date.
+  * @param params
+  *   Additional parameters to add information/restriction on given Access
+  *   token.
   */
 case class AccessToken(
     token: String,
@@ -52,19 +59,25 @@ object CodeChallengeMethod {
     value match {
       case "S256"  => Success(S256)
       case "plain" => Success(Plain)
-      case _       => Failure(new InvalidRequest("transform algorithm not supported"))
+      case _ => Failure(new InvalidRequest("transform algorithm not supported"))
     }
   }
 }
 
 /** Authorized information
   *
-  * @param user Authorized user which is registered on system.
-  * @param clientId Using client id which is registered on system.
-  * @param scope Inform the client of the scope of the access token issued.
-  * @param redirectUri This value is used by Authorization Code Grant.
-  * @param codeChallenge This value is used by Authorization Code Grant for PKCE support.
-  * @param codeChallengeMethod This value is used by Authorization Code Grant for PKCE support.
+  * @param user
+  *   Authorized user which is registered on system.
+  * @param clientId
+  *   Using client id which is registered on system.
+  * @param scope
+  *   Inform the client of the scope of the access token issued.
+  * @param redirectUri
+  *   This value is used by Authorization Code Grant.
+  * @param codeChallenge
+  *   This value is used by Authorization Code Grant for PKCE support.
+  * @param codeChallengeMethod
+  *   This value is used by Authorization Code Grant for PKCE support.
   */
 case class AuthInfo[+U](
     user: U,

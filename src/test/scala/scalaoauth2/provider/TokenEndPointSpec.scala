@@ -272,7 +272,7 @@ class TokenEndPointSpec extends AnyFlatSpec with ScalaFutures {
 
   it should "be a 401 InvalidClient failure when the Authorization header is present and there is a problem extracting the client credentials" in {
     val request = new AuthorizationRequest(
-      //Use Digest instead of Bearer.
+      // Use Digest instead of Bearer.
       Map(
         "Authorization" -> Seq(
           "Digest Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU="
@@ -311,7 +311,7 @@ class TokenEndPointSpec extends AnyFlatSpec with ScalaFutures {
 
   it should "be a 401 InvalidClient failure when the Authorization header is present but invalid - even when an invalid grant handler is provided" in {
     val request = new AuthorizationRequest(
-      //Use Digest instead of Bearer.
+      // Use Digest instead of Bearer.
       Map(
         "Authorization" -> Seq(
           "Digest Y2xpZW50X2lkX3ZhbHVlOmNsaWVudF9zZWNyZXRfdmFsdWU="
