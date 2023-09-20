@@ -67,8 +67,10 @@ case class RefreshTokenRequest(request: AuthorizationRequest)
 
   /** returns refresh_token.
     *
-    * @return code.
-    * @throws InvalidRequest if the parameter is not found
+    * @return
+    *   code.
+    * @throws InvalidRequest
+    *   if the parameter is not found
     */
   def refreshToken: String = requireParam("refresh_token")
 }
@@ -78,15 +80,19 @@ case class PasswordRequest(request: AuthorizationRequest)
 
   /** returns username.
     *
-    * @return username.
-    * @throws InvalidRequest if the parameter is not found
+    * @return
+    *   username.
+    * @throws InvalidRequest
+    *   if the parameter is not found
     */
   def username = requireParam("username")
 
   /** returns password.
     *
-    * @return password.
-    * @throws InvalidRequest if the parameter is not found
+    * @return
+    *   password.
+    * @throws InvalidRequest
+    *   if the parameter is not found
     */
   def password = requireParam("password")
 }
@@ -99,14 +105,17 @@ case class AuthorizationCodeRequest(request: AuthorizationRequest)
 
   /** returns code.
     *
-    * @return code.
-    * @throws InvalidRequest if code is not found
+    * @return
+    *   code.
+    * @throws InvalidRequest
+    *   if code is not found
     */
   def code: String = requireParam("code")
 
   /** Returns redirect_uri.
     *
-    * @return redirect_uri
+    * @return
+    *   redirect_uri
     */
   def redirectUri: Option[String] = param("redirect_uri")
 

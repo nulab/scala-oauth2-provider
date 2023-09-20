@@ -17,9 +17,11 @@ case class GrantHandlerResult[U](
 
 trait GrantHandler {
 
-  /** Controls whether client credentials are required.  Defaults to true but can be overridden to be false when needed.
-    * Per the OAuth2 specification, client credentials are required for all grant types except password, where it is up
-    * to the authorization provider whether to make them required or not.
+  /** Controls whether client credentials are required. Defaults to true but can
+    * be overridden to be false when needed. Per the OAuth2 specification,
+    * client credentials are required for all grant types except password, where
+    * it is up to the authorization provider whether to make them required or
+    * not.
     */
   def clientCredentialRequired = true
 
@@ -105,8 +107,8 @@ class Password extends GrantHandler {
       handler: AuthorizationHandler[U]
   )(implicit ctx: ExecutionContext): Future[GrantHandlerResult[U]] = {
 
-    /** Given that client credentials may be optional, if they are required, they must be fully validated before
-      * further processing.
+    /** Given that client credentials may be optional, if they are required,
+      * they must be fully validated before further processing.
       */
     if (clientCredentialRequired && maybeValidatedClientCred.isEmpty) {
       throw new InvalidRequest("Client credential is required")
