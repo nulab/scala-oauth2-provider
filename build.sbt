@@ -1,6 +1,6 @@
 val commonDependenciesInTestScope = Seq(
-  "org.scalatest" %% "scalatest" % "3.2.11" % "test",
-  "ch.qos.logback" % "logback-classic" % "1.2.10" % "test"
+  "org.scalatest" %% "scalatest" % "3.2.17" % "test",
+  "ch.qos.logback" % "logback-classic" % "1.4.11" % "test"
 )
 
 lazy val scalaOAuth2ProviderSettings =
