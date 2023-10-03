@@ -50,7 +50,8 @@ class TokenEndPointSpec extends AnyFlatSpec with ScalaFutures {
 
     val dataHandler = successfulDataHandler()
     val f = new TokenEndpoint {
-      override val handlers = Map("password" -> new Password())
+      override val handlers: Map[String, Password] =
+        Map("password" -> new Password())
     }.handleRequest(request, dataHandler)
 
     whenReady(f) { result =>
@@ -128,7 +129,8 @@ class TokenEndPointSpec extends AnyFlatSpec with ScalaFutures {
 
     val dataHandler = successfulDataHandler()
     val f = new TokenEndpoint {
-      override val handlers = Map("password" -> new Password())
+      override val handlers: Map[String, Password] =
+        Map("password" -> new Password())
     }.handleRequest(request, dataHandler)
 
     whenReady(f) { result =>
@@ -159,7 +161,8 @@ class TokenEndPointSpec extends AnyFlatSpec with ScalaFutures {
     }
 
     val f = new TokenEndpoint {
-      override val handlers = Map("password" -> passwordNoCred)
+      override val handlers: Map[String, Password] =
+        Map("password" -> passwordNoCred)
     }.handleRequest(request, dataHandler)
 
     whenReady(f) { result =>
@@ -192,7 +195,8 @@ class TokenEndPointSpec extends AnyFlatSpec with ScalaFutures {
     }
 
     val f = new TokenEndpoint {
-      override val handlers = Map("password" -> new Password())
+      override val handlers: Map[String, Password] =
+        Map("password" -> new Password())
     }.handleRequest(request, dataHandler)
 
     whenReady(f) { result =>
@@ -249,7 +253,8 @@ class TokenEndPointSpec extends AnyFlatSpec with ScalaFutures {
   it should "be possible to customize supporting grant types" in {
 
     object TestTokenEndpoint extends TokenEndpoint {
-      override val handlers = Map("password" -> new Password())
+      override val handlers: Map[String, Password] =
+        Map("password" -> new Password())
     }
 
     val f = TestTokenEndpoint.handleRequest(
@@ -296,7 +301,8 @@ class TokenEndPointSpec extends AnyFlatSpec with ScalaFutures {
     }
 
     val f = new TokenEndpoint {
-      override val handlers = Map("password" -> new Password())
+      override val handlers: Map[String, Password] =
+        Map("password" -> new Password())
     }.handleRequest(request, dataHandler)
 
     whenReady(f) { result =>
@@ -335,7 +341,8 @@ class TokenEndPointSpec extends AnyFlatSpec with ScalaFutures {
     }
 
     val f = new TokenEndpoint {
-      override val handlers = Map("password" -> new Password())
+      override val handlers: Map[String, Password] =
+        Map("password" -> new Password())
     }.handleRequest(request, dataHandler)
 
     whenReady(f) { result =>

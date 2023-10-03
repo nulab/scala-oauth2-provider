@@ -10,6 +10,14 @@ lazy val scalaOAuth2ProviderSettings =
       scalaVersion := "3.3.0",
       crossScalaVersions := Seq("2.13.12", "2.12.18", "2.11.12"),
       scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature"),
+      scalacOptions ++= {
+        scalaBinaryVersion.value match {
+          case "2.12" | "2.13" =>
+            Seq("-Xsource:3")
+          case _ =>
+            Nil
+        }
+      },
       publishTo := {
         val v = version.value
         val nexus = "https://oss.sonatype.org/"
