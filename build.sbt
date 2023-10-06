@@ -69,6 +69,6 @@ lazy val root = (project in file("."))
     scalaOAuth2ProviderSettings,
     name := "scala-oauth2-core",
     description := "OAuth 2.0 server-side implementation written in Scala",
-    version := "1.6.0",
+    version := "1.6.1-SNAPSHOT",
     libraryDependencies ++= commonDependenciesInTestScope
   )
