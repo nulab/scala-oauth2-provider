@@ -34,7 +34,7 @@ In this case, you need to implement your own OAuth provider working with web fra
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.nulab-inc" %% "scala-oauth2-core" % "1.5.0"
+  "com.nulab-inc" %% "scala-oauth2-core" % "1.6.0"
 )
 ```
 
@@ -42,7 +42,7 @@ libraryDependencies ++= Seq(
 
 ### Implement DataHandler
 
-Whether you use Play Framework or not, you have to implement ```DataHandler``` trait and make it work with your own ```User``` class that may be already defined in your application.
+Whether you use Play Framework or not, you have to implement `DataHandler` trait and make it work with your own `User` class that may be already defined in your application.
 
 ```scala
 case class User(id: Long, name: String, hashedPassword: String)
@@ -72,14 +72,14 @@ class MyDataHandler extends DataHandler[User] {
 }
 ```
 
-If your data access is blocking for the data storage, then you just wrap your implementation in the ```DataHandler``` trait with ```Future.successful(...)```.
+If your data access is blocking for the data storage, then you just wrap your implementation in the `DataHandler` trait with `Future.successful(...)`.
 
-For more details, refer to Scaladoc of ```DataHandler```.
+For more details, refer to Scaladoc of `DataHandler`.
 
 ### AuthInfo
 
-```DataHandler``` returns ```AuthInfo``` as authorized information.
-```AuthInfo``` is made up of the following fields.
+`DataHandler` returns `AuthInfo` as authorized information.
+`AuthInfo` is made up of the following fields.
 
 ```scala
 case class AuthInfo[User](
@@ -93,11 +93,11 @@ case class AuthInfo[User](
 ```
 
 - user
-  - ```user``` is authorized by DataHandler
+  - `user` is authorized by DataHandler
 - clientId
-  - ```clientId``` which is sent from a client has been verified by ```DataHandler```
-  - If your application requires client_id for client authentication, you can get ```clientId``` as below
-    - ```val clientId = authInfo.clientId.getOrElse(throw new InvalidClient())```
+  - `clientId` which is sent from a client has been verified by `DataHandler`
+  - If your application requires client_id for client authentication, you can get `clientId` as below
+    - `val clientId = authInfo.clientId.getOrElse(throw new InvalidClient())`
 - scope
   - inform the client of the scope of the access token issued
 - redirectUri
