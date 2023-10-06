@@ -24,5 +24,5 @@ jobs:
       - name: Coursier cache
         uses: coursier/cache-action@v5
       - name: Build and test
-        run: sbt scalafmtSbtCheck scalafmtCheck test:scalafmtCheck +test
+        run: sbt scalafmtSbtCheck scalafmtCheckAll +test
       - run: rm -rf "$HOME/.ivy2/local" || true
