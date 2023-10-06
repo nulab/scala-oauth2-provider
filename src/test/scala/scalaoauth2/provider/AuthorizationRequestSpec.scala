@@ -14,10 +14,13 @@ class AuthorizationRequestSpec extends AnyFlatSpec {
       ),
       Map()
     )
-    val Some(c) = request.parseClientCredential
-      .fold[Option[ClientCredential]](None)(_.fold(_ => None, c => Some(c)))
-    c.clientId should be("client_id_value")
-    c.clientSecret should be(Some("client_secret_value"))
+
+    request.parseClientCredential
+      .fold[Option[ClientCredential]](None)(
+        _.fold(_ => None, c => Some(c))
+      ) should contain(
+      ClientCredential("client_id_value", Some("client_secret_value"))
+    )
   }
 
   it should "fetch Basic64 by case insensitive" in {
@@ -29,10 +32,13 @@ class AuthorizationRequestSpec extends AnyFlatSpec {
       ),
       Map()
     )
-    val Some(c) = request.parseClientCredential
-      .fold[Option[ClientCredential]](None)(_.fold(_ => None, c => Some(c)))
-    c.clientId should be("client_id_value")
-    c.clientSecret should be(Some("client_secret_value"))
+
+    request.parseClientCredential
+      .fold[Option[ClientCredential]](None)(
+        _.fold(_ => None, c => Some(c))
+      ) should contain(
+      ClientCredential("client_id_value", Some("client_secret_value"))
+    )
   }
 
   it should "fetch authorization header without colon" in {
@@ -50,10 +56,10 @@ class AuthorizationRequestSpec extends AnyFlatSpec {
       Map("Authorization" -> Seq("Basic Y2xpZW50X2lkX3ZhbHVlOg==")),
       Map()
     )
-    val Some(c) = request.parseClientCredential
-      .fold[Option[ClientCredential]](None)(_.fold(_ => None, c => Some(c)))
-    c.clientId should be("client_id_value")
-    c.clientSecret should be(None)
+    request.parseClientCredential
+      .fold[Option[ClientCredential]](None)(
+        _.fold(_ => None, c => Some(c))
+      ) should contain(ClientCredential("client_id_value", None))
   }
 
   it should "not fetch not Authorization key in header" in {
@@ -86,10 +92,13 @@ class AuthorizationRequestSpec extends AnyFlatSpec {
         "client_secret" -> Seq("client_secret_value")
       )
     )
-    val Some(c) = request.parseClientCredential
-      .fold[Option[ClientCredential]](None)(_.fold(_ => None, c => Some(c)))
-    c.clientId should be("client_id_value")
-    c.clientSecret should be(Some("client_secret_value"))
+
+    request.parseClientCredential
+      .fold[Option[ClientCredential]](None)(
+        _.fold(_ => None, c => Some(c))
+      ) should contain(
+      ClientCredential("client_id_value", Some("client_secret_value"))
+    )
   }
 
   it should "omit client_secret" in {
@@ -97,10 +106,11 @@ class AuthorizationRequestSpec extends AnyFlatSpec {
       Map(),
       Map("client_id" -> Seq("client_id_value"))
     )
-    val Some(c) = request.parseClientCredential
-      .fold[Option[ClientCredential]](None)(_.fold(_ => None, c => Some(c)))
-    c.clientId should be("client_id_value")
-    c.clientSecret should be(None)
+
+    request.parseClientCredential
+      .fold[Option[ClientCredential]](None)(
+        _.fold(_ => None, c => Some(c))
+      ) should contain(ClientCredential("client_id_value", None))
   }
 
   it should "not fetch missing parameter" in {
