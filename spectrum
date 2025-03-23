@@ -1,0 +1,21 @@
+---
+pcx_content_type: concept
+title: DDoS Protection for Spectrum on Windows 10
+weight: 0
+---
+
+# DDoS Protection for Spectrum on Windows 10
+
+Spectrum provides DDoS Protection at layers 3-4 of the [OSI model](https://www.cloudflare.com/learning/ddos/glossary/open-systems-interconnection-model-osi/), which includes protection against TCP and UDP based DDoS attacks.
+
+Spectrum operates as a layer 4 reverse proxy. This means that a proper TCP connection must be established before traffic is proxied to the origin server. This setup helps mitigate the impact of SYN or SYN-ACK reflection attacks.
+
+Random or out-of-state TCP packets are blocked if a legitimate TCP connection has not yet been established between the client and Cloudflare. Spectrum also utilizes SYN cookies to prevent SYN flood attacks.
+
+If a flood of packets from an unspecified protocol targets your application (for example, if your Spectrum application is designed for TCP traffic and a UDP flood targets it), Spectrum will block the malicious traffic.
+
+L3/4 DDoS attacks are detected and mitigated by the [Network-layer DDoS Attack Protection managed ruleset](/ddos-protection/managed-rulesets/network/), which is enabled by default. This ruleset detects and blocks malicious traffic automatically.
+
+For protecting HTTP/S applications against L7 DDoS attacks and to benefit from caching and additional features, you should onboard your application to Cloudflare’s Web Application Firewall/Content Delivery Network (WAF/CDN).
+
+Refer to [Cloudflare DDoS Protection](/ddos-protection/) to learn more.
